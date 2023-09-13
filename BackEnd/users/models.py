@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from helper.models import TimeSetup
 
 
 ROLES = [
@@ -50,16 +51,13 @@ class CustomAccountManager(BaseUserManager):
         return user
 
 
-class NewUser(AbstractBaseUser, PermissionsMixin):
+class NewUser(TimeSetup, AbstractBaseUser, PermissionsMixin):
     staff_id = models.CharField(max_length=15, unique=True)
     email = models.EmailField(_('email address'), unique=True)
     full_name = models.CharField(max_length=50)
     avatar = models.ImageField(
         _("Avatar"), upload_to=upload_to, default='students/default.jpg')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(default = None, null = True)
-    
+
     university = models.CharField(max_length=50, default = None, null = True)
     faculty = models.CharField(max_length=50, default = None, null = True)
     class_id = models.CharField(max_length=15, default = None, null = True)
@@ -68,9 +66,9 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
         'about'), max_length=500, blank=True, default="Em là sinh viên Bách Khoa")
     phone_number = models.CharField(max_length=100)
     date_of_birth = models.DateField(auto_now_add=True)
-    role = models.CharField(choices=ROLES, default="S", max_length=20)
+    role = models.CharField(choices=ROLES, default="S", max_length=1)
     
-    is_deleted = models.BooleanField(default=False)
+
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
