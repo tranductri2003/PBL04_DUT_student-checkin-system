@@ -11,17 +11,19 @@ ROLES = [
 
 
 def upload_to(instance, filename):
-    # Xác định thư mục con dựa trên vai trò của người dùng
-    if isinstance(instance, Student):
+    # Kiểm tra vai trò của người dùng và xác định thư mục con
+    if instance.role == "S":
         folder = 'students'
-    else:
+    elif instance.role == "T":
         folder = 'teachers'
-    
+    else:
+        folder = 'admin'
+
     return f'{folder}/{filename}'
 
 
 class CustomAccountManager(BaseUserManager):
-    def create_superuser(self, identity_id, full_name, password, **extra_fields):
+    def create_superuser(self, staff_id, email, full_name, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
@@ -30,27 +32,36 @@ class CustomAccountManager(BaseUserManager):
             raise ValueError('Superuser must be assigned to is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must be assigned to is_superuser=True.')
+        if email is None:
+            raise ValueError('The Email field must be set')  # Kiểm tra email
 
-        # Không cần truyền giá trị email ở đây
-        return self.create_user(identity_id=identity_id, full_name=full_name, password=password, **extra_fields)
+        return self.create_user(staff_id, email, full_name, password, **extra_fields)
 
-    def create_user(self, identity_id, full_name, password, **extra_fields):
-        email = extra_fields.pop('email', None)  # Lấy giá trị email nếu có, nếu không thì là None
+
+    def create_user(self, staff_id, email, full_name, password, **other_fields):
+
+        if not email:
+            raise ValueError(_('You must provide an email address'))
+
         email = self.normalize_email(email)
-        user = self.model(email=email, identity_id=identity_id, full_name=full_name, **extra_fields)
+        user = self.model(staff_id=staff_id, email=email, full_name=full_name, **other_fields)
         user.set_password(password)
-        user.save(using=self._db)
+        user.save()
         return user
 
 
 class NewUser(AbstractBaseUser, PermissionsMixin):
-    identity_id = models.CharField(max_length=15, unique=True)
+    staff_id = models.CharField(max_length=15, unique=True)
     email = models.EmailField(_('email address'), unique=True)
     full_name = models.CharField(max_length=50)
     avatar = models.ImageField(
         _("Avatar"), upload_to=upload_to, default='students/default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    university = models.CharField(max_length=50, default = None, null = True)
+    faculty = models.CharField(max_length=50, default = None, null = True)
+    class_id = models.CharField(max_length=15, default = None, null = True)
 
     about = models.TextField(_(
         'about'), max_length=500, blank=True, default="Em là sinh viên Bách Khoa")
@@ -62,21 +73,11 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'identity_id'
-    REQUIRED_FIELDS = ['full_name']
+    USERNAME_FIELD = 'staff_id'
+    REQUIRED_FIELDS = ['full_name', 'email']
     
     objects = CustomAccountManager()
 
     def __str__(self):
         return self.full_name
 
-
-class Student(NewUser):
-    class_id = models.CharField(max_length=15)
-    faculty = models.CharField(max_length=50)
-    
-class Teacher(NewUser):
-    faculty = models.CharField(max_length=50)
-
-class Admin(NewUser):
-    pass
