@@ -58,7 +58,8 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
         _("Avatar"), upload_to=upload_to, default='students/default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    deleted_at = models.DateTimeField(default = None, null = True)
+    
     university = models.CharField(max_length=50, default = None, null = True)
     faculty = models.CharField(max_length=50, default = None, null = True)
     class_id = models.CharField(max_length=15, default = None, null = True)
@@ -73,6 +74,7 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
+    
     USERNAME_FIELD = 'staff_id'
     REQUIRED_FIELDS = ['full_name', 'email']
     
