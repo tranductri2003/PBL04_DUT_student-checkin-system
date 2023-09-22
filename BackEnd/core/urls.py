@@ -23,8 +23,43 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="PBL04_DUT_Student-CheckIn-System",
+        default_version='v1',
+        description="API documentation for PBL04_DUT_Student-CheckIn-System",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="tranductri2003@gmail.com",),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
 urlpatterns = [
     # Admin page URLs
     path('admin/', admin.site.urls),
- 
+    
+    # Authentication Management
+    path('api/auth/', include('authentication.urls', namespace='authentication')),
+    
+    # User Management
+    path('api/user/', include('users.urls', namespace='users')),
+    
+    # Course Management
+    path('api/course/', include('courses.urls', namespace='courses')),
+    
+    # Attendances Management
+    path('api/attendance/', include('attendances.urls', namespace='attendances')),
+    
+    #Swagger API documentation
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0),
+         name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger',
+                                         cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc',
+                                       cache_timeout=0), name='schema-redoc'),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
