@@ -1,3 +1,42 @@
-from django.shortcuts import render
+# courses/views.py
 
-# Create your views here.
+from rest_framework import generics, permissions
+from .models import Courses
+from .serializers import CoursesSerializer
+
+
+class CoursesListView(generics.ListAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+    queryset = Courses.objects.all()
+
+class CoursesDetailView(generics.RetrieveAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+    queryset = Courses.objects.all()
+
+class CoursesCreateView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+
+class CoursesUpdateView(generics.UpdateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+    queryset = Courses.objects.all()
+
+class CoursesDeleteView(generics.DestroyAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+    queryset = Courses.objects.all()
+
+class TeacherCoursesListView(generics.ListAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+
+    def get_queryset(self):
+        # Lấy teacher_id từ URL parameter
+        teacher_id = self.kwargs['teacher_id']
+
+        # Truy vấn danh sách các khóa học của giáo viên có teacher_id tương ứng
+        query_set = Courses.objects.filter(teacher_id=teacher_id)
+        return query_set
