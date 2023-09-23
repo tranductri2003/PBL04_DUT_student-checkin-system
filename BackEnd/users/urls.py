@@ -16,10 +16,7 @@ urlpatterns = [
     # path('<str:staff_id>/', views.UserDetailView.as_view(), name='user-detail'),
 
     # # Tạo, Chỉnh sửa và Xóa người dùng
-    # path('create/', views.UserCreateView.as_view(), name='user-create'),
+    path('create/', views.UserCreateView.as_view(), name='user-create'),
     # path('edit/<str:staff_id>/', views.UserUpdateView.as_view(), name='user-update'),
     # path('delete/<str:staff_id>/', views.UserDeleteView.as_view(), name='user-delete'),
-
-    # # Trang cá nhân của người dùng
-    # path('profile/', views.ProfileView.as_view(), name='profile'),
 ]
