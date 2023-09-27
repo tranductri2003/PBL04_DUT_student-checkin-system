@@ -1,10 +1,12 @@
 from django.urls import path
 from .views import (
-    CoursesListView,
-    CoursesDetailView,
-    CoursesCreateView,
-    CoursesUpdateView,
-    CoursesDeleteView,
+    # CoursesListView,
+    # CoursesDetailView,
+    # CoursesCreateView,
+    # CoursesUpdateView,
+    # CoursesDeleteView,
+    CoursesListCreateView,
+    CoursesRetrieveUpdateDeleteView,
     TeacherCoursesListView,
     StudentCoursesListView,
     CourseStudentListView,
@@ -16,19 +18,19 @@ app_name = 'courses'
 
 urlpatterns = [
     # Xem danh sách tất cả khóa học
-    path('', CoursesListView.as_view(), name='courses-list'),
+    path('', CoursesListCreateView.as_view(), name='courses-list-create'),
 
     # Xem chi tiết khóa học theo course_id
-    path('<str:course_id>/', CoursesDetailView.as_view(), name='courses-detail'),
+    path('<str:course_id>/', CoursesRetrieveUpdateDeleteView.as_view(), name='courses-retrieve-update-delete'),
 
     # Tạo khóa học mới
-    path('create/', CoursesCreateView.as_view(), name='courses-create'),
+    # path('create/', CoursesCreateView.as_view(), name='courses-create'),
 
-    # Chỉnh sửa thông tin khóa học theo course_id
-    path('edit/<str:course_id>/', CoursesUpdateView.as_view(), name='courses-update'),
+    # # Chỉnh sửa thông tin khóa học theo course_id
+    # path('edit/<str:course_id>/', CoursesUpdateView.as_view(), name='courses-update'),
 
-    # Xóa khóa học theo course_id
-    path('delete/<str:course_id>/', CoursesDeleteView.as_view(), name='courses-delete'),
+    # # Xóa khóa học theo course_id
+    # path('delete/<str:course_id>/', CoursesDeleteView.as_view(), name='courses-delete'),
 
     # Xem danh sách khóa học của một giáo viên
     path('teacher/<str:teacher_id>/', TeacherCoursesListView.as_view(), name='teacher-courses-list'),

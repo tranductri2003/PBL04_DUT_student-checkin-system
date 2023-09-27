@@ -5,12 +5,12 @@ from .models import Courses, StudentCourse
 from .serializers import CourseSerializer, StudentCourseSerializer
 from users.serializers import UserSerializer
 
-class CoursesListView(generics.ListAPIView):
+class CoursesListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = CourseSerializer
     queryset = Courses.objects.all()
 
-class CoursesDetailView(generics.RetrieveAPIView):
+class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDeleteAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = CourseSerializer
     lookup_field = "course_id"
@@ -19,19 +19,19 @@ class CoursesDetailView(generics.RetrieveAPIView):
         course_id = self.kwargs['course_id']
         return Courses.objects.filter(course_id=course_id)
 
-class CoursesCreateView(generics.CreateAPIView):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = CourseSerializer
+# class CoursesCreateView(generics.CreateAPIView):
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = CourseSerializer
 
-class CoursesUpdateView(generics.UpdateAPIView):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = CourseSerializer
-    queryset = Courses.objects.all()
+# class CoursesUpdateView(generics.UpdateAPIView):
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = CourseSerializer
+#     queryset = Courses.objects.all()
 
-class CoursesDeleteView(generics.DestroyAPIView):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = CourseSerializer
-    queryset = Courses.objects.all()
+# class CoursesDeleteView(generics.DestroyAPIView):
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = CourseSerializer
+#     queryset = Courses.objects.all()
 
 class TeacherCoursesListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
