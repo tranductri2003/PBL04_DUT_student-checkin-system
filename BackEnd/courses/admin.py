@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Courses
+from .models import Courses, StudentCourse
 
 @admin.register(Courses)
 class CoursesAdmin(admin.ModelAdmin):
@@ -18,3 +18,11 @@ class CoursesAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Ngăn người dùng xóa bất kỳ mục nào
         return False
+
+class StudentCourseAdmin(admin.ModelAdmin):
+    list_display = ('student', 'course')
+    list_filter = ('course',)
+    search_fields = ('student__full_name', 'course__course_name')
+    list_per_page = 20
+
+admin.site.register(StudentCourse, StudentCourseAdmin)
