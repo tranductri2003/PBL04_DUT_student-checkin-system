@@ -17,6 +17,14 @@ class UserListView(generics.ListAPIView):
     filterset_fields = ['role']
 
 
+class UserDetailView(generics.RetrieveAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
+    lookup_field = "staff_id"
+
+    def get_queryset(self):
+        staff_id = self.kwargs['staff_id']
+        return NewUser.objects.filter(staff_id=staff_id)
 
 class StudentListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
