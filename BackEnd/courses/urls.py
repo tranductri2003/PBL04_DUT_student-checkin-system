@@ -6,6 +6,7 @@ from .views import (
     CoursesUpdateView,
     CoursesDeleteView,
     TeacherCoursesListView,
+    StudentCoursesListView,
 )
 
 app_name = 'courses'
@@ -27,5 +28,8 @@ urlpatterns = [
     path('delete/<str:course_id>/', CoursesDeleteView.as_view(), name='courses-delete'),
 
     # Xem danh sách khóa học của một giáo viên
-    path('teacher/<int:teacher_id>/', TeacherCoursesListView.as_view(), name='teacher-courses-list'),
+    path('teacher/<str:teacher_id>/', TeacherCoursesListView.as_view(), name='teacher-courses-list'),
+    
+    # Xem danh sách khóa học của một sinh viên
+    path('student/<str:student_id>/', StudentCoursesListView.as_view(), name='student-courses-list'),
 ]
