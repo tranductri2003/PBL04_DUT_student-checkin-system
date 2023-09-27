@@ -1,8 +1,7 @@
 # courses/views.py
 
 from rest_framework import generics, permissions
-from .models import Courses
-from enrollments.models import StudentCourse
+from .models import Courses, StudentCourse
 from .serializers import CoursesSerializer
 
 

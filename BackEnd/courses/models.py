@@ -32,3 +32,10 @@ class Courses(TimeSetup, models.Model):
         return self.end_time - self.start_time
     def __str__(self):
         return self.course_name
+
+class StudentCourse(models.Model):
+    student = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    course = models.ForeignKey(Courses, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.course.course_name}"
