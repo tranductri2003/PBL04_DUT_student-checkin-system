@@ -2,6 +2,7 @@
 
 from rest_framework import generics, permissions
 from .models import Courses
+from enrollments.models import StudentCourse
 from .serializers import CoursesSerializer
 
 
@@ -44,3 +45,16 @@ class TeacherCoursesListView(generics.ListAPIView):
         # Truy vấn danh sách các khóa học của giáo viên có teacher_id tương ứng
         query_set = Courses.objects.filter(teacher_id=teacher_id)
         return query_set
+    
+class StudentCoursesListView(generics.ListAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CoursesSerializer
+    
+    def get_queryset(self):
+        # Lấy student_id từ URL parameter
+        student_id = self.kwargs['student_id']
+        
+        # Truy vấn danh sách các khóa học của sinh viên có student_id tương ứng
+        query_set = StudentCourse.objects.filter(student__staff_id=student_id)
+        return query_set
+        
