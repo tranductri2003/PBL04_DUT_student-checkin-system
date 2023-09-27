@@ -13,7 +13,11 @@ class CoursesListView(generics.ListAPIView):
 class CoursesDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = CoursesSerializer
-    queryset = Courses.objects.all()
+    lookup_field = "course_id"
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        return Courses.objects.filter(course_id=course_id)
 
 class CoursesCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]

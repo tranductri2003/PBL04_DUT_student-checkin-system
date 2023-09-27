@@ -13,7 +13,7 @@ urlpatterns = [
     path('admin/', views.AdminListView.as_view(), name='admin-list'),
 
     # # Xem chi tiết người dùng
-    # path('<str:staff_id>/', views.UserDetailView.as_view(), name='user-detail'),
+    path('<str:staff_id>/', views.UserDetailView.as_view(), name='user-detail'),
 
     # # Tạo, Chỉnh sửa và Xóa người dùng
     path('create/', views.UserCreateView.as_view(), name='user-create'),
