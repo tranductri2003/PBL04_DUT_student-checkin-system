@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import  generics, permissions,filters
 from attendances.models import Attendances
-from attendances.serializers import AttendanceSerializer, AttendanceUpdateSerializer, AttendanceDeleteSerializer
+from attendances.serializers import AttendanceSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response    
 from rest_framework import status
