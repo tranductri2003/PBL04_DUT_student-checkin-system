@@ -19,7 +19,7 @@ class UserListCreateView(generics.ListCreateAPIView):
 
 
 
-class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDeleteAPIView):
+class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
     lookup_field = "staff_id"

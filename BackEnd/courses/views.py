@@ -17,7 +17,7 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     ordering_fields = ['course_id']
 
 
-class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDeleteAPIView):
+class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = CourseSerializer
     lookup_field = "course_id"
