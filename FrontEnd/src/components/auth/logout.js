@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import axiosInstance from '../../axios';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Sử dụng useNavigate thay thế useHistory
 import { notification } from 'antd';
 export default function SignUp() {
-    const history = useHistory();
+    const navigate = useNavigate(); // Sử dụng useNavigate thay thế useHistory
 
     useEffect(() => {
         axiosInstance.post('auth/logout/blacklist/', {
@@ -11,7 +11,7 @@ export default function SignUp() {
         });
         localStorage.clear();
         axiosInstance.defaults.headers['Authorization'] = null;
-        history.push('/login');
+        navigate('/login'); // Sử dụng navigate để điều hướng thay vì history.push
         // Kích hoạt tái render cho thành phần Header sau khi đăng xuất thành công
         window.dispatchEvent(new Event('storage'));
         notification.success({
