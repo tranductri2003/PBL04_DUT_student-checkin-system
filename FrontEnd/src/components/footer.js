@@ -9,23 +9,23 @@ const footers = [
     {
         title: "About Us",
         description: [
-            { label: "Facebook", url: "https://example.com/source-code" },
-            { label: "Google", url: "https://example.com/source-code" },
-            { label: "Zalo", url: "https://example.com/source-code" },
+            { label: "Trí", url: "https://www.facebook.com/tranductri2003/" },
+            { label: "Phát", url: "https://www.facebook.com/phamnguyenanhphat" },
+            { label: "Tuấn", url: "https://www.facebook.com/profile.php?id=100011751662203" },
         ],
     },
     {
         title: "Referrences",
         description: [
-            { label: "Github", url: "https://www.facebook.com/tranductri2003/" },
-            { label: "Trello", url: "https://www.linkedin.com/in/duc-tri-tran-464343218/" },
-            { label: "Figma", url: "https://codeforces.com/profile/tranductri2003" },
+            { label: "Github", url: "https://github.com/tranductri2003/PBL04_DUT_Student-CheckIn-System" },
+            { label: "Trello", url: "https://trello.com/w/pbl4lptrinhmngvahdiuhanh" },
+            { label: "Figma", url: "https://www.figma.com/file/CtL8hnZPnWto9GFTMcaNLh/Untitled?type=design&node-id=2-27&mode=design&t=x5h9Ak2PvziuXua3-0" },
         ],
     },
     {
         title: "Contact",
         description: [
-            { label: "Address", url: "https://www.facebook.com/tranductri2003/" },
+            { label: "Facebook", url: "https://www.facebook.com/tranductri2003/" },
             { label: "LinkedIn", url: "https://www.linkedin.com/in/duc-tri-tran-464343218/" },
         ],
     },

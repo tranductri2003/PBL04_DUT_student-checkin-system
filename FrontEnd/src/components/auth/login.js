@@ -130,10 +130,10 @@ export default function SignIn() {
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
+                        id="staff_id"
+                        label="Staff Id"
+                        name="staff_id"
+                        autoComplete="Staff Id"
                         autoFocus
                         onChange={handleChange}
                     />

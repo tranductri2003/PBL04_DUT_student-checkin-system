@@ -117,7 +117,7 @@ function Header() {
                             component={NavLink}
                             to="/"
                         >
-                            Lịch học hôm nay
+                            Lịch hôm nay
                         </Typography>
                     </div>
                     <div className={classes.toolbarTitle}>
