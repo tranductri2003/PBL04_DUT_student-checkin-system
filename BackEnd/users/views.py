@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import  filters, generics, permissions
 from users.models import NewUser
-from users.serializers import UserSerializer, StudentSerializer, TeacherSerializer, AdminSerializer, UserCreateSerializer,UserUpdateSerializer,UserDeleteSerializer
+from users.serializers import UserSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response    
 from rest_framework import status
