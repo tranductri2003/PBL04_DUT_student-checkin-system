@@ -63,30 +63,25 @@ export default function SignIn() {
             })
             .then((res) => {
                 console.log(res.data);
-                localStorage.setItem('staff_id', res.data.user.staff_id);
                 localStorage.setItem('email', res.data.user.email);
                 localStorage.setItem('full_name', res.data.user.full_name);
-                localStorage.setItem('avatar', res.data.user.avatar);
                 localStorage.setItem('university', res.data.user.university);
                 localStorage.setItem('faculty', res.data.user.faculty);
                 localStorage.setItem('class_id', res.data.user.class_id);
                 localStorage.setItem('about', res.data.user.about);
                 localStorage.setItem('phone_number', res.data.user.phone_number);
                 localStorage.setItem('date_of_birth', res.data.user.date_of_birth);
-                localStorage.setItem('role', res.data.user.role);
 
                 localStorage.setItem('access_token', res.data.access);
                 localStorage.setItem('refresh_token', res.data.refresh);
                 axiosInstance.defaults.headers['Authorization'] =
                     'JWT ' + localStorage.getItem('access_token');
                 navigate('/');
-                //console.log(res);
-                //console.log(res.data);
                 // Kích hoạt tái render cho thành phần Header sau khi đăng nhập thành công
                 window.dispatchEvent(new Event('storage'));
                 notification.success({
                     message: 'Sign in successfully',
-                    description: `Welcome ${res.data.user.user_name}!!!`,
+                    description: `Welcome ${res.data.user.full_name}!!!`,
                     placement: 'topRight'
                 })
             })
