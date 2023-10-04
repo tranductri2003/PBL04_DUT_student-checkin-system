@@ -1,8 +1,10 @@
 from django.urls import path
+
 from .views import (
     CoursesListCreateView,
     CoursesRetrieveUpdateDeleteView,
-    StudentCoursesListView,
+    StaffCoursesListView,
+    StaffCoursesOnDayListView,
     CourseStudentListView,
     StudentEnrollView,
     StudentDeleteView,
@@ -18,7 +20,10 @@ urlpatterns = [
     path('<str:course_id>/', CoursesRetrieveUpdateDeleteView.as_view(), name='courses-retrieve-update-delete'),
 
     # Xem danh sách lớp học phần của một sinh viên
-    path('list-course/<str:student_id>/', StudentCoursesListView.as_view(), name='student-courses-list'),
+    path('list-all-course/<str:staff_id>/', StaffCoursesListView.as_view(), name='student-courses-list'),
+    
+    # Xem danh sách lớp học phần của một sinh viên
+    path('list-course-on-day/<str:staff_id>/', StaffCoursesOnDayListView.as_view(), name='student-courses-on-day-list'),
     
     # Xem danh sách sinh viên của một lớp học phần
     path('list-student/<str:course_id>/', CourseStudentListView.as_view(), name='course-student-list'),

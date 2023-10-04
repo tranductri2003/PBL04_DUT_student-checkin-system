@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db import models
 from django.forms import TextInput, Textarea, CharField
+
 from users.models import NewUser
 
 class UserAdminConfig(UserAdmin):

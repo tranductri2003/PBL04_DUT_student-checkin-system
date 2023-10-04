@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response    
 from rest_framework import status
 
-
+from helper.models import CustomPageNumberPagination
 
 # Create your views here.
 class UserListCreateView(generics.ListCreateAPIView):
@@ -16,7 +16,7 @@ class UserListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['staff_id', 'university', 'faculty', 'class_id']
     ordering_fields = ['staff_id']
-
+    pagination_class = CustomPageNumberPagination
 
 
 class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):

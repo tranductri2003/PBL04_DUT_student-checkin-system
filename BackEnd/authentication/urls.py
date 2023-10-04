@@ -1,6 +1,7 @@
-from .views import CustomTokenObtainPairView, BlacklistTokenUpdateView
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
+
+from .views import CustomTokenObtainPairView, BlacklistTokenUpdateView
 
 app_name = 'authentication'
 

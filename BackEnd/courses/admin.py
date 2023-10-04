@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Courses, StudentCourse
+
+from .models import Courses, UserCourse
 
 @admin.register(Courses)
 class CoursesAdmin(admin.ModelAdmin):
@@ -19,10 +20,10 @@ class CoursesAdmin(admin.ModelAdmin):
         # Ngăn người dùng xóa bất kỳ mục nào
         return False
 
-class StudentCourseAdmin(admin.ModelAdmin):
-    list_display = ('student', 'course')
+class UserCourseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course')
     list_filter = ('course',)
-    search_fields = ('student__full_name', 'course__course_name')
+    search_fields = ('user__full_name', 'course__course_name')
     list_per_page = 20
 
-admin.site.register(StudentCourse, StudentCourseAdmin)
+admin.site.register(UserCourse, UserCourseAdmin)
