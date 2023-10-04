@@ -126,16 +126,8 @@ function Header() {
                             color="textPrimary"
                             noWrap
                             className={classes.logo}
-                        >
-                            Thời khóa biểu
-                        </Typography>
-                    </div>
-                    <div className={classes.toolbarTitle}>
-                        <Typography
-                            variant="h6"
-                            color="textPrimary"
-                            noWrap
-                            className={classes.logo}
+                            component={NavLink}
+                            to="/attendance"
                         >
                             Lịch sử điểm danh
                         </Typography>

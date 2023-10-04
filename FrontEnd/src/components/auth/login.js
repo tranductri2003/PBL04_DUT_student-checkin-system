@@ -54,7 +54,6 @@ export default function SignIn() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
 
         axiosInstance
             .post(`auth/login/`, {
@@ -62,7 +61,6 @@ export default function SignIn() {
                 password: formData.password,
             })
             .then((res) => {
-                console.log(res.data);
                 localStorage.setItem('email', res.data.user.email);
                 localStorage.setItem('full_name', res.data.user.full_name);
                 localStorage.setItem('university', res.data.user.university);
