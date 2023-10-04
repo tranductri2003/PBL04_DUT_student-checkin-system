@@ -2,17 +2,18 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
 from users.models import NewUser
 from helper.models import TimeSetup
 
 DAY_CHOICES = [
-    (2, _('Monday')),
-    (3, _('Tuesday')),
-    (4, _('Wednesday')),
-    (5, _('Thursday')),
-    (6, _('Friday')),
-    (7, _('Saturday')),
-    (8, _('Sunday')),
+    (0, _('Monday')),
+    (1, _('Tuesday')),
+    (2, _('Wednesday')),
+    (3, _('Thursday')),
+    (4, _('Friday')),
+    (5, _('Saturday')),
+    (6, _('Sunday')),
 ]
 # Create your models here.
 class Courses(TimeSetup, models.Model):
@@ -33,8 +34,8 @@ class Courses(TimeSetup, models.Model):
     def __str__(self):
         return self.course_name
 
-class StudentCourse(models.Model):
-    student = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+class UserCourse(models.Model):
+    user = models.ForeignKey(NewUser, on_delete=models.CASCADE, default=None)
     course = models.ForeignKey(Courses, on_delete=models.CASCADE)
 
     def __str__(self):

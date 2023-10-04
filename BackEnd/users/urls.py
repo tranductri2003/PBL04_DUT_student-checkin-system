@@ -1,10 +1,12 @@
 # urls.py
 
 from django.urls import path
+
 from .views import (
     UserListCreateView,
     UserRetriveUpdateDeleteView,
 )
+
 app_name = 'users'
 
 urlpatterns = [

@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from users.models import NewUser
 from django.conf import settings
 
+from users.models import NewUser
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

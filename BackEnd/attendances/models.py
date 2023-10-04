@@ -2,10 +2,11 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from datetime import datetime
+
 from users.models import NewUser
 from courses.models import Courses
 from helper.models import TimeSetup
-from datetime import datetime
 # Create your models here.
 
 

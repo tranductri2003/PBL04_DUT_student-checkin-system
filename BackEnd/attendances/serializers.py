@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Attendances
 from django.conf import settings
 
+from .models import Attendances
 
 class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:

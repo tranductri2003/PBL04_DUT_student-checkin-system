@@ -1,15 +1,14 @@
-# courses/serializers.py
-
 from rest_framework import serializers
-from .models import Courses, StudentCourse
+
+from .models import Courses, UserCourse
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Courses
         fields = '__all__'
 
-class StudentCourseSerializer(serializers.ModelSerializer):
+class UserCourseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = StudentCourse
+        model = UserCourse
         fields = '__all__'
         
