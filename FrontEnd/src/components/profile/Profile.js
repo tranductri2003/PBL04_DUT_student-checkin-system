@@ -4,6 +4,7 @@ import axiosInstance from '../../axios';
 // reactstrap components
 import { Button, Card, Container, Row, Col } from "reactstrap";
 import { notification } from 'antd';
+import jwt_decode from "jwt-decode";
 
 
 class Profile extends React.Component {
@@ -119,9 +120,18 @@ class Profile extends React.Component {
     render() {
         // Destructure userInfo from props and provide a default value to prevent errors
         const { userInfo } = this.props;
+        // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
+        const token = "your_jwt_token_here"; // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
+
+        // Giải mã token
+        const decodedToken = jwt_decode(token);
+
+        // Lấy staff_id từ payload của token
+        const staffId = decodedToken.staff_id;
+
+        // Bây giờ bạn có thể sử dụng biến staffId
         const isAuthorProfile = () => {
-            const
-            return localStorage.getItem('user_name') === userInfo.user_name;
+            return staffId === userInfo.user_name;
         };
         return (
             <>
@@ -165,14 +175,6 @@ class Profile extends React.Component {
 
                                                 {isAuthorProfile() && (
                                                     <>
-                                                        <Button
-                                                            className="mr-4"
-                                                            color="info"
-                                                            href={`/profile/${userInfo.user_name}/post/create`}
-                                                            size="sm"
-                                                        >
-                                                            Add New Post
-                                                        </Button>
                                                         <Button
                                                             className="float-right"
                                                             color="default"

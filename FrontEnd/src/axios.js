@@ -53,7 +53,7 @@ axiosInstance.interceptors.response.use(
 
                 if (tokenParts.exp > now) {
                     return axiosInstance
-                        .post('/token/refresh/', {
+                        .post('/auth/refresh/', {
                             refresh: refreshToken,
                         })
                         .then((response) => {

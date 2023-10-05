@@ -36,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function PostLoading(Component) {
+function DataLoading(Component) {
     const classes = useStyles();
 
-    return function PostLoadingComponent({ isLoading, ...props }) {
+    return function DataLoadingComponent({ isLoading, ...props }) {
         if (!isLoading) return <Component {...props} />;
 
         return (
@@ -65,4 +65,4 @@ function PostLoading(Component) {
     };
 }
 
-export default PostLoading;
+export default DataLoading;

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'django_filters',
+    'chat',
     # 'django.contrib.sites', # new
 
     'users',
@@ -60,6 +61,15 @@ INSTALLED_APPS = [
     'attendances',
     'authentication',
 ]
+
+ASGI_APPLICATION = 'chat.asgi.application' 
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+CHANNELS_WS_KEEPALIVE_INTERVAL = 30  # Thời gian timeout tính bằng giây, tùy chỉnh theo ý muốn
 
 
 MIDDLEWARE = [
@@ -182,7 +192,7 @@ SWAGGER_SETTINGS = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,

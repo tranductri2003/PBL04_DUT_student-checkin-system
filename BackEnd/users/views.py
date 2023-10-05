@@ -14,7 +14,7 @@ class UserListCreateView(generics.ListCreateAPIView):
     serializer_class = UserSerializer
     queryset = NewUser.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['staff_id', 'university', 'faculty', 'class_id']
+    filterset_fields = ['staff_id', 'university', 'faculty', 'class_id', 'role']
     ordering_fields = ['staff_id']
     pagination_class = CustomPageNumberPagination
 
