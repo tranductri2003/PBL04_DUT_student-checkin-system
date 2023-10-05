@@ -8,7 +8,9 @@ import Header from './components/header';
 import Login from './components/auth/login';
 import Logout from './components/auth/logout';
 import UserProfile from './components/profile/userSite';
-import AttendancesLoading from './components/attendances/prepareAttendancesData';
+import Hall from './components/chat/hall';
+import ChatSite from './components/chat/ChatSite'
+import AttendancesLoading from './components/attendances/AttendanceSite';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -21,6 +23,8 @@ ReactDOM.render(
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/attendance" element={<AttendancesLoading />} />
+      <Route path="/hall/:slug" element={<ChatSite />} />
+      <Route path="/hall" element={<Hall />} />
     </Routes>
     <Footer />
   </Router >,

@@ -53,6 +53,9 @@ urlpatterns = [
     # Attendances Management
     path('api/attendance/', include('attendances.urls', namespace='attendances')),
     
+    # Attendances Management
+    path('api/chat/', include('chat.urls', namespace='chat')),
+    
     #Swagger API documentation
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0),
          name='schema-json'),

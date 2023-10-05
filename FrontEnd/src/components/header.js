@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import SearchBar from 'material-ui-search-bar';
 import Avatar from '@material-ui/core/Avatar';
 import { useNavigate } from 'react-router-dom';
+import jwt_decode from "jwt-decode";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -83,6 +84,25 @@ function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem('access_token')));
     const navigate = useNavigate();
 
+
+    // Khai báo staff_id và avatar ở ngoài phạm vi của if
+    let staff_id = "";
+    let avatar = "";
+
+    if (localStorage.getItem('access_token')) {
+        // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
+        const token = localStorage.getItem("access_token"); // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
+
+        // Giải mã token
+        const decodedToken = jwt_decode(token);
+
+        // Lấy staff_id từ payload của token
+        staff_id = decodedToken.staff_id;
+        avatar = decodedToken.avatar;
+    }
+
+
+
     useEffect(() => {
         const handleStorageChange = () => {
             setIsLoggedIn(Boolean(localStorage.getItem('access_token')));
@@ -151,12 +171,12 @@ function Header() {
                         inputClassName={classes.searchInput}
                     />
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <NavLink to={`/profile/${localStorage.getItem('user_name')}`}>
-                            <Avatar alt={localStorage.getItem('user_name')} src={`${MEDIA_URL}${localStorage.getItem('avatar')}`} />
+                        <NavLink to={`/profile/${staff_id}`}>
+                            <Avatar alt={staff_id} src={`${MEDIA_URL}${avatar}`} />
                         </NavLink>
                         <div style={{ marginLeft: '10px' }}>
                             <Typography variant="subtitle1" style={{ fontFamily: 'cursive' }}>
-                                {localStorage.getItem('user_name')}
+                                {staff_id}
                             </Typography>
                         </div>
                     </div>
