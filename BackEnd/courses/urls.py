@@ -3,8 +3,7 @@ from django.urls import path
 from .views import (
     CoursesListCreateView,
     CoursesRetrieveUpdateDeleteView,
-    StaffCoursesListView,
-    StaffCoursesOnDayListView,
+    TodayCoursesListView,
     CourseStudentListView,
     StudentEnrollView,
     StudentDeleteView,
@@ -17,20 +16,17 @@ urlpatterns = [
     path('', CoursesListCreateView.as_view(), name='courses-list-create'),
 
     # Xem chi tiết khóa học theo course_id
-    path('<str:course_id>/', CoursesRetrieveUpdateDeleteView.as_view(), name='courses-retrieve-update-delete'),
-
-    # Xem danh sách lớp học phần của một sinh viên
-    path('list-all-course/<str:staff_id>/', StaffCoursesListView.as_view(), name='student-courses-list'),
+    path('<str:course_id>', CoursesRetrieveUpdateDeleteView.as_view(), name='courses-retrieve-update-delete'),
     
     # Xem danh sách lớp học phần của một sinh viên
-    path('list-course-on-day/<str:staff_id>/', StaffCoursesOnDayListView.as_view(), name='student-courses-on-day-list'),
+    path('today/', TodayCoursesListView.as_view(), name='courses-today-list'),
     
     # Xem danh sách sinh viên của một lớp học phần
     path('list-student/<str:course_id>/', CourseStudentListView.as_view(), name='course-student-list'),
 
     # Thêm một sinh viên vào một lớp
-    path('add-student/<str:course_id>/<str:student_id>', StudentEnrollView.as_view(), name='student-enrollment-create'),
+    path('add-student/<str:course_id>/<str:student_id>/', StudentEnrollView.as_view(), name='student-enrollment-create'),
     
     # Xóa một sinh viên ra khỏi lớp
-    path('delete-student/<str:course_id>/<str:student_id>', StudentDeleteView.as_view(), name='student-enrollment-delete'),
+    path('delete-student/<str:course_id>/<str:student_id>/', StudentDeleteView.as_view(), name='student-enrollment-delete'),
 ]

@@ -22,7 +22,7 @@ class Courses(TimeSetup, models.Model):
     teacher_id = models.ForeignKey(
         NewUser, on_delete=models.CASCADE)
     num_of_student = models.IntegerField(default=0)
-    day_of_week = models.IntegerField(choices=DAY_CHOICES, default=1)
+    day_of_week = models.IntegerField(choices=DAY_CHOICES, default=0)
     start_time = models.TimeField(default=timezone.now)  # Sử dụng TimeField
     end_time = models.TimeField(default=timezone.now)
     start_date = models.DateField(default=timezone.now)  # Sử dụng TimeField

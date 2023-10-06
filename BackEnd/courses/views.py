@@ -2,6 +2,8 @@
 
 from rest_framework import generics, permissions
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.response import Response
 from django.http import Http404
 from datetime import datetime
 
@@ -19,7 +21,25 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     filterset_fields = ['course_id', 'teacher_id']
     ordering_fields = ['course_id']
     pagination_class = CustomPageNumberPagination
-
+    
+    def get_queryset(self):
+        # query_set = Courses.objects.all()
+        query_set = None
+        if self.request.user.is_authenticated:
+            recent_user = self.request.user
+            print(recent_user)
+            # Truy vấn danh sách các khóa học của người dùng có staff_id tương ứng
+            query_set = None
+            role = recent_user.role
+            if role == 'S':
+                query_set = Courses.objects.filter(course=UserCourse.objects.filter(user=recent_user).values_list('course', flat=True))
+            elif role == 'T':
+                query_set = Courses.objects.filter(teacher_id=recent_user)
+            elif role == 'A':
+                query_set = Courses.objects.all()   
+        else:
+            query_set = Courses.objects.all()
+        return query_set
 
 class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.AllowAny]
@@ -31,39 +51,7 @@ class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         return Courses.objects.filter(course_id=course_id)
 
 
-
-
-class StaffCoursesListView(generics.ListAPIView, ):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = CourseSerializer
-    ordering_fields = ['course_id']
-    pagination_class = CustomPageNumberPagination
-
-    def get_queryset(self):
-        recent_user = self.request.user
-        
-        # Truy vấn danh sách các khóa học của người dùng có staff_id tương ứng
-        query_set = None
-        if self.request.user.is_superuser:
-            # Lấy staff_id từ URL parameter
-            staff_id = self.kwargs['staff_id']
-            user = NewUser.objects.get(staff_id=staff_id)
-            role = user.role
-            if role == 'S':
-                query_set = UserCourse.objects.filter(user=user)
-            elif role == 'T':
-                query_set = Courses.objects.filter(user=user)
-            elif role == 'A':
-                query_set = Courses.objects.all()        
-        else:
-            if recent_user.role == 'S':
-                query_set = Courses.objects.filter(user=recent_user)
-            elif recent_user.role == 'T':
-                query_set = Courses.objects.filter(user=recent_user)
-                
-        return query_set
-
-class StaffCoursesOnDayListView(generics.ListAPIView):
+class TodayCoursesListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = CourseSerializer
     ordering_fields = ['course_id']
@@ -71,14 +59,20 @@ class StaffCoursesOnDayListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Lấy student_id từ URL parameter
-        staff_id = self.kwargs['staff_id']
+        # user = self.kwargs['user']
         
         # Truy vấn danh sách các khóa học của người dùng có staff_id tương ứng
         query_set = None
-        if self.request.user.role == 'S':
-            query_set = UserCourse.objects.filter(staff_id=staff_id, day_of_week=datetime.now().weekday())
-        elif self.request.user.role == 'T':
-            query_set = Courses.objects.filter(staff_id=staff_id, day_of_week=datetime.now().weekday())
+        try:
+            if self.request.user.role == 'S':
+                query_set = Courses.objects.filter(course_id__in=UserCourse.objects.filter(user=self.request.user.staff_id, day_of_week=datetime.now().weekday()).values_list('course', flat=True))
+            elif self.request.user.role == 'T':
+                query_set = Courses.objects.filter(teacher_id=self.request.user.staff_id, day_of_week=datetime.now().weekday())
+            else:
+                query_set = Courses.objects.filter(day_of_week=datetime.now().weekday())
+        except:
+            print('Cannot get user role')
+            query_set = Courses.objects.filter(day_of_week=3)
         return query_set
 
 class CourseStudentListView(generics.ListAPIView):
