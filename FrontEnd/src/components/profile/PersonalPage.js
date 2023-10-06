@@ -29,7 +29,6 @@ class Profile extends React.Component {
             private: true,
             participants: participants_string,
         };
-        console.log(requestData);
         axiosInstance.post('/chat/create/', requestData)
             .then(response => {
                 console.log('Room created:', response.data);
@@ -121,17 +120,17 @@ class Profile extends React.Component {
         // Destructure userInfo from props and provide a default value to prevent errors
         const { userInfo } = this.props;
         // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
-        const token = "your_jwt_token_here"; // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
+        const token = localStorage.getItem('access_token'); // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
 
         // Giải mã token
         const decodedToken = jwt_decode(token);
 
         // Lấy staff_id từ payload của token
-        const staffId = decodedToken.staff_id;
+        const staff_id = decodedToken.staff_id;
 
         // Bây giờ bạn có thể sử dụng biến staffId
         const isAuthorProfile = () => {
-            return staffId === userInfo.user_name;
+            return staff_id === userInfo.staff_id;
         };
         return (
             <>
@@ -178,7 +177,7 @@ class Profile extends React.Component {
                                                         <Button
                                                             className="float-right"
                                                             color="default"
-                                                            href={`/profile/${userInfo.user_name}/edit`}
+                                                            href={`/profile/${userInfo.staff_id}/edit`}
                                                             size="sm"
                                                         >
                                                             Update Profile

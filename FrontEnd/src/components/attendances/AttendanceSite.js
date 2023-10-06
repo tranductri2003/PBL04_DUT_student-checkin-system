@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-function App() {
+function AttendanceSite() {
     const classes = useStyles(); // Add this line to get the classes object
 
     const AttendanceLoading = AttendanceLoadingComponent(Attendances);
@@ -197,4 +197,4 @@ function App() {
     );
 }
 
-export default App;
+export default AttendanceSite;

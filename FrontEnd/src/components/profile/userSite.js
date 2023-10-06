@@ -1,259 +1,291 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-// import Paper from '@material-ui/core/Paper';
-// import Table from '@material-ui/core/Table';
-// import TableBody from '@material-ui/core/TableBody';
-// import TableCell from '@material-ui/core/TableCell';
-// import TableContainer from '@material-ui/core/TableContainer';
-// import TableHead from '@material-ui/core/TableHead';
-// import TableRow from '@material-ui/core/TableRow';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import EditIcon from '@material-ui/icons/Edit';
+import React, { useEffect, useState } from 'react';
+import PersonalPage from './components/profile/PersonalPage';
+import LoadingComponent from '../../DataLoading';
+import axiosInstance from '../../axios';
+import { useParams } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import { Link } from 'react-router-dom'; // Chỉ import thẻ Link duy nhất từ react-router-dom
+import { makeStyles } from '@material-ui/core/styles';
+import queryString from 'query-string';
+import { notification } from 'antd';
 
-import Avatar from '@material-ui/core/Avatar';
-import { format } from 'date-fns';
-import Profile from './Profile'; // Use the correct relative path here
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import CommentIcon from '@material-ui/icons/Comment';
-import jwt_decode from "jwt-decode";
 
 const useStyles = makeStyles((theme) => ({
-    cardMedia: {
-        paddingTop: '56.25%', // 16:9
-    },
-    link: {
-        margin: theme.spacing(1, 1.5),
-    },
-    cardHeader: {
-        backgroundColor:
-            theme.palette.type === 'light'
-                ? theme.palette.grey[200]
-                : theme.palette.grey[700],
-    },
-    postTitle: {
-        fontSize: '16px',
-        textAlign: 'left',
-    },
-    postText: {
+    paginationContainer: {
         display: 'flex',
-        justifyContent: 'left',
-        alignItems: 'baseline',
-        fontSize: '12px',
-        textAlign: 'left',
-        marginBottom: theme.spacing(2),
-    },
-    card: {
-        borderRadius: theme.spacing(2), // Góc bo tròn cho CardView
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Hiệu ứng shadow làm mềm mại CardView
-        overflow: 'hidden', // Đảm bảo nội dung không tràn ra ngoài CardView
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease', // Hiệu ứng smooth
-        '&:hover': {
-            transform: 'scale(1.05)', // Hiệu ứng zoom in khi hover
-            boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.2)', // Hiệu ứng shadow mạnh hơn khi hover
-            backgroundColor: theme.palette.grey[200], // Màu nền thay đổi khi hover
-        },
-    },
-
-    editedText: {
-        fontSize: '12px',
-        color: theme.palette.text.secondary,
-        textAlign: 'right', // Canh lề phải
-    },
-    newPostButton: {
-        position: 'fixed',
-        top: theme.spacing(20), // Cách header 20 spacing (có thể điều chỉnh tùy ý)
-        right: theme.spacing(20), // Cách lề phải 2 spacing (có thể điều chỉnh tùy ý)
-        borderRadius: '50%',
-        zIndex: 999,
-        width: '80px',
-        height: '80px',
-        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme.palette.primary.main, // Màu nền chính là màu primary của theme
-        color: theme.palette.common.white, // Màu chữ là trắng
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        '&:hover': {
-            transform: 'scale(1.1)',
-            boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.2)',
-        },
+        marginTop: theme.spacing(2),
     },
-
-    statsContainer: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        opacity: 0.7, // Điều chỉnh mức độ mờ, giá trị từ 0 đến 1
-    },
-    statsItem: {
-        display: 'flex',
-        alignItems: 'center',
-        marginRight: theme.spacing(2),
-        transition: 'opacity 0.3s ease', // Hiệu ứng mờ khi hover
-        opacity: 0.7, // Mức độ mờ ban đầu
-        '&:hover': {
-            opacity: 1, // Hiển thị thông tin rõ hơn khi hover
-        },
-        color: theme.palette.primary.main, // Đổi màu chữ cho các thông tin này
-        fontSize: '14px', // Đổi kích thước chữ cho các thông tin này
+    pageButton: {
+        margin: theme.spacing(1),
     },
 }));
 
-const UserSite = (props) => {
-    const { posts } = props;
-    const { user } = props;
-    const classes = useStyles();
 
-    if (!user) {
+function UserSite() {
+    const classes = useStyles(); // Add this line to get the classes object
+
+    const PostLoading = LoadingComponent(UserSite);
+    const [UserState, setUserState] = useState({
+        loading: true,
+        user: null,
+        courses: null,
+        next: null,
+        previous: null,
+        currentPage: 1,
+        maxPage: 1,
+        perPage: 1,
+    });
+    // Lấy các tham số từ URL của FE
+    const params = queryString.parse(window.location.search);
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentPage = parseInt(urlParams.get('page')) || 1;
+    UserState.currentPage = currentPage;
+
+
+
+    const { staff_id } = useParams();
+
+    // Gọi API để lấy thông tin người dùng
+    useEffect(() => {
+        axiosInstance.get(`user/${userName}/`)
+            .then((res) => {
+                const user = res.data;
+                setUserState((prevState) => ({ ...prevState, user }));
+            })
+            .catch((error) => {
+                console.error('Error fetching user data:', error);
+                if (error.response) {
+                    // Xử lý lỗi từ phản hồi của server (status code không thành công)
+                    console.error('An error occurred while fetching data:', error.response.data);
+                    console.error('Status code:', error.response.status);
+
+                    if (error.response.status === 400) {
+                        notification.error({
+                            message: 'Bad Request',
+                            description: 'The request sent to the server is invalid.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 401) {
+                        notification.warning({
+                            message: 'Unauthorized',
+                            description: 'You are not authorized to perform this action.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 403) {
+                        notification.warning({
+                            message: 'Forbidden',
+                            description: 'You do not have permission to access this resource.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 404) {
+                        notification.error({
+                            message: 'Not Found',
+                            description: 'The requested resource was not found on the server.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 405) {
+                        notification.error({
+                            message: 'Method Not Allowed',
+                            description: 'The requested HTTP method is not allowed for this resource.',
+                            placement: 'topRight'
+                        });
+                    } else {
+                        notification.error({
+                            message: 'Error',
+                            description: 'An error occurred while fetching data from the server.',
+                            placement: 'topRight'
+                        });
+                    }
+                } else if (error.request) {
+                    // Xử lý lỗi không có phản hồi từ server
+                    console.error('No response received from the server:', error.request);
+                    notification.error({
+                        message: 'No Response',
+                        description: 'No response received from the server.',
+                        placement: 'topRight'
+                    });
+                } else {
+                    // Xử lý lỗi khác
+                    console.error('An error occurred:', error.message);
+                    notification.error({
+                        message: 'Error',
+                        description: 'An error occurred while processing the request.',
+                        placement: 'topRight'
+                    });
+                }
+                setUserState((prevState) => ({ ...prevState, loading: false }));
+            });
+    }, [userName]);
+
+
+
+
+    // Gọi API để lấy danh sách các bài đăng của người dùng
+    useEffect(() => {
+        const queryParams = {
+            category__slug: params.category,
+            page: params.page,
+            author__user_name: userName,
+        };
+        const url = axiosInstance.getUri({
+            url: "post/",
+            params: queryParams,
+        });
+        axiosInstance.get(url)
+            .then((response) => {
+                const allPosts = response.data.results;
+                setUserState((prevState) => ({ ...prevState, loading: false, posts: allPosts, next: response.data.next, previous: response.data.previous, maxPage: response.data.count, perPage: response.data.page_size }));
+            })
+            .catch((error) => {
+                console.error('Error fetching user posts:', error);
+                if (error.response) {
+                    // Xử lý lỗi từ phản hồi của server (status code không thành công)
+                    console.error('An error occurred while fetching data:', error.response.data);
+                    console.error('Status code:', error.response.status);
+
+                    if (error.response.status === 400) {
+                        notification.error({
+                            message: 'Bad Request',
+                            description: 'The request sent to the server is invalid.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 401) {
+                        notification.warning({
+                            message: 'Unauthorized',
+                            description: 'You are not authorized to perform this action.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 403) {
+                        notification.warning({
+                            message: 'Forbidden',
+                            description: 'You do not have permission to access this resource.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 404) {
+                        notification.error({
+                            message: 'Not Found',
+                            description: 'The requested resource was not found on the server.',
+                            placement: 'topRight'
+                        });
+                    } else if (error.response.status === 405) {
+                        notification.error({
+                            message: 'Method Not Allowed',
+                            description: 'The requested HTTP method is not allowed for this resource.',
+                            placement: 'topRight'
+                        });
+                    } else {
+                        notification.error({
+                            message: 'Error',
+                            description: 'An error occurred while fetching data from the server.',
+                            placement: 'topRight'
+                        });
+                    }
+                } else if (error.request) {
+                    // Xử lý lỗi không có phản hồi từ server
+                    console.error('No response received from the server:', error.request);
+                    notification.error({
+                        message: 'No Response',
+                        description: 'No response received from the server.',
+                        placement: 'topRight'
+                    });
+                } else {
+                    // Xử lý lỗi khác
+                    console.error('An error occurred:', error.message);
+                    notification.error({
+                        message: 'Error',
+                        description: 'An error occurred while processing the request.',
+                        placement: 'topRight'
+                    });
+                }
+                setUserState((prevState) => ({ ...prevState, loading: false }));
+            });
+    }, [params.category, params.page, userName]);
+
+    // Kiểm tra xem cả hai API request đã thành công và có dữ liệu trả về
+    if (UserState.loading) {
         return (
-            <div className="error-message">
-                <p>This profile doesn't exist, sorry</p>
+            <div className="App">
+                <div>
+                    <PostLoading isLoading={true} />
+                </div>
             </div>
         );
     }
-    // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
-    const token = "your_jwt_token_here"; // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
+    // Thêm hàm xử lý khi nhấp nút Previous
+    const handlePreviousPage = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = parseInt(urlParams.get('page')) || 1;
+        urlParams.set('page', currentPage - 1);
 
-    // Giải mã token
-    const decodedToken = jwt_decode(token);
+        // Tạo URL mới với giá trị parameter "page" tăng lên 1
+        const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
 
-    // Lấy staff_id từ payload của token
-    const staffId = decodedToken.staff_id;
-
-    const isAuthorProfile = () => {
-        return staffId === user.user_name;
+        // Chuyển hướng trang sang URL mới
+        window.location.href = newUrl;
     };
 
-    // Xử lý dữ liệu và lấy thông tin của người dùng, ví dụ:
-    // const userInfo = {
-    //     email: user.email,
-    //     user_name: user.user_name,
-    //     avatar: user.avatar,
-    //     firstName: user.first_name,
-    //     about: user.about,
-    //     // Các thông tin khác của người dùng
-    // };
+    // Thêm hàm xử lý khi nhấp nút Next
+    const handleNextPage = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = parseInt(urlParams.get('page')) || 1;
+        urlParams.set('page', currentPage + 1);
+
+        // Tạo URL mới với giá trị parameter "page" tăng lên 1
+        const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
+
+        // Chuyển hướng trang sang URL mới
+        window.location.href = newUrl;
+
+    };
+
+    const handlePageNumber = (pageNumber) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', pageNumber);
+
+        // Tạo URL mới với giá trị parameter "page" tương ứng với số trang được nhấp
+        const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
+
+        // Chuyển hướng trang sang URL mới
+        window.location.href = newUrl;
+    };
+
+    // Khi cả hai request thành công và có dữ liệu trả về, hiển thị component UserSite
     return (
-        <React.Fragment>
-            <Profile userInfo={user} />
-            <div style={{ fontFamily: 'cursive', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
-                <span role="img" aria-label="Latest Posts">📝</span> Latest Posts
+        <div className="App">
+            <div>
+                <PostLoading isLoading={UserState.loading} user={UserState.user} posts={UserState.posts} />
             </div>
-            <Container maxWidth="lg" component="main">
-                {isAuthorProfile() && (
-                    <>
-                        {/* Thêm nút "New Post" ở đây */}
-                        <Button
-                            className={classes.newPostButton}
-                            href={`/profile/${user.user_name}/post/create`}
-                            variant="contained"
-                            color="primary"
-                        >
-                            +
-                        </Button>
-                    </>
+            {/* Container chứa cả dãy số trang và nút Previous và Next */}
+            <div className={classes.paginationContainer}>
+                {/* Hiển thị nút Previous nếu không phải trang đầu tiên */}
+                {UserState.previous != null && (
+                    <Button variant="contained" color="primary" onClick={handlePreviousPage} className={classes.pageButton}>
+                        Previous
+                    </Button>
                 )}
-                <Grid container spacing={5} alignItems="flex-end">
-                    {posts.map((post) => {
-                        return (
-                            <Grid item key={post.id} xs={12} md={4}>
-                                <Card className={classes.card}>
-                                    {/* Sử dụng thẻ Link để điều hướng */}
-                                    <Link to={`/post/${post.slug}`} className={classes.link}>
-                                        <CardMedia
-                                            className={classes.cardMedia}
-                                            image={post.image}
-                                            title="Image title"
-                                        />
-                                    </Link>
-                                    <CardContent className={classes.cardContent}>
-                                        <Typography gutterBottom variant="h6" component="h2" className={classes.postTitle}>
-                                            {post.title.substr(0, 50)}...
-                                        </Typography>
-                                        <div className={classes.postText}>
-                                            <Typography color="textSecondary">
-                                                {post.excerpt.substr(0, 40)}...
-                                            </Typography>
-                                        </div>
-                                        {/* Hiển thị dòng chữ "edited at" và thời điểm đã chỉnh sửa */}
-                                        <div className={classes.postText}>
-                                            <Typography className={classes.editedText}>
-                                                edited at{' '}
-                                                {format(new Date(post.edited), 'dd-MM-yyyy HH:mm (xxx)')}
-                                                ...
-                                            </Typography>
-                                        </div>
-                                        {/* Hiển thị số lượng views, likes và comments */}
-                                        <div className={classes.statsContainer}>
-                                            <div className={classes.statsItem}>
-                                                <VisibilityIcon />
-                                                <Typography color="textSecondary">
-                                                    {post.num_view}
-                                                </Typography>
-                                            </div>
-                                            <div className={classes.statsItem}>
-                                                <ThumbUpIcon />
-                                                <Typography color="textSecondary">
-                                                    {post.num_like}
-                                                </Typography>
-                                            </div>
-                                            <div className={classes.statsItem}>
-                                                <CommentIcon />
-                                                <Typography color="textSecondary">
-                                                    {post.num_comment}
-                                                </Typography>
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            {/* Avatar của tác giả */}
-                                            <Link to={`/profile/${post.author.user_name}`}>
-                                                <Avatar alt={user.user_name} src={user.avatar} />
-                                            </Link>
+                {/* Hiển thị dãy số trang */}
+                {Array.from({ length: Math.ceil(UserState.maxPage / UserState.perPage) }, (_, index) => index + 1).map((page) => (
+                    <Button
+                        key={page}
+                        variant={page === UserState.currentPage ? "contained" : "outlined"}
+                        color="primary"
+                        onClick={() => handlePageNumber(page)}
+                        className={classes.pageButton}
+                    >
+                        {page}
+                    </Button>
+                ))}
 
-                                            <div style={{ marginLeft: '10px' }}>
-                                                <Typography variant="subtitle1" style={{ fontFamily: 'cursive' }}>
-                                                    {post.author.user_name}
-                                                </Typography>
-                                            </div>
-                                            {isAuthorProfile() && (
-                                                <>
-                                                    <Link
-                                                        color="textPrimary"
-                                                        to={`/profile/${user.user_name}/post/edit/${post.id}`}
-                                                        className={classes.link}
-                                                    >
-                                                        <EditIcon />
-                                                    </Link>
-                                                    <Link
-                                                        color="textPrimary"
-                                                        to={`/profile/${user.user_name}/post/delete/${post.id}`}
-                                                        className={classes.link}
-                                                    >
-                                                        <DeleteForeverIcon />
-                                                    </Link>
-                                                </>
-                                            )}
-                                        </div>
-
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        );
-                    })}
-                </Grid>
-            </Container>
-        </React.Fragment>
+                {/* Hiển thị nút Next nếu không phải trang cuối cùng */}
+                {UserState.next != null && (
+                    <Button variant="contained" color="primary" onClick={handleNextPage} className={classes.pageButton}>
+                        Next
+                    </Button>
+                )}
+            </div>
+        </div>
     );
-};
+}
 
 export default UserSite;
