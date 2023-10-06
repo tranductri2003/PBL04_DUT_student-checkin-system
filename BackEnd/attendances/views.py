@@ -13,7 +13,7 @@ from courses.models import Courses
 
 # Create your views here.
 class AttendanceListCreateView(generics.ListAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
     queryset = Attendances.objects.all()
     filter_backends = [DjangoFilterBackend]
@@ -40,7 +40,7 @@ class AttendanceListCreateView(generics.ListAPIView):
         )
 
 class AttendanceUpdateView(generics.UpdateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
     lookup_field = "attendance_id"
     queryset = Attendances.objects.all()
@@ -48,7 +48,7 @@ class AttendanceUpdateView(generics.UpdateAPIView):
 #    filterset_fields = ["student_id", "course_id", "attendance_date", "status"]
 
 class AttendanceDeleteView(generics.DestroyAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
     queryset = Attendances.objects.all()
     lookup_field = "attendance_id"

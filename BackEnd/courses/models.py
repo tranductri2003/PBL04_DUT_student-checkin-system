@@ -39,4 +39,4 @@ class UserCourse(models.Model):
     course = models.ForeignKey(Courses, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.student.full_name} - {self.course.course_name}"
+        return f"{self.user.full_name} - {self.course.course_name}"

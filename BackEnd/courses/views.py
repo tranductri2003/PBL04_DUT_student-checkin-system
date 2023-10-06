@@ -14,7 +14,7 @@ from users.models import NewUser
 from helper.models import CustomPageNumberPagination
 
 class CoursesListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = CourseSerializer
     queryset = Courses.objects.all()
     filter_backends = [DjangoFilterBackend]
@@ -32,7 +32,10 @@ class CoursesListCreateView(generics.ListCreateAPIView):
             query_set = None
             role = recent_user.role
             if role == 'S':
-                query_set = Courses.objects.filter(course=UserCourse.objects.filter(user=recent_user).values_list('course', flat=True))
+                #course_of_user = UserCourse.objects.filter(user=recent_user)
+                CourseId=UserCourse.objects.filter(user=recent_user).values_list('course__course_id', flat=True)
+                query_set = Courses.objects.filter(course_id__in=CourseId)
+                print(query_set)
             elif role == 'T':
                 query_set = Courses.objects.filter(teacher_id=recent_user)
             elif role == 'A':
@@ -42,7 +45,7 @@ class CoursesListCreateView(generics.ListCreateAPIView):
         return query_set
 
 class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = CourseSerializer
     lookup_field = "course_id"
 
@@ -52,7 +55,7 @@ class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class TodayCoursesListView(generics.ListAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = CourseSerializer
     ordering_fields = ['course_id']
     pagination_class = CustomPageNumberPagination
@@ -76,7 +79,7 @@ class TodayCoursesListView(generics.ListAPIView):
         return query_set
 
 class CourseStudentListView(generics.ListAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
     ordering_fields = ['staff_id']
     pagination_class = CustomPageNumberPagination
@@ -91,7 +94,7 @@ class CourseStudentListView(generics.ListAPIView):
        
         
 class StudentEnrollView(generics.CreateAPIView): 
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserCourseSerializer
     
     def create(self, request, *args, **kwargs):
@@ -108,7 +111,7 @@ class StudentEnrollView(generics.CreateAPIView):
         return response
 
 class StudentDeleteView(generics.DestroyAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserCourseSerializer
     
     def destroy(self, request, *args, **kwargs):
