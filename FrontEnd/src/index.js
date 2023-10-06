@@ -7,7 +7,7 @@ import Footer from './components/footer';
 import Header from './components/header';
 import Login from './components/auth/login';
 import Logout from './components/auth/logout';
-import UserProfile from './components/profile/userSite';
+import UserProfile from './components/profile/UserSite';
 import Hall from './components/chat/hall';
 import ChatSite from './components/chat/ChatSite'
 import AttendancesLoading from './components/attendances/AttendanceSite';
@@ -19,7 +19,7 @@ ReactDOM.render(
     <Header />
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="/profile/:userName" element={<UserProfile />} />
+      <Route path="/profile/:staff_id" element={<UserProfile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/attendance" element={<AttendancesLoading />} />

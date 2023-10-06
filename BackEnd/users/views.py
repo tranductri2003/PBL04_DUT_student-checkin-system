@@ -10,7 +10,7 @@ from helper.models import CustomPageNumberPagination
 
 # Create your views here.
 class UserListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
     queryset = NewUser.objects.all()
     filter_backends = [DjangoFilterBackend]
@@ -20,7 +20,7 @@ class UserListCreateView(generics.ListCreateAPIView):
 
 
 class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
     lookup_field = "staff_id"
 

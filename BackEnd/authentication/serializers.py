@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
-from users.serializers import BasicUserSerializer, UserSerializer
+from users.serializers import BasicUserSerializer
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -27,7 +27,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Kiểm tra xem thông tin của người dùng có tồn tại hay không
         if user:
             # Serialize thông tin người dùng bằng CustomUserSerializer
-            user_serializer = UserSerializer(user)
+            user_serializer = BasicUserSerializer(user)
             # Thêm thông tin người dùng vào kết quả trả về
             data['user'] = user_serializer.data
 
