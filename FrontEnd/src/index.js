@@ -10,7 +10,9 @@ import Logout from './components/auth/logout';
 import UserProfile from './components/profile/UserSite';
 import Hall from './components/chat/hall';
 import ChatSite from './components/chat/ChatSite'
-import AttendancesLoading from './components/attendances/AttendanceSite';
+import AttendancesSite from './components/attendances/AttendanceSite';
+import CoursesSite from './components/courses/CourseSite';
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -22,7 +24,8 @@ ReactDOM.render(
       <Route path="/profile/:staff_id" element={<UserProfile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/attendance" element={<AttendancesLoading />} />
+      <Route path="/attendance" element={<AttendancesSite />} />
+      <Route path="/today" element={<CoursesSite />} />
       <Route path="/hall/:slug" element={<ChatSite />} />
       <Route path="/hall" element={<Hall />} />
     </Routes>
