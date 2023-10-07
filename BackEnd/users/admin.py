@@ -10,11 +10,11 @@ class UserAdminConfig(UserAdmin):
     search_fields = ('email', 'full_name',)
     list_filter = ('email', 'full_name', 'avatar', 'is_active', 'is_staff')
     ordering = ('-created_at',)
-    list_display = ('email', 'staff_id', 'full_name', 'is_active', 'is_staff',)
+    list_display = ('email', 'staff_id', 'full_name', 'role', 'is_active', 'is_staff',)
     
     fieldsets = (
         (None, {'fields': ('staff_id', 'email', 'full_name', 'avatar')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups')}),
+        ('Permissions', {'fields': ('role', 'is_staff', 'is_active', 'groups')}),
         ('Personal', {'fields': ('about',)}),
     )
     formfield_overrides = {
