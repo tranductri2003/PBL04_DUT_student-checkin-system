@@ -15,7 +15,7 @@ urlpatterns = [
 
     # Xem danh sách người dùng
     path('',UserListCreateView.as_view(), name='user-list-create'),
-    # Xem chi tiết người dùng
+    # Chỉnh sửa và xóa người dùng
     path('<str:staff_id>/',UserRetriveUpdateDeleteView.as_view(), name='user-retrive-update-delete'),
     
 
