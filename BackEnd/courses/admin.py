@@ -16,10 +16,6 @@ class CoursesAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('created_at', 'updated_at')
 
-    def has_delete_permission(self, request, obj=None):
-        # Ngăn người dùng xóa bất kỳ mục nào
-        return False
-
 class UserCourseAdmin(admin.ModelAdmin):
     list_display = ('user', 'course')
     list_filter = ('course',)
