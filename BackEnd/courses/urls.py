@@ -16,7 +16,7 @@ urlpatterns = [
     path('', CoursesListCreateView.as_view(), name='courses-list-create'),
 
     # Xem chi tiết khóa học theo course_id
-    path('<str:course_id>', CoursesRetrieveUpdateDeleteView.as_view(), name='courses-retrieve-update-delete'),
+    path('<str:course_id>/', CoursesRetrieveUpdateDeleteView.as_view(), name='courses-retrieve-update-delete'),
     
     # Xem danh sách lớp học phần của một sinh viên
     path('today/', TodayCoursesListView.as_view(), name='courses-today-list'),

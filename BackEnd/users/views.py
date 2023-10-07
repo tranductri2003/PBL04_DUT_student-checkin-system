@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from rest_framework import  filters, generics, permissions
 from users.models import NewUser
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, TXTUploadSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response    
 from rest_framework import status
+from rest_framework.views import APIView
 
 from helper.models import CustomPageNumberPagination
 
@@ -46,5 +47,38 @@ class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     #     instance.save()
     #     instance.delete()  # Thực hiện xóa cứng
     #     return Response({'message': 'User deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-    
-    
+
+class TXTUploadView(APIView):
+    serializer_class = TXTUploadSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            txt_file = serializer.validated_data['file']  # Sửa thành 'file' thay vì 'user.txt'
+            # Đảm bảo tệp txt đã được tải lên
+            try:
+                # Đọc dữ liệu từ tệp văn bản
+                decoded_file = txt_file.read().decode('utf-8').splitlines()
+
+                # Duyệt qua từng dòng trong tệp văn bản và nạp dữ liệu vào cơ sở dữ liệu
+                for line in decoded_file:
+                    staff_id, full_name, class_id, phone_number = line.split('\t')
+                    # Tạo hoặc cập nhật đối tượng NewUser
+                    user, created = NewUser.objects.update_or_create(
+                        staff_id=staff_id,
+                        defaults={
+                            'full_name': full_name,
+                            'email': str(staff_id)+"@sv1.dut.udn.vn",
+                            'class_id': class_id,
+                            'phone_number': phone_number,
+                            'is_active' : True,
+
+                        }
+                    )
+            except Exception as e:
+                return Response({'error': 'Lỗi trong quá trình nạp dữ liệu từ tệp văn bản'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response({'message': 'Dữ liệu đã được nạp thành công'}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

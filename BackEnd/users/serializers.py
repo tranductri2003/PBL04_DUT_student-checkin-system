@@ -12,3 +12,9 @@ class BasicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewUser
         fields = ['full_name', 'university', 'faculty', 'class_id', 'about', 'phone_number', 'date_of_birth'] 
+
+class TXTUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    
+    
+

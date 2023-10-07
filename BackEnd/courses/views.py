@@ -46,10 +46,17 @@ class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CourseSerializer
     lookup_field = "course_id"
+    queryset = Courses.objects.all()  # Lấy tất cả các khóa học
 
-    def get_queryset(self):
+    def get_object(self):
         course_id = self.kwargs['course_id']
-        return Courses.objects.filter(course_id=course_id)
+        # Sử dụng lookup_field để tìm khóa học với course_id tương ứng
+        obj = generics.get_object_or_404(Courses, **{self.lookup_field: course_id})
+        return obj
+
+    def perform_destroy(self, instance):
+        # Xóa đối tượng khóa học
+        instance.delete()
 
 
 class TodayCoursesListView(generics.ListAPIView):
