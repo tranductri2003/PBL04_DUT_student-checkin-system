@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response    
 from rest_framework import status
 from rest_framework.views import APIView
+from django.contrib.auth.hashers import make_password  # Thêm import này
 
 from helper.models import CustomPageNumberPagination
 
@@ -73,7 +74,7 @@ class TXTUploadView(APIView):
                             'class_id': class_id,
                             'phone_number': phone_number,
                             'is_active' : True,
-
+                            'password': make_password('123456789'),  # Tạo và lưu mật khẩu đã mã hóa
                         }
                     )
             except Exception as e:

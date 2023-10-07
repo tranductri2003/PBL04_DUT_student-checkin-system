@@ -44,7 +44,7 @@ function App() {
         page: params.page,
     };
     const url = axiosInstance.getUri({
-        url: "/course/today/",
+        url: "/course",
         params: queryParams,
     });
 
