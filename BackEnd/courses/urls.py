@@ -6,6 +6,7 @@ from .views import (
     CourseStudentListView,
     StudentEnrollView,
     StudentDeleteView,
+    AssignStudentsToCoursesView,
 )
 
 app_name = 'courses'
@@ -25,4 +26,7 @@ urlpatterns = [
     
     # Xóa một sinh viên ra khỏi lớp
     path('delete-student/<str:course_id>/<str:student_id>/', StudentDeleteView.as_view(), name='student-enrollment-delete'),
+    # Gán user cho từng course
+    path('assign_students_to_courses/', AssignStudentsToCoursesView.as_view(), name='assign_students_to_courses'),
+
 ]

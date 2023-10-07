@@ -129,3 +129,24 @@ class StudentDeleteView(generics.DestroyAPIView):
         course.save()
         
         return response
+    
+
+
+class AssignStudentsToCoursesView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def create(self, request, *args, **kwargs):
+        # Get all users with role 'S'
+        students = NewUser.objects.filter(role='S')
+        
+        # Get all existing courses
+        courses = Courses.objects.all()
+        
+        # Loop through each student and each course to create UserCourse entries
+        for student in students:
+            for course in courses:
+                # Check if the user is already enrolled in the course
+                if not UserCourse.objects.filter(user=student, course=course).exists():
+                    UserCourse.objects.create(user=student, course=course)
+        
+        return Response({"message": "Students assigned to courses successfully"}, status=201)
