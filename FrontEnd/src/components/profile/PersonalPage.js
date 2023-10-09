@@ -9,9 +9,9 @@
 
 // class Profile extends React.Component {
 
-//     handleCreateRoom = (user_name_1, user_name_2, first_name_1, first_name_2) => {
+//     handleCreateRoom = (staff_id_1, staff_id_2, first_name_1, first_name_2) => {
 //         // Sắp xếp tên người dùng theo thứ tự từ điển
-//         const sortedUserName = [user_name_1, user_name_2].sort();
+//         const sortedUserName = [staff_id_1, staff_id_2].sort();
 //         const sortedFirstName = [first_name_1, first_name_2].sort();
 
 
@@ -19,7 +19,7 @@
 //         const room_slug = `${sortedUserName[0]}-${sortedUserName[1]}`;
 //         const room_name = `${sortedFirstName[0]} and ${sortedFirstName[1]}`;
 //         const room_description = `Space for ${first_name_1} and ${first_name_2}`;
-//         const room_participants = [user_name_1, user_name_2]
+//         const room_participants = [staff_id_1, staff_id_2]
 //         const participants_string = room_participants.join(' ');
 
 //         const requestData = {
@@ -186,7 +186,7 @@
 //                                                 )}
 //                                                 {!isAuthorProfile() && (
 //                                                     <Button
-//                                                         onClick={() => this.handleCreateRoom(localStorage.getItem('user_name'), userInfo.user_name, localStorage.getItem('first_name'), userInfo.first_name)}
+//                                                         onClick={() => this.handleCreateRoom(localStorage.getItem('staff_id'), userInfo.staff_id, localStorage.getItem('first_name'), userInfo.first_name)}
 //                                                         className="mr-4"
 //                                                         color="info"
 //                                                         size="sm"
@@ -218,7 +218,7 @@
 //                                     </Row>
 //                                     <div className="text-center mt-5">
 //                                         <h3>
-//                                             {userInfo.user_name} ({userInfo.first_name}){" "}
+//                                             {userInfo.staff_id} ({userInfo.first_name}){" "}
 //                                             <span className="font-weight-light">, {userInfo.age}</span>
 //                                         </h3>
 //                                         <div className="h6 font-weight-300">

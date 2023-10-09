@@ -27,7 +27,7 @@ class RoomListView(APIView):
         
         
         return Response({
-            "user_name": user.full_name,
+            "staff_id": user.staff_id,
             "rooms": serializer.data
         })
         
@@ -49,8 +49,8 @@ class CreateRoom(APIView):
         
         participants = room_data['participants'].split()
 
-        for user_name in participants:
-            user  = NewUser.objects.get(user_name=user_name)
+        for staff_id in participants:
+            user  = NewUser.objects.get(staff_id=staff_id)
             room.participants.add(user)
 
         serializer = RoomSerializer(room)
@@ -64,4 +64,4 @@ class RoomView(APIView):
         room = Room.objects.get(slug=slug)
         messages = Message.objects.filter(room=room)
         serializer = MessageSerializer(messages, many=True)
-        return Response({ "user_name": request.user.full_name,"room_name": room.name, "slug": slug, "messages": serializer.data})
+        return Response({ "staff_id": request.user.staff_id,"room_name": room.name, "slug": slug, "messages": serializer.data})

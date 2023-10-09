@@ -135,7 +135,7 @@ function Header() {
                             noWrap
                             className={classes.logo}
                             component={NavLink}
-                            to="/today"
+                            to="/"
                         >
                             Lịch hôm nay
                         </Typography>

@@ -8,7 +8,7 @@ class RoomAdmin(admin.ModelAdmin):
         return [participant.staff_id for participant in obj.participants.all()]
         # data=[]
         # for participant in obj.participants.all():
-        #     data.append(participant.user_name)
+        #     data.append(participant.staff_id)
         # return data
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
