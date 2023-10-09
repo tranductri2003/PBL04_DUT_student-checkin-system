@@ -19,11 +19,10 @@ ReactDOM.render(
   <Router>
     <Header />
     <Routes>
-      <Route path="/" element={<App />} />
+      <Route path="/" element={<CoursesSite />} />
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/attendance" element={<AttendancesSite />} />
-      <Route path="/today" element={<CoursesSite />} />
       <Route path="/hall/:slug" element={<ChatSite />} />
       <Route path="/hall" element={<Hall />} />
     </Routes>

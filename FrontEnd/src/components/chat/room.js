@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
+import jwt_decode from "jwt-decode";
 
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -88,11 +89,16 @@ const useStyles = (theme) => ({
 class ChatApp extends Component {
     constructor(props) {
         super(props);
+
+        const token = localStorage.getItem("access_token"); // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
+
+        // Giải mã token
+        const decodedToken = jwt_decode(token);
         this.state = {
             filledForm: false,
             messages: this.props.messages || [], // Sử dụng messages từ props nếu có, nếu không thì mặc định là mảng rỗng
             content: "",
-            user_name: localStorage.getItem("user_name"),
+            staff_id: decodedToken.staff_id,
             room_name: this.props.room_slug || "nang-bach-khoa",
             room_title: this.props.room_title || "Nẵng Bách Khoa",
         };
@@ -105,17 +111,26 @@ class ChatApp extends Component {
 
     }
     onButtonClicked = (e) => {
-        this.client.send(
-            JSON.stringify({
-                type: "message",
-                message: this.state.content,
-                user_name: this.state.user_name,
-                room_name: this.state.room_name,
-            })
-        );
+        // Tạo đối tượng messageData từ state
+        const messageData = {
+            type: "message",
+            message: this.state.content,
+            staff_id: this.state.staff_id,
+            room_name: this.state.room_name,
+        };
+
+        // In ra dòng mã JSON trước khi gửi nó
+        console.log("Message Data:", JSON.stringify(messageData));
+
+        // Gửi tin nhắn đến máy chủ WebSocket
+        this.client.send(JSON.stringify(messageData));
+
+        // Đặt lại trạng thái content
         this.setState({ content: "" });
+
         e.preventDefault();
     };
+
 
     componentDidMount() {
         this.client.onopen = () => {
@@ -130,7 +145,7 @@ class ChatApp extends Component {
                         ...state.messages,
                         {
                             message: dataFromServer.message,
-                            user_name: dataFromServer.user_name,
+                            staff_id: dataFromServer.staff_id,
                         },
                     ],
                 }));
@@ -169,15 +184,15 @@ class ChatApp extends Component {
                                 this.state.messages.map((message, index) => (
                                     <div
                                         key={index}
-                                        className={`${classes.message} ${message.user_name === this.state.user_name ? classes.messageRight : classes.messageLeft
+                                        className={`${classes.message} ${message.staff_id === this.state.staff_id ? classes.messageRight : classes.messageLeft
                                             }`}
                                     >
                                         <Avatar className={classes.avatar}>
-                                            {message.user_name.charAt(0).toUpperCase()}
+                                            {message.staff_id.charAt(0).toUpperCase()}
                                         </Avatar>
                                         <div className={classes.messageText}>
                                             <Typography variant="subtitle2" className={classes.messageSender}>
-                                                {message.user_name}
+                                                {message.staff_id}
                                             </Typography>
                                             <Typography variant="body1">{message.message}</Typography>
                                         </div>

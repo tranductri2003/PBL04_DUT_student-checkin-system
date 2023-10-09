@@ -126,7 +126,7 @@
 //         const queryParams = {
 //             category__slug: params.category,
 //             page: params.page,
-//             author__user_name: userName,
+//             author__staff_id: userName,
 //         };
 //         const url = axiosInstance.getUri({
 //             url: "post/",
