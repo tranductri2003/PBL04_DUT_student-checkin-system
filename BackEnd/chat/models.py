@@ -10,7 +10,7 @@ class Room(models.Model):
     participants = models.ManyToManyField(NewUser, related_name='chat_rooms', blank=True)
 
     def __str__(self):
-        return self.name
+        return self.slug
     
 
 class Message(models.Model):
