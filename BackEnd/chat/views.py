@@ -64,9 +64,9 @@ class RoomView(APIView):
         user = request.user
         room = Room.objects.get(slug=slug)
         
-        if user not in room.participants.all():
-            return Response({"message": "You are not a participant of this room."}, status=status.HTTP_FORBIDDEN)
-        else:      
+        if user in room.participants.all() or room.private==False:      
             messages = Message.objects.filter(room=room)
             serializer = MessageSerializer(messages, many=True)
             return Response({ "staff_id": request.user.staff_id,"room_name": room.name, "slug": slug, "messages": serializer.data})
+        else:
+            return Response({"message": "You are not a participant of this room."}, status=status.HTTP_FORBIDDEN)

@@ -33,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 user = await self.get_user(staff_id)
                 room = await self.get_room()
 
-                if await self.user_in_room(user, room):
+                if await self.user_in_room(user, room) or await self.room_is_private(room)==False:
                     pass
                 else:
                     print("Invalid or missing staff_id in access_token")
@@ -91,3 +91,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return True
         else:
             return False
+        
+    @database_sync_to_async
+    def room_is_private(self, room):
+        return room.private
