@@ -24,6 +24,7 @@ class Attendances(TimeSetup, models.Model):
         student_name = NewUser.objects.get(id=self.student_id_id, role="S").full_name
         course_name = Courses.objects.get(id=self.course_id_id).course_name
         return f"{student_name} - {course_name}"
+    
     def save(self, *args, **kwargs):
         # Tạo giá trị cho trường attendance_id
         self.attendance_id = f"{self.student_id_id}-{self.course_id_id}-{self.attendance_date}"
