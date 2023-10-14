@@ -19,10 +19,9 @@ DAY_CHOICES = [
 class Courses(TimeSetup, models.Model):
     course_id = models.CharField(max_length=15, unique=True)
     course_name = models.CharField(max_length=50)
-    teacher_id = models.ForeignKey(
-        NewUser, on_delete=models.CASCADE)
+    teacher_id = models.ForeignKey(NewUser, on_delete=models.CASCADE)
     num_of_student = models.IntegerField(default=0)
-    day_of_week = models.IntegerField(choices=DAY_CHOICES, default=0)
+    day_of_week = models.IntegerField(choices=DAY_CHOICES, default=1)
     start_time = models.TimeField(default=timezone.now)  # Sử dụng TimeField
     end_time = models.TimeField(default=timezone.now)
     start_date = models.DateField(default=timezone.now)  # Sử dụng TimeField
@@ -33,7 +32,7 @@ class Courses(TimeSetup, models.Model):
         return self.end_time - self.start_time
     def __str__(self):
         return self.course_name
-
+    
 class UserCourse(models.Model):
     user = models.ForeignKey(NewUser, on_delete=models.CASCADE, default=None)
     course = models.ForeignKey(Courses, on_delete=models.CASCADE)
