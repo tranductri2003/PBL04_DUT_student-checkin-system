@@ -18,7 +18,6 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['course_id', 'teacher_id']
     ordering_fields = ['course_id']
-    pagination_class = CustomPageNumberPagination
     
     def get_queryset(self):
         # query_set = Courses.objects.all()
@@ -76,7 +75,6 @@ class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
     lookup_field = "course_id"
     queryset = Courses.objects.all()  # Lấy tất cả các khóa học
-    pagination_class = CustomPageNumberPagination
 
     def get_object(self):
         
