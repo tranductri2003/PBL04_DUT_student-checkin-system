@@ -12,7 +12,7 @@ from helper.models import CustomPageNumberPagination
 from courses.models import Courses
 
 # Create your views here.
-class AttendanceListCreateView(generics.ListAPIView):
+class AttendanceListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
     queryset = Attendances.objects.all()

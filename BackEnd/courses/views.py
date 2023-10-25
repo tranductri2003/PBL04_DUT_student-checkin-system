@@ -18,7 +18,6 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['course_id', 'teacher_id']
     ordering_fields = ['course_id']
-    pagination_class = CustomPageNumberPagination
     
     def get_queryset(self):
         # query_set = Courses.objects.all()
@@ -27,7 +26,7 @@ class CoursesListCreateView(generics.ListCreateAPIView):
             recent_user = self.request.user
             # Truy vấn danh sách các khóa học của người dùng có staff_id tương ứng
             role = recent_user.role
-            day_of_week = self.request.data.get('day_of_week', None)
+            day_of_week = self.request.GET.get('day_of_week', None)
             if role == 'S':
                 CourseId=UserCourse.objects.filter(user=recent_user).values_list('course__course_id', flat=True)
                 query_set = Courses.objects.filter(course_id__in=CourseId)
@@ -42,8 +41,8 @@ class CoursesListCreateView(generics.ListCreateAPIView):
                     query_set = query_set.filter(day_of_week=day_of_week)
             elif role == 'A':
                 query_set = Courses.objects.all()
-                course_id = self.request.data.get('course_id', None)
-                staff_id = self.request.data.get('staff_id', None)
+                course_id = self.request.GET.get('course_id', None)
+                staff_id = self.request.GET.get('staff_id', None)
                 if course_id is not None and course_id != '':
                     query_set = query_set.filter(course_id=course_id)
 
@@ -76,7 +75,6 @@ class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
     lookup_field = "course_id"
     queryset = Courses.objects.all()  # Lấy tất cả các khóa học
-    pagination_class = CustomPageNumberPagination
 
     def get_object(self):
         
