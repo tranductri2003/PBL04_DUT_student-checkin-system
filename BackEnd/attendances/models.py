@@ -15,7 +15,7 @@ class Attendances(TimeSetup, models.Model):
     student_id = models.ForeignKey(
         NewUser, on_delete=models.CASCADE)
     course_id = models.ForeignKey(Courses, on_delete=models.CASCADE)
-    attendance_time = models.TimeField(default=None, null=True, blank=True)
+    attendance_time = models.TimeField(null=True, blank=True, default = datetime.now)
     attendance_date = models.DateField(null=True, blank=True, default=datetime.now)
     status = models.BooleanField(default=False)
     note = models.CharField(max_length=100)

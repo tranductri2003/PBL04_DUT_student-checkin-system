@@ -107,7 +107,7 @@ class ChatApp extends Component {
         state. The WebSocket URL is used to establish a connection between the client and the server
         for real-time communication. */
         // this.client = new W3CWebSocket("ws://127.0.0.1:8000/ws/" + this.state.room_slug + "/");
-        const websocketURL = `${process.env.REACT_APP_WEBSOCKET_URL}${this.state.room_slug}/`;
+        const websocketURL = `${process.env.REACT_APP_CHAT_WEBSOCKET_URL}${this.state.room_slug}/`;
         this.client = new W3CWebSocket(websocketURL);
 
     }
@@ -118,7 +118,6 @@ class ChatApp extends Component {
             message: this.state.content,
             staff_id: this.state.staff_id,
             room_slug: this.state.room_slug,
-            // Authorization: `Bearer ${localStorage.getItem('access_token')}`, // Sử dụng getItem thay vì get
         };
 
         // In ra dòng mã JSON trước khi gửi nó

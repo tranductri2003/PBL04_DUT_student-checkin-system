@@ -241,7 +241,7 @@ SIMPLE_JWT = {
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-MEDIA_URL = 'media/'
+REACT_APP_MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
