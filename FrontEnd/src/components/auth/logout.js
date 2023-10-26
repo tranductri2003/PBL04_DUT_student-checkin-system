@@ -9,6 +9,16 @@ export default function SignUp() {
         axiosInstance.post('auth/logout/blacklist/', {
             refresh_token: localStorage.getItem('refresh_token'),
         });
+
+        //localStorage.setItem('access_token', res.data.access);
+        const access_token = localStorage.getItem('access_token');
+        const socket = new WebSocket('ws://localhost:8000/ws/user/status/');
+        socket.onopen = () => {
+            const message_token = "off" + access_token;
+            socket.send(JSON.stringify({ "access_token": message_token }));
+            console.log('Access logout token sent via WebSocket (logout):', message_token);
+        };
+
         localStorage.clear();
         axiosInstance.defaults.headers['Authorization'] = null;
         navigate('/login'); // Sử dụng navigate để điều hướng thay vì history.push

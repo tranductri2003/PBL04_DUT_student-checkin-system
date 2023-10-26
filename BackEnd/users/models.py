@@ -69,7 +69,7 @@ class NewUser(TimeSetup, AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField(auto_now_add=True)
     role = models.CharField(choices=ROLES, default="S", max_length=1)
     
-
+    status = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 

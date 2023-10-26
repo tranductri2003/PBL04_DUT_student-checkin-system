@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     'authentication',
 ]
 
-ASGI_APPLICATION = 'chat.asgi.application' 
+ASGI_APPLICATION = 'core.asgi.application' 
 
 CHANNEL_LAYERS = {
     "default": {

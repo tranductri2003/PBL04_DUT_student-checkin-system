@@ -7,14 +7,21 @@ from users.models import NewUser
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        print("DCM")
         self.room_name = self.scope['url_route']['kwargs']['room_slug']
         self.roomGroupName = 'chat_%s' % self.room_name
         
-        await self.channel_layer.group_add(
-            self.roomGroupName,
-            self.channel_name
-        )
-        await self.accept()
+        user = self.scope['user']
+        room = await self.get_room()
+        
+        if user not in room.participants.all():
+            await self.close()
+        else:
+            await self.channel_layer.group_add(
+                self.roomGroupName,
+                self.channel_name
+            )
+            await self.accept()
         
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(

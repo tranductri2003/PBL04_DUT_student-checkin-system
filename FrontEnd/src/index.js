@@ -11,7 +11,7 @@ import Hall from './components/chat/hall';
 import ChatSite from './components/chat/ChatSite'
 import AttendancesSite from './components/attendances/AttendanceSite';
 import CoursesSite from './components/courses/CourseSite';
-
+//import UserStatus from './components/chat/UserStatus';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -32,3 +32,6 @@ ReactDOM.render(
 );
 
 reportWebVitals();
+
+
+
