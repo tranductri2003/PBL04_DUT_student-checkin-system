@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { notification } from 'antd';
 
@@ -78,17 +78,26 @@ const Leaderboard = (props) => {
     const { data } = props;
     const [websocket, setWebsocket] = useState(null);
 
-    const connectToWebSocket = (course_id) => {
-        // Tạo kết nối WebSocket khi click nút điểm danh
-        const token = localStorage.getItem('access_token');
+    let course_id = "";
+    if (data && Array.isArray(data)) {
+        for (const course of data) {
+            if (isWithinTimeRange(course.start_time, course.end_time)) {
+                course_id = course.course_id;
+                break; // Dừng khi tìm thấy lớp học đầu tiên thỏa mãn điều kiện
+            }
+        }
+    }
 
+    // Sử dụng useEffect để thiết lập kết nối WebSocket khi trang được tải
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
         const websocketURL = `${process.env.REACT_APP_CHECK_IN_WEBSOCKET_URL}${course_id}/`;
         const client = new W3CWebSocket(websocketURL);
 
         client.onopen = () => {
             console.log('WebSocket Client Connected');
-            client.send(JSON.stringify({ 'access_token': token }));
-            console.log('Sent access_token as the first message!');
+            // client.send(JSON.stringify({ 'access_token': token }));
+            // console.log('Sent access_token as the first message!');
         };
 
         client.onmessage = (message) => {
@@ -105,7 +114,24 @@ const Leaderboard = (props) => {
         };
 
         setWebsocket(client);
+
+        // Loại bỏ kết nối WebSocket khi Component unmount
+        return () => {
+            if (websocket) {
+                websocket.close();
+            }
+        };
+    }, []); // Rỗng [] đảm bảo hiệu ứng này chỉ chạy một lần khi trang được tải.
+
+    // Hàm gửi dữ liệu thông qua WebSocket
+    const sendWebSocketData = () => {
+        if (websocket) {
+            const token = localStorage.getItem('access_token');
+            websocket.send(JSON.stringify({ 'access_token': token }));
+            console.log('Sent access_token via WebSocket');
+        }
     };
+
 
     return (
         <div style={styles.leaderboard}>
@@ -134,7 +160,7 @@ const Leaderboard = (props) => {
                                 </td>
                                 <td style={styles.cell}>
                                     {isWithinTimeRange(course.start_time, course.end_time) ? (
-                                        <button style={styles.button} onClick={() => connectToWebSocket(course.course_id)}>Điểm danh</button>
+                                        <button style={styles.button} onClick={sendWebSocketData}>Điểm danh</button>
                                     ) : (
                                         <button style={styles.disabledButton} disabled>Điểm danh</button>
                                     )}
