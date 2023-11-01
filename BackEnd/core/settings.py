@@ -115,11 +115,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "HOST": os.getenv("DB_HOST"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "PORT": os.getenv("DB_PORT"),
+        "NAME": os.getenv("DB_NAME", 'postgres'),
+        "USER": os.getenv("DB_USER", 'postgres'),
+        "HOST": os.getenv("DB_HOST", 'localhost'),
+        "PASSWORD": os.getenv("DB_PASSWORD", 'postgres'),
+        "PORT": os.getenv("DB_PORT", 5432),
     }
 }
 
@@ -241,7 +241,7 @@ SIMPLE_JWT = {
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-MEDIA_URL = 'media/'
+REACT_APP_MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type

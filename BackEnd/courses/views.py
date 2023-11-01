@@ -5,11 +5,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import Http404
-from datetime import datetime
 
 from .models import Courses, UserCourse
-from .serializers import CourseSerializer, UserCourseSerializer
-from users.serializers import UserSerializer
+from .serializers import CourseSerializer, StudentsCourseSerializer
 from users.models import NewUser
 from helper.models import CustomPageNumberPagination
 
@@ -20,7 +18,6 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['course_id', 'teacher_id']
     ordering_fields = ['course_id']
-    pagination_class = CustomPageNumberPagination
     
     def get_queryset(self):
         # query_set = Courses.objects.all()
@@ -29,7 +26,7 @@ class CoursesListCreateView(generics.ListCreateAPIView):
             recent_user = self.request.user
             # Truy vấn danh sách các khóa học của người dùng có staff_id tương ứng
             role = recent_user.role
-            day_of_week = self.request.data.get('day_of_week', None)
+            day_of_week = self.request.GET.get('day_of_week', None)
             if role == 'S':
                 CourseId=UserCourse.objects.filter(user=recent_user).values_list('course__course_id', flat=True)
                 query_set = Courses.objects.filter(course_id__in=CourseId)
@@ -44,8 +41,8 @@ class CoursesListCreateView(generics.ListCreateAPIView):
                     query_set = query_set.filter(day_of_week=day_of_week)
             elif role == 'A':
                 query_set = Courses.objects.all()
-                course_id = self.request.data.get('course_id', None)
-                staff_id = self.request.data.get('staff_id', None)
+                course_id = self.request.GET.get('course_id', None)
+                staff_id = self.request.GET.get('staff_id', None)
                 if course_id is not None and course_id != '':
                     query_set = query_set.filter(course_id=course_id)
 
@@ -61,6 +58,17 @@ class CoursesListCreateView(generics.ListCreateAPIView):
                         course_ids=UserCourse.objects.filter(user=staff).values_list('course__course_id', flat=True)
                         query_set = Courses.objects.filter(course_id__in=course_ids)
         return query_set
+    
+    def perform_create(self, serializer):
+        
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to create a course."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if self.request.user.role != 'A':
+            return Response({"message": "You do not have permission to create a course."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -69,84 +77,113 @@ class CoursesRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Courses.objects.all()  # Lấy tất cả các khóa học
 
     def get_object(self):
+        
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to view."}, status=status.HTTP_400_BAD_REQUEST)
+        
         course_id = self.kwargs['course_id']
-        # Sử dụng lookup_field để tìm khóa học với course_id tương ứng
         obj = generics.get_object_or_404(Courses, **{self.lookup_field: course_id})
+        
+        if self.request.user.role != 'A' or (self.request.user.role == "S" and UserCourse.objects.filter(course=obj, user=self.request.user).first()==None) or (self.request.user.role == "T" and self.request.user.staff_id != obj.teacher_id):
+            return Response({"message": "You do not have this permission."}, status=status.HTTP_400_BAD_REQUEST)
+        
         return obj
 
+
     def perform_destroy(self, instance):
-        # Xóa đối tượng khóa học
+        # Thực hiện kiểm tra trước khi xóa
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to delete."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if self.request.user.role != 'A':
+            # Nếu điều kiện không đúng, trả về lỗi và không xóa
+            return Response({"message": "You do not have this permission."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Nếu điều kiện đúng, xóa đối tượng khóa học
         instance.delete()
+        return Response({"message": "This course has been deleted."}, status=status.HTTP_204_NO_CONTENT)
+    
+    def perform_update(self, serializer):
+        # Thực hiện kiểm tra trước khi cập nhật
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to update."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if self.request.user.role != 'A':
+            # Nếu điều kiện không đúng, trả về lỗi và không xóa
+            return Response({"message": "You do not have this permission."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Nếu điều kiện đúng, thực hiện cập nhật dữ liệu
+        serializer.save()
+        return Response(serializer.data, status=200)
 
-class CourseStudentListView(generics.ListAPIView):
+class StudentsCourseRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView): 
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserSerializer
-    ordering_fields = ['staff_id']
+    serializer_class = StudentsCourseSerializer
+    queryset = UserCourse.objects.all()
     pagination_class = CustomPageNumberPagination
-
-    def get_queryset(self):
-        # Lấy course_id từ URL parameter
-        course_id = self.kwargs['course_id']
-
-        #Truy vấn danh sách các sinh viên của một lớp
-        query_set = UserCourse.objects.filter(course_id=course_id)
-        return query_set
-       
-        
-class StudentEnrollView(generics.CreateAPIView): 
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserCourseSerializer
     
-    def create(self, request, *args, **kwargs):
-        # Gọi phương thức create mặc định của CreateAPIView để tạo bản ghi UserCourse
-        response = super().create(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to update."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Lấy thông tin khóa học từ bản ghi vừa tạo
-        course_id = self.kwargs['course_id']
-        course = UserCourse.objects.get(course_id=course_id)
+        try:
+            course_id = self.kwargs.get("course_id")
+            course = Courses.objects.get(course_id=course_id)
+            student_list = UserCourse.objects.filter(course=course) 
+            student_data = student_list.values('user__staff_id', 'user__full_name', 'user__class_id', 'user__phone_number',)
+            if self.request.user.role != 'A' and (self.request.user.role == 'S' and self.request.user not in student_list) and  (self.request.user.role == 'T' and self.request.user != course.teacher_id):
+                return Response({"message": "You do not have this permission."}, status=status.HTTP_403_FORBIDDEN)
+            formatted_data = [{k.split('__')[1]: v for k, v in item.items()} for item in student_data]
+            return Response(formatted_data, status=status.HTTP_200_OK)
+        except UserCourse.DoesNotExist:
+            return Response({"message": "Object not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    def perform_destroy(self, instance):
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to update."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Tăng giá trị num_of_student của khóa học lên 1
-        course.num_of_student += 1
+        if self.request.user.role != 'A':
+            return Response({"message": "You do not have this permission."}, status=status.HTTP_403_FORBIDDEN)
+        
+        instance.delete()
+        return Response({"message": "This course has been deleted."}, status=status.HTTP_204_NO_CONTENT)
+    
+    def perform_update(self, serializer):
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to update."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        print(self.request.user.role)
+        if self.request.user.role != 'A' and self.request.user.role != 'T':
+            return Response({"message": "You do not have this permission."}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Nếu điều kiện đúng, thực hiện cập nhật dữ liệu
+        serializer.save()
+        return Response(serializer.data, status=200)
+    
+    def delete(self, request, *args, **kwargs):
+        
+        removed_student_ids = request.data.get('student_ids', [])
+        course = Courses.objects.get(course_id=self.kwargs['course_id'])
+        
+        removed_students = NewUser.objects.filter(staff_id__in=removed_student_ids)
+        UserCourse.objects.filter(course=course, user__in=removed_students).delete()
+        course.num_of_student -= len(removed_students)
         course.save()
-        return response
-
-class StudentDeleteView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserCourseSerializer
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def destroy(self, request, *args, **kwargs):
-        # Gọi phương thức destroy mặc định của DestroyAPIView để xóa bản ghi UserCourse
-        response = super().destroy(request, *args, **kwargs)
+    def update(self, request, *args, **kwargs):    
+        new_student_ids = request.data.get('student_ids', [])
+        course = Courses.objects.get(course_id=self.kwargs['course_id'])
         
-        # Lấy thông tin course_id từ URL parameter
-        course_id = self.kwargs['course_id']
+        # Loại bỏ những học sinh không còn trong danh sách `new_student_ids`
+        existed_student = UserCourse.objects.filter(course=course).values('user__staff_id')
+        new_students = NewUser.objects.filter(staff_id__in=new_student_ids).exclude(staff_id__in=existed_student)
         
-        # Tìm khóa học liên quan
-        course = Courses.objects.get(course_id=course_id)
-        
-        # Giảm giá trị num_of_student của khóa học đi 1
-        course.num_of_student -= 1
+        # Thêm những học sinh mới vào khóa học
+        for student in new_students:
+            user_course = UserCourse.objects.create(user=student, course=course)
+            user_course.save()
+            
+        course.num_of_student += len(new_students)
         course.save()
-        
-        return response
-    
-
-
-class AssignStudentsToCoursesView(generics.CreateAPIView):
-    permission_classes = [permissions.AllowAny]
-    
-    def create(self, request, *args, **kwargs):
-        # Get all users with role 'S'
-        students = NewUser.objects.filter(role='S')
-        
-        # Get all existing courses
-        courses = Courses.objects.all()
-        
-        # Loop through each student and each course to create UserCourse entries
-        for student in students:
-            for course in courses:
-                # Check if the user is already enrolled in the course
-                if not UserCourse.objects.filter(user=student, course=course).exists():
-                    UserCourse.objects.create(user=student, course=course)
-        
-        return Response({"message": "Students assigned to courses successfully"}, status=201)
+        return Response(status=status.HTTP_204_NO_CONTENT)

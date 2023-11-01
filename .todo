@@ -1,0 +1,54 @@
+1. Điểm Danh cho Sinh Viên:
+    Sinh viên bấm điểm danh.
+    Hiển thị giao diện quét khuôn mặt để kiểm tra hợp lệ.
+    So sánh khuôn mặt với ảnh đại diện từ access_token (thông tin rất bảo mật).
+    Kiểm tra địa chỉ có khớp với địa chỉ của trường BK không.
+    Nếu thông tin hợp lệ, gửi yêu cầu kết nối đến URL websocket: ws/check_in/<str: tên môn học>.
+    BE sau khi nhận yêu cầu kết nối, kiểm tra xem sinh viên có ở trong lớp và giờ điểm danh có nằm trong giờ học không.
+    Nếu thỏa, nếu chưa có trường điểm danh, thêm nó.
+    Nếu đã có, cập nhật nó thành True (cơ bản không cần làm gì).
+    Trả lời với thông báo điểm danh thành công về FE (tương tự như chat đã làm thành công).
+2. Xem Tình Trạng Điểm Danh cho Giáo Viên:
+    2.1. Trường Hợp Điểm Danh Sau Tiết:
+        Khi giáo viên bấm xem tình trạng điểm danh 1 lớp, đầu tiên, gọi API để lấy thông tin về những sinh viên đã điểm danh (thiết lập ban đầu).
+    2.2. Trường Hợp Điểm Danh Trong Tiết:
+        Khi giáo viên bấm xem tình trạng điểm danh 1 lớp:
+            Đầu tiên, gọi API để lấy thông tin về những sinh viên đã điểm danh (thiết lập ban đầu).
+            Sau khi đã có lịch sử điểm danh ban đầu, giáo viên gửi yêu cầu kết nối đến websocket /ws/check_in/<str: tên lớp>.
+        BE đương nhiên có thể kiểm tra xem có kết nối được không.
+        Khi sinh viên điểm danh, BE gửi 2 tin nhắn:
+            Tới sinh viên đó.
+            Tới giáo viên của lớp đó.
+        Dựa vào thông báo này, có thể cập nhật trạng thái điểm danh của lớp theo thời gian thực ở trang giáo viên.
+3. Về Phần Admin:
+    Admin không có nhiệm vụ xem hoặc thực hiện điểm danh.
+    Chỉ quản lý những thứ chung chung, chẳng hạn như quản lý người dùng và lớp học
+
+
+
+Nhiệm vụ 24/10:
+    ☐ 1. Xây dựng lại giao diện trang Lịch hôm nay
+    ☐ 2. Xây dựng websocket cho việc điểm danh
+    ☐ 3. Xây dựng giao diện trang cá nhân
+
+Những trang FE cần thiết kế:
+    ☐ 1. Trang lịch học hôm nay, giao diện ngoài khi chưa điểm danh (Có lớp thì sẽ bấm điểm danh)
+    ☐ 2. Trang điểm danh chi tiết
+    ☐ 3. Lịch sử điểm danh sinh viên
+
+    ☐ 4. Chat 
+    ☐ 5. Trang cá nhân
+    ☐ 6. Quên mật khẩu
+    ☐ 7. Trang kích hoạt tài khoản
+
+    ☐ 8. Lịch dạy trong ngày
+    ☐ 9. Xem chi tiết điểm danh của các lớp
+    ☐ 10. Lịch sử điểm danh
+    ☐ 11. Search
+    
+
+
+
+
+
+

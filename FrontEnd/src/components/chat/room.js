@@ -99,15 +99,16 @@ class ChatApp extends Component {
             messages: this.props.messages || [], // Sử dụng messages từ props nếu có, nếu không thì mặc định là mảng rỗng
             content: "",
             staff_id: decodedToken.staff_id,
-            room_name: this.props.room_slug || "nang-bach-khoa",
+            room_slug: this.props.room_slug || "nang-bach-khoa",
             room_title: this.props.room_title || "Nẵng Bách Khoa",
         };
         /* This line of code is creating a new instance of the `W3CWebSocket` class and initializing it
         with the WebSocket URL. The URL is constructed using the room name from the component's
         state. The WebSocket URL is used to establish a connection between the client and the server
         for real-time communication. */
-        // this.client = new W3CWebSocket("ws://127.0.0.1:8000/ws/" + this.state.room_name + "/");
-        this.client = new W3CWebSocket(process.env.REACT_APP_WEBSOCKET_URL + this.state.room_name + "/");
+        // this.client = new W3CWebSocket("ws://127.0.0.1:8000/ws/" + this.state.room_slug + "/");
+        const websocketURL = `${process.env.REACT_APP_CHAT_WEBSOCKET_URL}${this.state.room_slug}/`;
+        this.client = new W3CWebSocket(websocketURL);
 
     }
     onButtonClicked = (e) => {
@@ -116,7 +117,7 @@ class ChatApp extends Component {
             type: "message",
             message: this.state.content,
             staff_id: this.state.staff_id,
-            room_name: this.state.room_name,
+            room_slug: this.state.room_slug,
         };
 
         // In ra dòng mã JSON trước khi gửi nó
@@ -135,6 +136,9 @@ class ChatApp extends Component {
     componentDidMount() {
         this.client.onopen = () => {
             console.log("WebSocket Client Connected");
+            const token = localStorage.getItem("access_token");
+            this.client.send(JSON.stringify({ "access_token": token })); // Gửi access_token ngay khi kết nối WebSocket được thiết lập
+            console.log("Sent access_token as first message!");
         };
         this.client.onmessage = (message) => {
             const dataFromServer = JSON.parse(message.data);
@@ -175,7 +179,7 @@ class ChatApp extends Component {
                             <span role="img" aria-label="Chat Icon">
                                 💬
                             </span>{" "}
-                            Chat Room: {this.state.room_name}
+                            Chat Room: {this.state.room_slug}
                         </Typography>
                     </div>
                     <div className={classes.chatBoxContainer} id="chatbox-container">
