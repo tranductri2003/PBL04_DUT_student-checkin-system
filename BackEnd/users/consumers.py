@@ -67,7 +67,7 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
                 print("Invalid token")
                 await self.close()
         else:
-            print("Ko tìm thấy access token")
+            print("Không tìm thấy access token")
     
     @database_sync_to_async
     def get_user(self, staff_id):
