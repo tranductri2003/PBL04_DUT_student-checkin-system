@@ -19,6 +19,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
             'attendance_id': instance.attendance_id,
             'student_id': instance.student_id.staff_id,
             'course_id': instance.course_id.course_id,
+            'course_name': instance.course_id.course_name,
             'attendance_time': instance.attendance_time,
             'attendance_date': instance.attendance_date,
             'status': instance.status,

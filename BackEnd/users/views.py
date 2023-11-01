@@ -17,7 +17,7 @@ class UserListCreateView(generics.ListCreateAPIView):
     queryset = NewUser.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['staff_id', 'university', 'faculty', 'class_id', 'role']
-    ordering_fields = ['staff_id']
+    ordering_fields = ['id']
     pagination_class = CustomPageNumberPagination
 
 
