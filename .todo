@@ -26,10 +26,12 @@
 
 
 
-Nhiệm vụ 24/10:
-    ☐ 1. Xây dựng lại giao diện trang Lịch hôm nay
-    ☐ 2. Xây dựng websocket cho việc điểm danh
-    ☐ 3. Xây dựng giao diện trang cá nhân
+Nhiệm vụ 01/11:
+    ☐ 1. Hoàn thiện chức năng điểm danh với table và websocket cùng api lịch sử
+    ☐ 2. Hoàn thiện chức năng xem lịch sử điểm danh với filter
+    ☐ 3. Thêm data loading phòng chat, tạo phòng chat
+    ☐ 4. Trang cá nhân của sinh viên
+    
 
 Những trang FE cần thiết kế:
     ☐ 1. Trang lịch học hôm nay, giao diện ngoài khi chưa điểm danh (Có lớp thì sẽ bấm điểm danh)
