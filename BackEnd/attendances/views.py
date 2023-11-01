@@ -15,11 +15,24 @@ from courses.models import Courses
 class AttendanceListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
-    queryset = Attendances.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["student_id", "course_id", "attendance_date", "status"]
     pagination_class = CustomPageNumberPagination
-
+    ordering_fields = ['attendance_date', 'attendance_time']
+    
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Response({"message": "Please login to update."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if self.request.user.role == 'A':
+            return Attendances.objects.all()
+        
+        if self.request.user.role == 'T':
+            course_list = Courses.objects.filter(teacher_id=self.request.user)
+            return Attendances.objects.filter(course_id__in=course_list)
+            
+        if self.request.user.role == 'S':
+            return Attendances.objects.filter(student_id=self.request.user) 
 class AttendanceUpdateView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
