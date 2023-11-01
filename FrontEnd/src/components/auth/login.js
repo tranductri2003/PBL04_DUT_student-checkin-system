@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axiosInstance from '../../axios';
 import { useNavigate } from 'react-router-dom';
 //MaterialUI
+import { w3cwebsocket as W3CWebSocket } from "websocket";
+
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,7 +15,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { notification } from 'antd';
+import { message, notification } from 'antd';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -74,7 +76,29 @@ export default function SignIn() {
                 localStorage.setItem('refresh_token', res.data.refresh);
                 axiosInstance.defaults.headers['Authorization'] =
                     'JWT ' + localStorage.getItem('access_token');
+                console.log("SENT REQUEST TO WEBSOCKET");
+                if (res.data.access != null) {
+                    const socket = new WebSocket('ws://localhost:8000/ws/user/status/');
+                    socket.onopen = () => {
+                        const access_token = res.data.access; // Lấy access token từ phản hồi đăng nhập
+                        const message_token = "onl" + access_token;
+                        socket.send(JSON.stringify({ "access_token": message_token }));
+                        console.log('Access token sent via WebSocket:', message_token);
+                    };
+                }
+                //console.log(socket.url)
+
+                //this.client = new W3CWebSocket('ws://localhost:8000/ws/user/status/');
                 navigate('/');
+                //Kết nối WebSocket và gửi access token
+                // const socket = new WebSocket('ws://localhost:8000/ws/user/status/');
+                // console.log(socket.url)
+                // socket.onopen = () => {
+                //     const access_token = res.data.access; // Lấy access token từ phản hồi đăng nhập
+                //     socket.send(JSON.stringify({ access_token }));
+                //     console.log('Access token sent via WebSocket:', access_token);
+                // };
+
                 // Kích hoạt tái render cho thành phần Header sau khi đăng nhập thành công
                 window.dispatchEvent(new Event('storage'));
                 notification.success({
@@ -82,6 +106,11 @@ export default function SignIn() {
                     description: `Welcome ${res.data.user.full_name}!!!`,
                     placement: 'topRight'
                 })
+
+
+
+
+
             })
             .catch((error) => {
                 if (error.response) {

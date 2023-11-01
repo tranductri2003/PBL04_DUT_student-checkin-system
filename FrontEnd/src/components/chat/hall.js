@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Grid, Typography, makeStyles } from '@material-ui/core';
+import { Card, CardContent, Grid, Typography, makeStyles, TextField } from '@material-ui/core';
 import axiosInstance from '../../axios';
 import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
+import UserStatus from './UserStatus';
+
 
 const useStyles = makeStyles((theme) => ({
     hall: {
@@ -10,18 +12,32 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         padding: '50px',
-        fontFamily: 'cursive', // Áp dụng font chữ cursive cho toàn bộ component
+        fontFamily: 'cursive',
     },
     welcomeText: {
         fontSize: '32px',
         fontWeight: 'bold',
         color: theme.palette.primary.main,
         marginBottom: '20px',
-        fontFamily: 'cursive', // Áp dụng font chữ cursive cho toàn bộ component
-
+        fontFamily: 'cursive',
     },
     gridContainer: {
         justifyContent: 'center',
+    },
+    userStatus: {
+        flex: '0 0 30%', // UserStatus chiếm 30% của chiều rộng
+        marginRight: '10px',
+        maxHeight: '600px', // Đặt chiều cao cố định tại đây
+        overflowY: 'auto',
+        border: '1px solid #ccc', // Để tạo khung bao quanh danh sách
+        borderRadius: '5px', // Làm tròn góc của khung
+        padding: '10px', // Khoảng cách bên trong khung
+    },
+    searchInput: {
+        marginBottom: '10px',
+    },
+    room: {
+        flex: '1', // Phần Room chiếm phần còn lại của chiều rộng
     },
     roomCard: {
         border: '1px solid #ccc',
@@ -56,7 +72,60 @@ const useStyles = makeStyles((theme) => ({
 function ChatHall() {
     const classes = useStyles();
     const [rooms, setRooms] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [searchKeyword, setSearchKeyword] = useState(''); // Added this line
     const navigate = useNavigate();
+    const [userStatus, setUserStatus] = useState({});
+
+    // dùng cho lấy dữ liệu tất cả người dùng
+    useEffect(() => {
+        axiosInstance.get(`user/?role=T`)
+            .then(response => {
+                setUsers(response.data.results);
+                console.log(response.data.results);
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải dữ liệu users:', error);
+                // Xử lý lỗi cho dữ liệu users
+            });
+    }, []);
+
+    useEffect(() => {
+        const socket = new WebSocket('ws://localhost:8000/ws/user/status/');
+
+        socket.onopen = () => {
+            console.log('Kết nối WebSocket đã mở');
+
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'user.status') {
+                // Cập nhật trạng thái của người dùng
+                setUserStatus((prevUserStatus) => ({
+                    ...prevUserStatus,
+                    [data.staff_id]: data.status,
+                }));
+            }
+        };
+
+        socket.onclose = (event) => {
+            console.log('Kết nối WebSocket đã đóng:', event);
+        };
+
+        return () => {
+            if (socket) {
+                socket.close();
+            }
+        };
+    }, []);
+
+
+
+
+
+
+
 
     useEffect(() => {
         axiosInstance.get('chat/')
@@ -126,30 +195,54 @@ function ChatHall() {
                 }
             });
     }, []);
+    const handleSearchChange = (event) => {
+        setSearchKeyword(event.target.value);
+    };
+
+    const filteredUsers = users.filter(user => {
+        return user.full_name.toLowerCase().includes(searchKeyword.toLowerCase());
+    });
+
+
+
+
 
     const handleCardClick = (slug) => {
         navigate(`/hall/${slug}`);
     };
+
+
     return (
         <div className={classes.hall}>
             <Typography className={classes.welcomeText}>
                 Welcome to the Chat Hall
             </Typography>
+
             <Grid container spacing={3} className={classes.gridContainer}>
-                {rooms.map(room => (
-                    <Grid item key={room.id} xs={12} sm={6} md={4}>
-                        <Card className={classes.roomCard} onClick={() => handleCardClick(room.slug)}>
+
+                <div className={classes.userStatus}>
+                    {users && users.length > 0 && users.map((user) => (
+                        <UserStatus
+                            key={user.id}
+                            name={user.full_name}
+                            status={userStatus[user.staff_id] || user.status}
+                            avt={user.avatar}
+                        />
+                    ))}
+                </div>
+                <div className={classes.room}>
+                    {rooms.map(room => (
+                        <Card key={room.id} className={classes.roomCard} onClick={() => handleCardClick(room.slug)}>
                             <CardContent>
                                 <Typography className={classes.roomName}>{room.name}</Typography>
                                 <Typography className={classes.roomDescription}>{room.description}</Typography>
                                 <Typography className={classes.roomId}>Room ID: {room.id}</Typography>
                             </CardContent>
                         </Card>
-                    </Grid>
-                ))}
+                    ))}
+                </div>
             </Grid>
         </div>
     );
 }
-
 export default ChatHall;
