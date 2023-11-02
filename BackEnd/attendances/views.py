@@ -15,24 +15,40 @@ from courses.models import Courses
 class AttendanceListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["student_id", "course_id", "attendance_date", "status"]
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['attendance_date', 'attendance_time']
     
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Response({"message": "Please login to update."}, status=status.HTTP_401_UNAUTHORIZED)
         
         if self.request.user.role == 'A':
-            return Attendances.objects.all()
+            queryset = Attendances.objects.all()
         
-        if self.request.user.role == 'T':
+        elif self.request.user.role == 'T':
             course_list = Courses.objects.filter(teacher_id=self.request.user)
-            return Attendances.objects.filter(course_id__in=course_list)
+            queryset = Attendances.objects.filter(course_id__in=course_list)
             
-        if self.request.user.role == 'S':
-            return Attendances.objects.filter(student_id=self.request.user) 
+        else:
+            queryset = Attendances.objects.filter(student_id=self.request.user)
+        
+        course_id = self.request.GET.get('course_id', None)
+        if course_id is not None:
+            try:
+                course = Courses.objects.get(course_id=course_id)
+                queryset = queryset.filter(course_id=course)
+            except Courses.DoesNotExist:
+                queryset = queryset.none()
+                
+        attendance_date = self.request.GET.get('attendance_date', None)
+        if attendance_date is not None:
+            queryset.filter(attendance_date=attendance_date)
+            
+        status = self.request.GET.get('status', None)
+        if status is not None:
+            queryset.filter(status=status)
+        
+        return queryset.order_by('-attendance_date', '-attendance_time')       
+        
 class AttendanceUpdateView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AttendanceSerializer

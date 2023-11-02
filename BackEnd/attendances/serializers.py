@@ -5,8 +5,8 @@ from .models import Attendances
 from courses.models import Courses
 
 class AttendanceSerializer(serializers.ModelSerializer):
-    student_id = serializers.CharField(required=False)
-    course_id = serializers.CharField(required=False)
+    student_id = serializers.CharField(max_length=25, required=False)
+    course_id = serializers.CharField(max_length=25, required=False)
     attendance_date = serializers.DateField(required=False)
     attendance_time = serializers.TimeField(required=False)
     note = serializers.CharField(required=False)
@@ -18,7 +18,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
         return {
             'attendance_id': instance.attendance_id,
             'student_id': instance.student_id.staff_id,
-            'course_id': instance.course_id.course_id,
+            'student_name': instance.student_id.full_name,
             'course_name': instance.course_id.course_name,
             'attendance_time': instance.attendance_time,
             'attendance_date': instance.attendance_date,
