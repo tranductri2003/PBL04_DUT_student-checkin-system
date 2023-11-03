@@ -78,7 +78,7 @@ export default function SignIn() {
                     'JWT ' + localStorage.getItem('access_token');
                 console.log("SENT REQUEST TO WEBSOCKET");
                 if (res.data.access != null) {
-                    const socket = new WebSocket('ws://localhost:8000/ws/user/status/');
+                    const socket = new WebSocket(process.env.REACT_APP_CHECK_IN_WEBSOCKET_URL);
                     socket.onopen = () => {
                         const access_token = res.data.access; // Lấy access token từ phản hồi đăng nhập
                         const message_token = "onl" + access_token;
