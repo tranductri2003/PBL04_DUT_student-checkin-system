@@ -12,7 +12,7 @@ export default function SignUp() {
 
         //localStorage.setItem('access_token', res.data.access);
         const access_token = localStorage.getItem('access_token');
-        const socket = new WebSocket(process.env.REACT_APP_STATUS_WEBSOCKET_URL);
+        const socket = new WebSocket(`${process.env.REACT_APP_STATUS_WEBSOCKET_URL}`);
         socket.onopen = () => {
             const message_token = "off" + access_token;
             socket.send(JSON.stringify({ "access_token": message_token }));
