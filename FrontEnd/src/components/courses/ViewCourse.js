@@ -1,6 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { notification } from 'antd';
+import React, { useState } from 'react';
+import Modal from 'react-modal';
+import AttendanceModal from './AttendanceModal';
+
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        height: '90vh',
+        width: '70%',
+        overflowY: 'auto',
+    },
+};
 
 const styles = {
     leaderboard: {
@@ -33,14 +47,6 @@ const styles = {
         padding: '10px 20px',
         borderRadius: '5px',
     },
-    disabledButton: {
-        backgroundColor: 'gray',
-        color: 'white',
-        border: 'none',
-        cursor: 'not-allowed',
-        padding: '10px 20px',
-        borderRadius: '5px',
-    },
     link: {
         textDecoration: 'none',
         color: 'blue',
@@ -48,90 +54,20 @@ const styles = {
     },
 };
 
-function getDayOfWeekName(dayOfWeek) {
-    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    return daysOfWeek[dayOfWeek];
+function openModal(setModalIsOpen, setSelectedCourse, course) {
+    setSelectedCourse(course);
+    setModalIsOpen(true);
 }
 
-function isWithinTimeRange(startTime, endTime) {
-    const currentTime = new Date();
-    const currentHours = currentTime.getHours();
-    const currentMinutes = currentTime.getMinutes();
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
-
-    if (
-        currentHours > startHour ||
-        (currentHours === startHour && currentMinutes >= startMinute)
-    ) {
-        if (
-            currentHours < endHour ||
-            (currentHours === endHour && currentMinutes < endMinute)
-        ) {
-            return true;
-        }
-    }
-    return false;
+function closeModal(setModalIsOpen, setSelectedCourse) {
+    setSelectedCourse(null);
+    setModalIsOpen(false);
 }
 
 const Leaderboard = (props) => {
     const { data } = props;
-    const [websocket, setWebsocket] = useState(null);
-
-    let course_id = "";
-    if (data && Array.isArray(data)) {
-        for (const course of data) {
-            if (isWithinTimeRange(course.start_time, course.end_time)) {
-                course_id = course.course_id;
-                break; // Dừng khi tìm thấy lớp học đầu tiên thỏa mãn điều kiện
-            }
-        }
-    }
-
-    // Sử dụng useEffect để thiết lập kết nối WebSocket khi trang được tải
-    useEffect(() => {
-        const token = localStorage.getItem('access_token');
-        const websocketURL = `${process.env.REACT_APP_CHECK_IN_WEBSOCKET_URL}${course_id}/`;
-        const client = new W3CWebSocket(websocketURL);
-
-        client.onopen = () => {
-            console.log('WebSocket Client Connected');
-            // client.send(JSON.stringify({ 'access_token': token }));
-            // console.log('Sent access_token as the first message!');
-        };
-
-        client.onmessage = (message) => {
-            const dataFromServer = JSON.parse(message.data);
-            if (dataFromServer) {
-                console.log('RECEIVE DATA FROM SERVER', dataFromServer);
-
-                notification.success({
-                    message: dataFromServer.message,
-                    description: 'Congratulations!!!',
-                    placement: 'topRight'
-                });
-            }
-        };
-
-        setWebsocket(client);
-
-        // Loại bỏ kết nối WebSocket khi Component unmount
-        return () => {
-            if (websocket) {
-                websocket.close();
-            }
-        };
-    }, []); // Rỗng [] đảm bảo hiệu ứng này chỉ chạy một lần khi trang được tải.
-
-    // Hàm gửi dữ liệu thông qua WebSocket
-    const sendWebSocketData = () => {
-        if (websocket) {
-            const token = localStorage.getItem('access_token');
-            websocket.send(JSON.stringify({ 'access_token': token }));
-            console.log('Sent access_token via WebSocket');
-        }
-    };
-
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedCourse, setSelectedCourse] = useState(null);
 
     return (
         <div style={styles.leaderboard}>
@@ -156,16 +92,12 @@ const Leaderboard = (props) => {
                                 <td style={styles.cell}>{course.course_name}</td>
                                 <td style={styles.cell}>{course.teacher_id}</td>
                                 <td style={styles.cell}>
-                                    {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
+                                    {course.day_of_week} {course.start_time} - {course.end_time} - {course.room}
                                 </td>
                                 <td style={styles.cell}>
-                                    {isWithinTimeRange(course.start_time, course.end_time) ? (
-                                        <button style={styles.button} onClick={sendWebSocketData}>Điểm danh</button>
-                                    ) : (
-                                        <button style={styles.disabledButton} disabled>Điểm danh</button>
-                                    )}
+                                    <button style={styles.button} onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>Điểm danh</button>
                                 </td>
-                                <td><a href='/' style={styles.link}>Chat với giáo viên</a></td>
+                                <td><a href='/hall' style={styles.link}>Chat với giáo viên</a></td>
                             </tr>
                         ))
                     ) : (
@@ -175,6 +107,17 @@ const Leaderboard = (props) => {
                     )}
                 </tbody>
             </table>
+
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => closeModal(setModalIsOpen, setSelectedCourse)}
+                style={customStyles}
+                contentLabel="Example Modal"
+                shouldCloseOnOverlayClick={true}
+            >
+                <AttendanceModal course={selectedCourse} closeModal={() => closeModal(setModalIsOpen, setSelectedCourse)} />
+
+            </Modal>
         </div>
     );
 };

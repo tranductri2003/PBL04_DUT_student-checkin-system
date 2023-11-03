@@ -48,7 +48,11 @@ class AttendanceConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def sendMessage(self, user):
-        message = f"{user.full_name} đã điểm danh!"
+        message = {
+            'student_id': user.staff_id,
+            'full_name': user.full_name,
+            'message': f"{user.full_name} đã điểm danh"
+        }
         await self.channel_layer.group_send(
             self.courseGroupName,
             {

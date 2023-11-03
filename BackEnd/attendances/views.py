@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404  
 from datetime import datetime
+from rest_framework.exceptions import PermissionDenied
 
 from attendances.models import Attendances
 from attendances.serializers import AttendanceSerializer
@@ -18,6 +19,13 @@ class AttendanceListView(generics.ListAPIView):
     pagination_class = CustomPageNumberPagination
     
     def get_queryset(self):
+        page_size = self.request.GET.get('page_size', None)
+        if page_size is None:
+            page_size = CustomPageNumberPagination.page_size
+        else:
+            page_size = int(page_size)
+        self.pagination_class.page_size = page_size
+        
         if not self.request.user.is_authenticated:
             return Response({"message": "Please login to update."}, status=status.HTTP_401_UNAUTHORIZED)
         
@@ -29,7 +37,9 @@ class AttendanceListView(generics.ListAPIView):
             queryset = Attendances.objects.filter(course_id__in=course_list)
             
         else:
-            queryset = Attendances.objects.filter(student_id=self.request.user)
+            # queryset = Attendances.objects.filter(student_id=self.request.user)
+            queryset = Attendances.objects.all()
+
         
         course_id = self.request.GET.get('course_id', None)
         if course_id is not None:
@@ -41,12 +51,18 @@ class AttendanceListView(generics.ListAPIView):
                 
         attendance_date = self.request.GET.get('attendance_date', None)
         if attendance_date is not None:
-            queryset.filter(attendance_date=attendance_date)
+            queryset = queryset.filter(attendance_date=attendance_date)
             
         status = self.request.GET.get('status', None)
         if status is not None:
-            queryset.filter(status=status)
+            queryset = queryset.filter(status=status)
         
+        student_id = self.request.GET.get('student_id', None)
+        if student_id is not None:
+            if student_id != self.request.user.staff_id:
+                raise PermissionDenied("You do not have permission")
+            else:
+                queryset = queryset.filter(student_id__staff_id=student_id)
         return queryset.order_by('-attendance_date', '-attendance_time')       
         
 class AttendanceUpdateView(generics.UpdateAPIView):
