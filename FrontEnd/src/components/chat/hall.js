@@ -91,7 +91,7 @@ function ChatHall() {
     }, []);
 
     useEffect(() => {
-        const socket = new WebSocket(process.env.REACT_APP_CHECK_IN_WEBSOCKET_URL);
+        const socket = new WebSocket(process.env.REACT_APP_STATUS_WEBSOCKET_URL);
 
         socket.onopen = () => {
             console.log('Kết nối WebSocket đã mở');
