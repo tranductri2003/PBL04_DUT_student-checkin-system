@@ -34,6 +34,10 @@ class AttendanceConsumer(AsyncWebsocketConsumer):
             end_time = str(course.end_time)
             current_time = datetime.datetime.now().strftime("%H:%M:%S")
 
+            print(1111, staff_id)
+            print(2222, start_time <= current_time <= end_time)
+            print(4444, start_time, current_time, end_time)
+            print(3333, await self.student_in_course(user, course))
             if await self.student_in_course(user, course) and start_time <= current_time <= end_time:
                 await self.check_in(user, course)
                 await self.sendMessage(user)
