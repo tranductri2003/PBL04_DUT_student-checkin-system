@@ -200,7 +200,9 @@ const AttendanceModal = (props) => {
                                         <td style={modalStyles.cell}>{index + 1}</td>
                                         <td style={modalStyles.cell}>{user.staff_id}</td>
                                         <td style={modalStyles.cell}>{user.full_name}</td>
-                                        <td style={modalStyles.cell}>{course.course_name}</td>
+                                        <td style={modalStyles.cell}>
+                                            {course ? course.course_name : '-'}
+                                        </td>
                                         <td style={modalStyles.cell}>
                                             {presentStudents[user.staff_id] ? (
                                                 <span style={modalStyles.tick}>&#10003;</span>
