@@ -6,7 +6,6 @@ import queryString from 'query-string';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import { notification, Select, DatePicker } from 'antd'
-import jwt_decode from "jwt-decode";
 
 const { Option } = Select;
 
@@ -62,6 +61,7 @@ function AttendanceSite() {
         axiosInstance.get("/course")
             .then((response) => {
                 const subjectsData = response.data;
+                console.log(response.data);
 
                 setSubjects(subjectsData); // Cập nhật danh sách môn học
 
@@ -87,6 +87,7 @@ function AttendanceSite() {
     // Lấy các tham số từ URL của FE
     const params = queryString.parse(window.location.search);
     const urlParams = new URLSearchParams(window.location.search);
+
     const currentPage = parseInt(urlParams.get('page')) || 1;
     appState.currentPage = currentPage;
 
@@ -122,13 +123,10 @@ function AttendanceSite() {
         window.location.href = newUrl;
     }
 
-    const token = localStorage.getItem("access_token"); // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
 
-    // Giải mã token
-    const decodedToken = jwt_decode(token);
     const queryParams = {
         page: params.page,
-        student_id: decodedToken["staff_id"],
+        student_id: params.student_id,
     };
     const url = axiosInstance.getUri({
         url: "attendance/",
@@ -136,14 +134,20 @@ function AttendanceSite() {
     });
 
     useEffect(() => {
-        console.log(url);
         axiosInstance.get(url).then((response) => {
             console.log(response.data);
 
 
             if (response.data && response.data.results) {
                 const allAttendances = response.data.results;
-                setAppState({ loading: false, attendances: allAttendances, next: response.data.next, previous: response.data.previous, maxPage: response.data.count, perPage: response.data.page_size });
+                setAppState({
+                    loading: false,
+                    attendances: allAttendances,
+                    next: response.data.next,
+                    previous: response.data.previous,
+                    maxPage: response.data.count,
+                    perPage: response.data.page_size
+                });
             } else {
                 // Handle the case where response data is null or missing data
                 notification.error({
@@ -313,17 +317,19 @@ function AttendanceSite() {
                     </Button>
                 )}
                 {/* Hiển thị dãy số trang */}
-                {Array.from({ length: Math.ceil(appState.maxPage / appState.perPage) }, (_, index) => index + 1).map((page) => (
-                    <Button
-                        key={page}
-                        variant={page === appState.currentPage ? "contained" : "outlined"}
-                        color="primary"
-                        onClick={() => handlePageNumber(page)}
-                        className={classes.pageButton}
-                    >
-                        {page}
-                    </Button>
-                ))}
+                {Array.from({ length: Math.ceil(appState.maxPage / appState.perPage) }, (_, index) => index + 1)
+                    .filter(page => page <= Math.ceil(appState.maxPage / appState.perPage))
+                    .map((page) => (
+                        <Button
+                            key={page}
+                            variant={page === appState.currentPage ? "contained" : "outlined"}
+                            color="primary"
+                            onClick={() => handlePageNumber(page)}
+                            className={classes.pageButton}
+                        >
+                            {page}
+                        </Button>
+                    ))}
 
                 {/* Hiển thị nút Next nếu không phải trang cuối cùng */}
                 {appState.next != null && (

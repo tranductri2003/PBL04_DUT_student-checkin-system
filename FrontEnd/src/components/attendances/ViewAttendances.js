@@ -49,6 +49,7 @@ const styles = {
 const Leaderboard = (props) => {
     const { data } = props;
     console.log(data);
+
     return (
         <div style={styles.leaderboard}>
             <table style={styles.table}>
@@ -62,7 +63,7 @@ const Leaderboard = (props) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((attendance, index) => (
+                    {data?.map((attendance, index) => (
                         <tr key={attendance.id}>
                             <td style={styles.cell}>{attendance.course_name}</td>
                             <td style={styles.cell}>{attendance.attendance_time}</td>
