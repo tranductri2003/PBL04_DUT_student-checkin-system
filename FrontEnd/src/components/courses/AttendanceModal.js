@@ -1,7 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../../axios';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { notification } from 'antd';
+import Webcam from 'react-webcam';
+import styled from 'styled-components';
+import download from 'downloadjs';
+
+
+let isFaceValidated = false; // Global variable for overall validation
+let isLocationValidated = false;
+
+
+const WebcamOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;
+
+const CaptureButton = styled.button`
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
 
 const modalStyles = {
     AttendanceModal: {
@@ -49,13 +79,38 @@ const modalStyles = {
         fontSize: '20px',
         color: 'red',
     },
-    button: {
+    cameraButton: {
+        position: 'absolute',
+        left: '10px', // Adjust left position as needed
+        bottom: '10px', // Adjust top position as needed
         backgroundColor: 'green',
         color: 'white',
         border: 'none',
         cursor: 'pointer',
         padding: '10px 20px',
         borderRadius: '5px',
+    },
+    checkLocationButton: {
+        position: 'absolute',
+        left: '200px', // Adjust left position as needed
+        bottom: '10px', // Adjust top position as needed
+        backgroundColor: 'green',
+        color: 'white',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '10px 20px',
+        borderRadius: '5px',
+    },
+    button: {
+        position: 'absolute',
+        bottom: '10px', // Adjust top position as needed
+        backgroundColor: 'green',
+        color: 'white',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        margin: "center",
     },
 };
 
@@ -90,6 +145,74 @@ const AttendanceModal = (props) => {
     const [users, setUsers] = useState([]);
     const [presentStudents, setPresentStudents] = useState([]);
     const [websocket, setWebsocket] = useState(null);
+
+    const [webcamVisible, setWebcamVisible] = useState(false);
+    const [capturedImage, setCapturedImage] = useState(null);
+    const webcamRef = useRef(null);
+
+    const [savedPosition, setSavedPosition] = useState(null);
+    // const [isImageCaptured, setIsImageCaptured] = useState(false);
+    // const [isLocationValidated, setisLocationValidated] = useState(false);
+
+
+    const saveImageToLocalstorage = (imageName, imageData) => {
+        localStorage.setItem(imageName, imageData);
+    };
+
+
+
+    // Function to convert data URI to Blob
+    function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    }
+
+
+
+
+    const handleCapture = () => {
+        const image = webcamRef.current.getScreenshot();
+        setCapturedImage(image);
+        setWebcamVisible(false);
+        saveImageToLocalstorage('check_in_image', image);
+        // setIsImageCaptured(true);
+        // console.log('isImageCaptured:', isImageCaptured); // Add this line to log the state
+
+        const token = localStorage.getItem('access_token');
+
+        const formData = new FormData();
+        formData.append('staff_id', '102210096');
+        formData.append('image', dataURItoBlob(image)); // Convert data URI to Blob
+
+        console.log(isFaceValidated);
+        axiosInstance.post(
+            `${process.env.REACT_APP_AI_URL}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
+                },
+            }
+        )
+            .then(response => {
+                isFaceValidated = response.data.validated; // Update the face validation status
+                console.log(response.data);
+                console.log(isFaceValidated);
+
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải dữ liệu users:', error);
+            });
+    };
+
+
 
     // Sử dụng useEffect để thiết lập kết nối WebSocket khi trang được tải
     useEffect(() => {
@@ -139,14 +262,116 @@ const AttendanceModal = (props) => {
         };
     }, []); // Rỗng [] đảm bảo hiệu ứng này chỉ chạy một lần khi trang được tải.
 
-    // Hàm gửi dữ liệu thông qua WebSocket
-    const sendWebSocketData = () => {
-        if (websocket) {
-            const token = localStorage.getItem('access_token');
-            websocket.send(JSON.stringify({ 'check_in': token }));
-            console.log('Sent check-in signal and access_token via WebSocket');
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Bán kính trái đất trong km
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) *
+            Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // Khoảng cách trong km
+        return distance;
+    }
+
+    const handleCheckLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const { latitude, longitude } = position.coords;
+                const currentPosition = { latitude, longitude };
+                localStorage.setItem('position', JSON.stringify(currentPosition));
+
+                // Show the coordinates on the screen
+                notification.info({
+                    message: 'Current Location',
+                    description: `Latitude: ${latitude}, Longitude: ${longitude}`,
+                    placement: 'topRight'
+                });
+
+                // Open Google Maps with the current coordinates
+                const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                // window.open(googleMapsLink, '_blank');
+
+                // Set the saved position to state for rendering on the screen
+                setSavedPosition(currentPosition);
+
+                const distance = calculateDistance(
+                    latitude,
+                    longitude,
+                    16.073981,
+                    108.149891
+                );
+                console.log(isLocationValidated);
+                if (distance <= 1) {
+                    // Nếu khoảng cách lớn hơn 1km, thông báo
+                    isLocationValidated = true;
+                    notification.success({
+                        message: 'Distance Check',
+                        description: `The distance is smaller than 1km. Goood.`,
+                        placement: 'topRight'
+                    });
+
+                } else {
+                    isLocationValidated = false;
+                    notification.error({
+                        message: 'Distance Check',
+                        description: `The distance is greater than 1km. Please check in within 1km.`,
+                        placement: 'topRight'
+                    });
+                    console.log('isLocationValidated:', isLocationValidated); // Add this line to log the state
+
+                }
+                console.log(isLocationValidated);
+
+
+
+
+            }, (error) => {
+                console.error('Error getting location:', error);
+                notification.error({
+                    message: 'Error',
+                    description: 'Could not retrieve location.',
+                    placement: 'topRight'
+                });
+            });
+        } else {
+            // Geolocation is not supported
+            // Handle the case where geolocation is not supported
+            notification.error({
+                message: 'Error',
+                description: 'Geolocation is not supported by your browser.',
+                placement: 'topRight'
+            });
         }
     };
+
+
+
+    // Hàm gửi dữ liệu thông qua WebSocket
+    const sendWebSocketData = () => {
+        if (isFaceValidated && isLocationValidated) {
+            if (websocket) {
+                const token = localStorage.getItem('access_token');
+                websocket.send(JSON.stringify({ 'check_in': token }));
+                console.log('Sent check-in signal and access_token via WebSocket');
+            }
+        } else {
+            // Show a notification for invalid conditions
+            notification.error({
+                message: 'Error',
+                description: 'Invalid conditions for check-in. Please check face validation and location.',
+                placement: 'topRight'
+            });
+        }
+    };
+
+    const turnOnCamera = () => {
+        setWebcamVisible(true);
+    };
+
 
 
     useEffect(() => {
@@ -180,6 +405,7 @@ const AttendanceModal = (props) => {
 
     return (
         <div style={modalStyles.AttendanceModal}>
+
             <div style={modalStyles.tableContainer}>
                 <div style={modalStyles.tableWrapper}>
                     <table style={modalStyles.table}>
@@ -209,6 +435,8 @@ const AttendanceModal = (props) => {
                                             ) : (
                                                 <span style={modalStyles.cross}>&#10007;</span>
                                             )}
+                                            {presentStudents[user.staff_id] && presentStudents[user.staff_id].message}
+
                                         </td>
                                         <td style={modalStyles.cell}>{presentStudents[user.staff_id] || '-'}</td>
                                     </tr>
@@ -219,12 +447,50 @@ const AttendanceModal = (props) => {
                                 </tr>
                             )}
                         </tbody>
-                        {isWithinTimeRange(course?.start_time, course?.end_time) ? (
-                            <button style={modalStyles.button} onClick={sendWebSocketData}>Điểm danh</button>
-                        ) : (
-                            <button style={modalStyles.disabledButton} disabled>Điểm danh</button>
-                        )}
+
                     </table>
+                    {isWithinTimeRange(course?.start_time, course?.end_time) ? (
+                        <>
+                            <>
+                                <button style={modalStyles.cameraButton} onClick={turnOnCamera}>
+                                    Bật camera điểm danh
+                                </button>
+                                <button style={modalStyles.checkLocationButton} onClick={handleCheckLocation}>
+                                    Kiểm tra vị trí
+                                </button>
+                            </>
+                            <div style={{ margin: '20px', textAlign: 'center' }}>
+                                <button style={modalStyles.button} onClick={sendWebSocketData}>
+                                    Điểm danh
+                                </button>
+                            </div>
+                            {webcamVisible && (
+                                <WebcamOverlay>
+                                    <Webcam
+                                        audio={false}
+                                        videoConstraints={{ facingMode: 'user' }}
+                                        ref={webcamRef}
+                                    />
+                                    <CaptureButton onClick={handleCapture}>Chụp ảnh</CaptureButton>
+                                </WebcamOverlay>
+                            )}
+                        </>
+                    ) : (
+                        <button style={modalStyles.disabledButton} disabled>Bật camera điểm danh</button>
+                    )}
+                    {savedPosition && (
+                        <div style={{ margin: '20px', textAlign: 'center' }}>
+                            <h3>vị trí:</h3>
+                            <p>Vĩ độ: {savedPosition.latitude}</p>
+                            <p>Kinh độ: {savedPosition.longitude}</p>
+                        </div>
+                    )}
+                    {capturedImage && (
+                        <div>
+                            <h3>Ảnh đã chụp:</h3>
+                            <img src={capturedImage} alt="Captured" />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
