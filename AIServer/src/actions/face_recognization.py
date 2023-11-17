@@ -4,6 +4,10 @@ from keras.models import Model
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import cv2
+import jwt
+from settings import JWT_SECRET_KEY, MEDIA_URL
+from flask import request, jsonify
+import requests
 
 import os
 from db import *
@@ -33,7 +37,7 @@ def create_features(staff_id, image):
 
     # Trích xuất đặc trưng từ ảnh đã lưu
     features_vector = extract_features(img_path)
-    print(111111, features_vector)
+
     # Insert đặc trưng vào cơ sở dữ liệu
     conn = get_connection()
     cur = conn.cursor()
@@ -42,7 +46,6 @@ def create_features(staff_id, image):
 
     if existing_record:
         cur.execute("UPDATE FaceFeatures SET features = %s WHERE staff_id = %s", (features_vector.tolist(), staff_id))
-
     else:
         cur.execute("INSERT INTO FaceFeatures (features, staff_id) VALUES (%s , %s)", (features_vector.tolist(), staff_id))
 
@@ -62,22 +65,37 @@ def face_recognize(staff_id, image, threshold = 0.1):
     image.save(img_path)
     check_vector = extract_features(img_path)
 
+    decoded_token = jwt.decode(jwt=request.headers.get('Authorization').split(' ')[1], key=JWT_SECRET_KEY, algorithms=['HS256'])
+    avatar_url = MEDIA_URL + decoded_token.get('avatar')
+    
+    # Sử dụng thư viện requests để tải ảnh từ URL
+    response = requests.get(avatar_url)
+    url_path = os.path.join(current_directory, "temp_avatar.jpg") 
+    with open(url_path, 'wb') as f:
+            f.write(response.content)
+            
+    base_vector = extract_features(url_path)
 
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM FaceFeatures WHERE staff_id = %s', (str(staff_id), )) 
-    base_vector = cur.fetchone() 
-    cur.close()
-    close_connection(conn)
+    
+
+    # conn = get_connection()
+    # cur = conn.cursor()
+    # cur.execute('SELECT * FROM FaceFeatures WHERE staff_id = %s', (str(staff_id), )) 
+    # base_vector = cur.fetchone() 
+    # cur.close()
+    # close_connection(conn)
     
     print(len(base_vector))
     print(len(check_vector))
 
-    # matrix = np.vstack([base_vector, check_vector])
+    matrix = np.vstack([base_vector, check_vector])
     
-    # cosine_sim = cosine_similarity(matrix)
-    # os.remove(img_path)
+    cosine_sim = cosine_similarity(matrix)
+    os.remove(img_path)
+    os.remove(url_path)
 
-    # return cosine_sim
-    
+    # Chuyển giá trị float32 thành float
+    cosine_similarity_value = float(cosine_sim[0, 1])
+    print(cosine_similarity_value)
+    return cosine_similarity_value
     
