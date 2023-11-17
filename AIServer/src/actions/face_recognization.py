@@ -57,7 +57,7 @@ def create_features(staff_id, image):
 
      
 
-def face_recognize(staff_id, image, threshold = 0.1):
+def face_recognize(staff_id, image, threshold = 0.4):
     # Lấy đường dẫn của thư mục chứa tệp tin hiện tại
     current_directory = os.path.dirname(os.path.abspath(__file__))
     
@@ -97,5 +97,8 @@ def face_recognize(staff_id, image, threshold = 0.1):
     # Chuyển giá trị float32 thành float
     cosine_similarity_value = float(cosine_sim[0, 1])
     print(cosine_similarity_value)
-    return cosine_similarity_value
+    
+    check = True if cosine_similarity_value >= threshold else False
+    return cosine_similarity_value, check
+    
     

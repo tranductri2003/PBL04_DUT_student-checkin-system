@@ -32,4 +32,4 @@ def face_recognization():
     staff_id = decoded_token.get('staff_id')
     image = request.files['image']
     result = face_recognize(staff_id=staff_id, image=image)
-    return jsonify({"data": result}), 200
+    return jsonify({"cosine_similarity_value": result[0], "validated": result[1]}), 200
