@@ -40,7 +40,7 @@ def create_table():
 def drop_table():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute('DROP TABLE ImageFeatures;') 
+    cur.execute('DROP TABLE FaceFeatures;') 
     conn.commit() 
     cur.close() 
     conn.close() 

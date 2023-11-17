@@ -143,8 +143,8 @@ const AttendanceModal = (props) => {
     const sendWebSocketData = () => {
         if (websocket) {
             const token = localStorage.getItem('access_token');
-            websocket.send(JSON.stringify({ 'access_token': token }));
-            console.log('Sent access_token via WebSocket');
+            websocket.send(JSON.stringify({ 'check_in': token }));
+            console.log('Sent check-in signal and access_token via WebSocket');
         }
     };
 
