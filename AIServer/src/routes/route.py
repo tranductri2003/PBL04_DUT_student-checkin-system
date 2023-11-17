@@ -10,7 +10,7 @@ api_v1 = Blueprint('api_v1', __name__)
 def home():
     return jsonify({"msg":"Hello"}), 200
 
-@api_v1.route('/image-features', methods=["POST"])
+@api_v1.route('/create-image-features', methods=["POST"])
 def add_image_feature():
     img = request.files['image']
     staff_id = request.form.get('staff_id')
