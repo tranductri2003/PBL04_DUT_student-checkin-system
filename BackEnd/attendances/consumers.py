@@ -23,33 +23,31 @@ class AttendanceConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        access_token = text_data_json["access_token"]
+        
+        if "check_in" in text_data_json:
+            access_token = text_data_json["check_in"]
 
-        try:
-            decoded_token = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])
-            staff_id = decoded_token.get('staff_id')
-            user = await self.get_user(staff_id)
-            course = await self.get_course()
-            start_time = str(course.start_time)
-            end_time = str(course.end_time)
-            current_time = datetime.datetime.now().strftime("%H:%M:%S")
+            try:
+                decoded_token = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])
+                staff_id = decoded_token.get('staff_id')
+                user = await self.get_user(staff_id)
+                course = await self.get_course()
+                start_time = str(course.start_time)
+                end_time = str(course.end_time)
+                current_time = datetime.datetime.now().strftime("%H:%M:%S")
 
-            print(1111, staff_id)
-            print(2222, start_time <= current_time <= end_time)
-            print(4444, start_time, current_time, end_time)
-            print(3333, await self.student_in_course(user, course))
-            if await self.student_in_course(user, course) and start_time <= current_time <= end_time:
-                await self.check_in(user, course)
-                await self.sendMessage(user)
-            else:
-                print("Invalid or missing staff_id in access_token")
+                if await self.student_in_course(user, course) and start_time <= current_time <= end_time:
+                    await self.check_in(user, course)
+                    await self.sendMessage(user)
+                else:
+                    print("Invalid or missing staff_id in access_token")
+                    await self.close()
+            except jwt.ExpiredSignatureError:
+                print("Token has expired")
                 await self.close()
-        except jwt.ExpiredSignatureError:
-            print("Token has expired")
-            await self.close()
-        except jwt.DecodeError:
-            print("Invalid token")
-            await self.close()
+            except jwt.DecodeError:
+                print("Invalid token")
+                await self.close()
 
     async def sendMessage(self, user):
         message = {
