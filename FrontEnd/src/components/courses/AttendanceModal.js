@@ -205,6 +205,21 @@ const AttendanceModal = (props) => {
                 isFaceValidated = response.data.validated; // Update the face validation status
                 console.log(response.data);
                 console.log(isFaceValidated);
+                if (response.data.validated === true) {
+                    isFaceValidated = true;
+                    notification.success({
+                        message: 'Face Check',
+                        description: `Validated!. Gudjob! ${response.data.cosine_similarity_value}`,
+                        placement: 'topRight'
+                    });
+                } else {
+                    isFaceValidated = false;
+                    notification.error({
+                        message: 'Face Check',
+                        description: `Not Validated!. Please try again! ${response.data.cosine_similarity_value}`,
+                        placement: 'topRight'
+                    });
+                }
 
             })
             .catch(error => {

@@ -57,7 +57,7 @@ def create_features(staff_id, image):
 
      
 
-def face_recognize(staff_id, image, threshold = 0.4):
+def face_recognize(staff_id, image, threshold = 0.3):
     # Lấy đường dẫn của thư mục chứa tệp tin hiện tại
     current_directory = os.path.dirname(os.path.abspath(__file__))
     
