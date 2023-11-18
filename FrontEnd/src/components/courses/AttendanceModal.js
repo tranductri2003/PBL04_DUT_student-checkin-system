@@ -205,6 +205,21 @@ const AttendanceModal = (props) => {
                 isFaceValidated = response.data.validated; // Update the face validation status
                 console.log(response.data);
                 console.log(isFaceValidated);
+                if (response.data.validated === true) {
+                    isFaceValidated = true;
+                    notification.success({
+                        message: 'Face Check',
+                        description: `Validated!. Gudjob! ${response.data.cosine_similarity_value}`,
+                        placement: 'topRight'
+                    });
+                } else {
+                    isFaceValidated = false;
+                    notification.error({
+                        message: 'Face Check',
+                        description: `Not Validated!. Please try again! ${response.data.cosine_similarity_value}`,
+                        placement: 'topRight'
+                    });
+                }
 
             })
             .catch(error => {
@@ -310,7 +325,7 @@ const AttendanceModal = (props) => {
                     isLocationValidated = true;
                     notification.success({
                         message: 'Distance Check',
-                        description: `The distance is smaller than 1km. Goood.`,
+                        description: `The distance is smaller than 1km (${distance} km). Good.`,
                         placement: 'topRight'
                     });
 
@@ -318,7 +333,7 @@ const AttendanceModal = (props) => {
                     isLocationValidated = false;
                     notification.error({
                         message: 'Distance Check',
-                        description: `The distance is greater than 1km. Please check in within 1km.`,
+                        description: `The distance is greater than 1km (${distance} km). Please check in within 1km.`,
                         placement: 'topRight'
                     });
                     console.log('isLocationValidated:', isLocationValidated); // Add this line to log the state
