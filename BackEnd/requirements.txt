@@ -21,3 +21,4 @@ django-filter
 channels
 daphne
 django-allauth
+django-db-connection-pool

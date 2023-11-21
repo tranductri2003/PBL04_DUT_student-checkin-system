@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'django_filters',
-    'chat',
 
     # 'django.contrib.sites', # new
 
@@ -63,6 +62,7 @@ INSTALLED_APPS = [
     'courses',
     'attendances',
     'authentication',
+    'chat',
 ]
 
 ASGI_APPLICATION = 'core.asgi.application' 
@@ -114,12 +114,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Sử dụng các biến môi trường trong cấu hình
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "dj_db_conn_pool.backends.postgresql",
         "NAME": os.getenv("DB_NAME", 'postgres'),
         "USER": os.getenv("DB_USER", 'postgres'),
         "HOST": os.getenv("DB_HOST", 'localhost'),
         "PASSWORD": os.getenv("DB_PASSWORD", 'postgres'),
         "PORT": os.getenv("DB_PORT", 5432),
+        "POOL_OPTIONS": {
+            'POOL_SIZE': 50,
+            'MAX_OVERFLOW': 10,
+            'RECYCLE': 120,
+        }
     }
 }
 
