@@ -11,7 +11,7 @@ api_v1 = Blueprint('api_v1', __name__)
 def home():
     return jsonify({"msg":"Hello"}), 200
 
-@api_v1.route('/image-features', methods=["POST"])
+@api_v1.route('/create-image-features', methods=["POST"])
 def add_image_feature():
     decoded_token = jwt.decode(jwt=request.headers.get('Authorization').split(' ')[1], key=JWT_SECRET_KEY, algorithms=['HS256'])
     if decoded_token.get('role', None) != 'A':
@@ -31,5 +31,6 @@ def face_recognization():
         return jsonify({"msg": "Unauthorized"}), 401
     staff_id = decoded_token.get('staff_id')
     image = request.files['image']
-    result = face_recognize(staff_id=staff_id, image=image)
+    avatar = decoded_token.get('avatar')
+    result = face_recognize(staff_id, avatar, image, 0.3)
     return jsonify({"cosine_similarity_value": result[0], "validated": result[1]}), 200
