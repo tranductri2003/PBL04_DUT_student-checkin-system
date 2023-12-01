@@ -209,14 +209,14 @@ const AttendanceModal = (props) => {
                     isFaceValidated = true;
                     notification.success({
                         message: 'Face Check',
-                        description: `Validated!. Gudjob! ${response.data.cosine_similarity_value}`,
+                        description: `Validated!. Gudjob! `,
                         placement: 'topRight'
                     });
                 } else {
                     isFaceValidated = false;
                     notification.error({
                         message: 'Face Check',
-                        description: `Not Validated!. Please try again! ${response.data.cosine_similarity_value}`,
+                        description: `Not Validated!. Please try again!`,
                         placement: 'topRight'
                     });
                 }

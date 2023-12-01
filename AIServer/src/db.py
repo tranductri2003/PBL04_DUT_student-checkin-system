@@ -32,7 +32,7 @@ def close_connection(conn):
 def create_table():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS FaceFeatures (id serial PRIMARY KEY, staff_id varchar(15) UNIQUE, features double precision[]);') 
+    cur.execute('CREATE TABLE IF NOT EXISTS FaceFeatures (id serial PRIMARY KEY, staff_id varchar(15) UNIQUE, features text);') 
     conn.commit() 
     cur.close() 
     conn.close() 
