@@ -49,7 +49,9 @@ const styles = {
 const Leaderboard = (props) => {
     const { data } = props;
     console.log(data);
-
+    const formatTime = (timeString) => {
+        return timeString.split('.')[0]; // Chỉ lấy phần trước dấu chấm
+    };
     return (
         <div style={styles.leaderboard}>
             <table style={styles.table}>
@@ -66,7 +68,7 @@ const Leaderboard = (props) => {
                     {data?.map((attendance, index) => (
                         <tr key={attendance.id}>
                             <td style={styles.cell}>{attendance.course_name}</td>
-                            <td style={styles.cell}>{attendance.attendance_time}</td>
+                            <td style={styles.cell}>{formatTime(attendance.attendance_time)}</td>
                             <td style={styles.cell}>{attendance.attendance_date}</td>
                             <td style={styles.cell}>{attendance.status ? 'Present' : 'Absent'}</td>
                             <td style={styles.cell}>{attendance.note}</td>

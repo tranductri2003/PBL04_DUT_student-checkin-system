@@ -85,9 +85,8 @@ function AttendanceSite() {
             });
     }, []);
     // Lấy các tham số từ URL của FE
-    const params = queryString.parse(window.location.search);
+    //const params = queryString.parse(window.location.search);
     const urlParams = new URLSearchParams(window.location.search);
-
     const currentPage = parseInt(urlParams.get('page')) || 1;
     appState.currentPage = currentPage;
 
@@ -103,12 +102,11 @@ function AttendanceSite() {
         }
 
         // Lọc theo trạng thái
-        if (selectedStatus === 'true' || selectedStatus === 'false') {
+        if (selectedStatus === 'True' || selectedStatus === 'False') {
             urlParams.set('status', selectedStatus);
         } else {
             urlParams.delete('status');
         }
-
         // Lọc theo ngày tháng năm
         if (selectedDate) {
             const formattedDate = selectedDate.toISOString().split('T')[0];
@@ -117,26 +115,32 @@ function AttendanceSite() {
             urlParams.delete('attendance_date');
         }
 
-        const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
+        //const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
 
         // Chuyển hướng trang sang URL mới
-        window.location.href = newUrl;
+        window.location.search = urlParams.toString();
     }
 
 
-    const queryParams = {
-        page: params.page,
-        student_id: params.student_id,
-    };
-    const url = axiosInstance.getUri({
-        url: "attendance/",
-        params: queryParams,
-    });
+    // const queryParams = {
+    //     page: params.page,
+    // };
+
+
+    // const url = axiosInstance.getUri({
+    //     url: "attendance/",
+    //     params: queryParams,
+    // });
 
     useEffect(() => {
-        axiosInstance.get(url).then((response) => {
-            console.log(response.data);
+        const queryParams = queryString.parse(window.location.search);
+        const fetchUrl = axiosInstance.getUri({
+            url: "attendance/",
+            params: queryParams,
+        });
 
+        axiosInstance.get(fetchUrl).then((response) => {
+            console.log(response.data);
 
             if (response.data && response.data.results) {
                 const allAttendances = response.data.results;
@@ -218,7 +222,7 @@ function AttendanceSite() {
                     });
                 }
             });;
-    }, [setAppState, url]);
+    }, [window.location.search]);
 
 
 
@@ -284,8 +288,8 @@ function AttendanceSite() {
                         placeholder="Select Status"
                         onChange={value => setSelectedStatus(value)}
                     >
-                        <Option value="true">Present</Option>
-                        <Option value="false">Absent</Option>
+                        <Option value="True">Present</Option>
+                        <Option value="False">Absent</Option>
                     </Select>
                     <DatePicker
                         className={classes.datePicker}

@@ -20,6 +20,7 @@ class AttendanceListView(generics.ListAPIView):
     
     def get_queryset(self):
         page_size = self.request.GET.get('page_size', None)
+        
         if page_size is None:
             page_size = CustomPageNumberPagination.page_size
         else:
@@ -38,16 +39,21 @@ class AttendanceListView(generics.ListAPIView):
             
         else:
             # queryset = Attendances.objects.filter(student_id=self.request.user)
-            queryset = Attendances.objects.all()
+            queryset = Attendances.objects.filter(student_id=self.request.user)
 
         
         course_id = self.request.GET.get('course_id', None)
         if course_id is not None:
             try:
-                course = Courses.objects.get(course_id=course_id)
-                queryset = queryset.filter(course_id=course)
+                #course = course_id       #Courses.objects.get(course_id=course_id)
+                #queryset = queryset.filter(course_id=course)
+                #queryset = queryset.filter(course_id=course)
+                #print("1111",queryset)
+                course_name = Courses.objects.get(course_id=course_id).course_name
             except Courses.DoesNotExist:
-                queryset = queryset.none()
+                course_name = None
+            if course_name:
+                queryset = queryset.filter(course_id__course_name=course_name)
                 
         attendance_date = self.request.GET.get('attendance_date', None)
         if attendance_date is not None:
