@@ -37,20 +37,29 @@ def extract_features(image):
     return features_vector
 
 
-def face_recognize(student_id, avatar, image, threshold=0.3):
+def normalize_vector(vector):
+    max_value = np.max(np.abs(vector))
+    if max_value > 0:
+        normalized_vector = vector / max_value
+    else:
+        normalized_vector = vector
+    return normalized_vector
+
+
+def euclidean_distance(vector1, vector2):
+    distance = 0
+    for i in range(len(vector1)):
+        distance += (vector1[i] - vector2[i])**2
+    return math.sqrt(distance)
+
+
+
+
+
+def face_recognize(student_id, image, threshold):
     check_vector = extract_features(image)
     check_vector = normalize_vector(check_vector)
 
-
-
-    # Trích xuất đặc trưng từ hình ảnh cơ sở (avatar)
-    # avatar_url = MEDIA_URL + avatar
-    # response = requests.get(avatar_url)
-    
-    # Đọc hình ảnh từ dữ liệu bytes sử dụng io.BytesIO
-    # base_image = io.BytesIO(response.content)
-    # base_vector = extract_features(base_image)
-    
     conn = get_connection()
     cur = conn.cursor()
     cur.execute('SELECT staff_id, features FROM FaceFeatures')  # Chọn cột staff_id và features
@@ -73,71 +82,38 @@ def face_recognize(student_id, avatar, image, threshold=0.3):
         for i in range(len(vector2)):
             vector2[i] = float(vector2[i])
         
+        
+        if staff_id == student_id:
+            correct_vector1 = np.array(vector1, dtype=float)
+            correct_vector2 = np.array(vector2, dtype=float)
+
+            # Calculate the mean of the vectors
+            correct_vector = np.mean([correct_vector1, correct_vector2], axis=0)
+        
+        vector1 = normalize_vector(vector1)        
+        vector2 = normalize_vector(vector2)
+        
         distance = min(euclidean_distance(check_vector, vector1), euclidean_distance(check_vector, vector2))
         min_distance = min(min_distance, distance)
         
         student_vector[distance] = staff_id
 
-    print(student_vector)
-    print(student_vector[min_distance])
-    print(student_vector[min_distance],student_id)
-    print(student_vector[min_distance] == student_id)
-    return student_vector[min_distance] == student_id
-
-    # # Tính toán độ tương đồng cosine giữa hai vectơ đặc trưng
-    # matrix = np.vstack([base_vector, check_vector])
-    # cosine_sim = cosine_similarity(matrix)
-
-    # # Chuyển giá trị float32 thành float
-    # cosine_similarity_value = float(cosine_sim[0, 1])
+    print("Sinh viên đăng nhập hệ thống", student_id)
+    print("Sinh viên nhận diện được", student_vector[min_distance])
+    print("Khoảng cách chi tiết", student_vector)
     
-    # return cosine_similarity_value, cosine_similarity_value >= threshold
-    return 1,1
+    #Tính toán độ tương đồng cosine giữa hai vectơ đặc trưng
+    matrix = np.vstack([correct_vector, check_vector])
+    cosine_sim = cosine_similarity(matrix)
 
-
-
-
-
-
-# def face_detection(image):
-#     # Load the pre-trained Haar Cascade face classifier
-#     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-#     # Perform face detection
-#     faces = face_cascade.detectMultiScale(image, scaleFactor=1.3, minNeighbors=5)
-
-#     # Find the largest face
-#     largest_face = None
-#     largest_area = 0
-
-#     for (x, y, w, h) in faces:
-#         current_area = w * h
-#         if current_area > largest_area:
-#             largest_area = current_area
-#             largest_face = (x, y, w, h)
+    # Chuyển giá trị float32 thành float
+    cosine_similarity_value = float(cosine_sim[0, 1])
+    print("Tương đồng cosine giữa ảnh trong db và ảnh thực tế của người đó", cosine_similarity_value)
     
-#     if largest_face is not None:
-#         x, y, w, h = largest_face
-#         largest_face_image = image[y:y+h, x:x+w]
-#         largest_face_resized = cv2.resize(largest_face_image, (224, 224))
-#         return largest_face_resized
+    return cosine_similarity_value >= threshold
 
-#     return None
-def euclidean_distance(vector1, vector2):
-    """
-    Compute the Euclidean distance between two vectors.
 
-    Parameters:
-    - vector1 (np.ndarray): First vector.
-    - vector2 (np.ndarray): Second vector.
 
-    Returns:
-    - float: Euclidean distance.
-    """
-    distance = 0
-    for i in range(len(vector1)):
-        distance += (vector1[i] - vector2[i])**2
-    return math.sqrt(distance)
 
 
 
@@ -156,7 +132,6 @@ def create_features(staff_id, images):
     centroids = kmeans.cluster_centers_
     
     try:
-        print("OK1")
         string_features_vector = []
         for centroid in centroids:
             temp_array = []
@@ -172,7 +147,7 @@ def create_features(staff_id, images):
         cur.execute("SELECT * FROM FaceFeatures WHERE staff_id = %s", (staff_id,))
         existing_record = cur.fetchone()
 
-        print("OK2")
+
         if existing_record:
             print("Existing")
             cur.execute("UPDATE FaceFeatures SET features = %s WHERE staff_id = %s", (string_features_vector, staff_id))
@@ -180,17 +155,9 @@ def create_features(staff_id, images):
             print("No existing features")
             cur.execute("INSERT INTO FaceFeatures (features, staff_id) VALUES (%s , %s)", (string_features_vector, staff_id))
 
-        print("OK3")
         conn.commit()
         cur.close()
         close_connection(conn)
     except Exception as e:
         print("Error:", str(e))
 
-def normalize_vector(vector):
-    max_value = np.max(np.abs(vector))
-    if max_value > 0:
-        normalized_vector = vector / max_value
-    else:
-        normalized_vector = vector
-    return normalized_vector

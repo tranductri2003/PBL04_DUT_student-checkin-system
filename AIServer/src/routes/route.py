@@ -28,7 +28,6 @@ def add_image_feature():
 @api_v1.route('/face-recognization', methods=["POST"])
 def face_recognization():
     decoded_token = jwt.decode(jwt=request.headers.get('Authorization').split(' ')[1], key=JWT_SECRET_KEY, algorithms=['HS256'])
-    print("ROLE", decoded_token.get('role', None))
     if decoded_token.get('role', None) == None:
         return jsonify({"msg": "Unauthorized"}), 401
     staff_id = decoded_token.get('staff_id')
@@ -36,6 +35,6 @@ def face_recognization():
     avatar = decoded_token.get('avatar')
     
     # Đọc hình ảnh từ đối tượng FileStorage
-    validated = face_recognize(staff_id, avatar, image, 0.3)
+    validated = face_recognize(staff_id, image, 0.3)
     
     return jsonify({"validated": validated}), 200
