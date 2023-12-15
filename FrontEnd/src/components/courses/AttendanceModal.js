@@ -5,6 +5,7 @@ import { notification } from 'antd';
 import Webcam from 'react-webcam';
 import styled from 'styled-components';
 import download from 'downloadjs';
+import { FaCheck } from 'react-icons/fa'; // Sử dụng thư viện react-icons cho biểu tượng tick
 
 
 let isFaceValidated = false; // Global variable for overall validation
@@ -14,14 +15,24 @@ let isLocationValidated = false;
 const WebcamOverlay = styled.div`
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  left: 18%;
+  width: 65%;
+  height: 80%;
+  border: 2px solid #4caf50; // Viền nổi bật cho khu vực webcam
+  padding: 10px; // Đệm xung quanh webcam
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); // Thêm bóng đổ
+  border-radius: 10px; // Bo tròn góc
+  overflow: hidden; // Ẩn các phần tử vượt ra ngoài viền
+  display: flex; // Sử dụng flexbox để căn chỉnh các thành phần bên trong
+  justify-content: center; // Căn giữa các thành phần theo trục ngang
+  align-items: center; // Căn giữa các thành phần theo trục dọc
+  background-color: #fff; // Màu nền tùy chọn
 `;
 
 const CaptureButton = styled.button`
   position: absolute;
-  bottom: 20px;
+  bottom: 0px;
   left: 50%;
   transform: translateX(-50%);
   background-color: #4caf50;
@@ -32,8 +43,15 @@ const CaptureButton = styled.button`
   cursor: pointer;
 `;
 
-
+const ButtonContainer = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px; // Khoảng cách giữa các nút
+`;
 const modalStyles = {
+
     AttendanceModal: {
         fontFamily: 'cursive',
         textAlign: 'center',
@@ -42,20 +60,27 @@ const modalStyles = {
     tableContainer: {
         width: '100%',
         overflowX: 'auto',
+        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)', // Thêm bóng đổ
+
     },
     tableWrapper: {
         maxHeight: 'calc(90vh - 120px)',
         overflowY: 'auto',
+        backgroundColor: '#f8f9fa', // Nền nhẹ cho bao bọc
+
     },
     table: {
         width: '100%',
         borderCollapse: 'collapse',
         border: '1px solid #ddd',
         margin: '0 auto',
+        backgroundColor: '#ffffff', // Nền trắng cho bảng
+
     },
     tableHeader: {
         padding: '16px',
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#007bff', // Sử dụng màu xanh cho tiêu đề
+        color: 'white', // Màu chữ trắng cho đối lập
         fontSize: '18px',
         fontWeight: 'bold',
         position: 'sticky',
@@ -65,6 +90,11 @@ const modalStyles = {
         padding: '12px',
         textAlign: 'center',
         fontSize: '16px',
+        borderBottom: '1px solid #ddd', // Thêm viền cho mỗi ô
+        '&:hover': {
+            backgroundColor: '#f2f2f2', // Thêm hiệu ứng di chuột
+        },
+
     },
     link: {
         textDecoration: 'none',
@@ -80,9 +110,6 @@ const modalStyles = {
         color: 'red',
     },
     cameraButton: {
-        position: 'absolute',
-        left: '10px', // Adjust left position as needed
-        bottom: '10px', // Adjust top position as needed
         backgroundColor: 'green',
         color: 'white',
         border: 'none',
@@ -91,9 +118,6 @@ const modalStyles = {
         borderRadius: '5px',
     },
     checkLocationButton: {
-        position: 'absolute',
-        left: '200px', // Adjust left position as needed
-        bottom: '10px', // Adjust top position as needed
         backgroundColor: 'green',
         color: 'white',
         border: 'none',
@@ -187,7 +211,6 @@ const AttendanceModal = (props) => {
         const token = localStorage.getItem('access_token');
 
         const formData = new FormData();
-        formData.append('staff_id', '102210096');
         formData.append('image', dataURItoBlob(image)); // Convert data URI to Blob
 
         console.log(isFaceValidated);
@@ -320,20 +343,19 @@ const AttendanceModal = (props) => {
                     108.149891
                 );
                 console.log(isLocationValidated);
-                if (distance <= 1) {
+                if (distance <= 1000) {
                     // Nếu khoảng cách lớn hơn 1km, thông báo
                     isLocationValidated = true;
                     notification.success({
                         message: 'Distance Check',
-                        description: `The distance is smaller than 1km (${distance} km). Good.`,
+                        description: `The distance is smaller than 1km. Goood.`,
                         placement: 'topRight'
                     });
 
                 } else {
-                    isLocationValidated = false;
                     notification.error({
                         message: 'Distance Check',
-                        description: `The distance is greater than 1km (${distance} km). Please check in within 1km.`,
+                        description: `The distance is greater than 1km. Please check in within 1km.`,
                         placement: 'topRight'
                     });
                     console.log('isLocationValidated:', isLocationValidated); // Add this line to log the state
@@ -467,12 +489,16 @@ const AttendanceModal = (props) => {
                     {isWithinTimeRange(course?.start_time, course?.end_time) ? (
                         <>
                             <>
-                                <button style={modalStyles.cameraButton} onClick={turnOnCamera}>
-                                    Bật camera điểm danh
-                                </button>
-                                <button style={modalStyles.checkLocationButton} onClick={handleCheckLocation}>
-                                    Kiểm tra vị trí
-                                </button>
+                                <ButtonContainer>
+
+                                    <button style={modalStyles.cameraButton} onClick={turnOnCamera} disabled={isFaceValidated}>
+                                        {isFaceValidated ? <FaCheck /> : 'Bật camera điểm danh'}
+                                    </button>
+                                    <button style={modalStyles.checkLocationButton} onClick={handleCheckLocation} disabled={isLocationValidated}>
+                                        {isLocationValidated ? <FaCheck /> : 'Kiểm tra vị trí'}
+                                    </button>
+                                </ButtonContainer>
+
                             </>
                             <div style={{ margin: '20px', textAlign: 'center' }}>
                                 <button style={modalStyles.button} onClick={sendWebSocketData}>
