@@ -117,6 +117,11 @@ function Header() {
     const goSearch = () => {
         navigate(`/search/?search=${data.search}`);
         window.location.reload();
+
+    };
+
+    const handleAvatarClick = () => {
+        navigate(`/profile/${staff_id}`); // Thay đổi đường dẫn này theo cấu hình định tuyến của bạn
     };
 
     return (
@@ -172,8 +177,10 @@ function Header() {
                         inputClassName={classes.searchInput}
                     />
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <NavLink to={`/profile/${staff_id}`}>
-                            <Avatar alt={staff_id} src={`${MEDIA_URL}${avatar}`} />
+                        <NavLink to={`/user/${staff_id}`}>
+                            <Avatar alt={staff_id}
+                                src={`${MEDIA_URL}${avatar}`}
+                                onClick={handleAvatarClick} />
                         </NavLink>
                         <div style={{ marginLeft: '10px' }}>
                             <Typography variant="subtitle1" style={{ fontFamily: 'cursive' }}>
