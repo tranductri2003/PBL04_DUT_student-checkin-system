@@ -110,7 +110,7 @@ def face_recognize(student_id, image, threshold):
     cosine_similarity_value = float(cosine_sim[0, 1])
     print("Tương đồng cosine giữa ảnh trong db và ảnh thực tế của người đó", cosine_similarity_value)
     
-    return cosine_similarity_value >= threshold
+    return cosine_similarity_value >= threshold or student_vector[min_distance] == student_id
 
 
 
