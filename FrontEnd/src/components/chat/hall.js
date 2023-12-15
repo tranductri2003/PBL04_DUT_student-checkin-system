@@ -45,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
         padding: '15px',
         margin: '10px',
         width: '250px',
+        height: '250px',
         cursor: 'pointer',
         transition: 'background-color 0.3s, transform 0.2s',
         '&:hover': {
@@ -219,7 +220,6 @@ function ChatHall() {
             </Typography>
 
             <Grid container spacing={3} className={classes.gridContainer}>
-
                 <div className={classes.userStatus}>
                     {users && users.length > 0 && users.map((user) => (
                         <UserStatus
@@ -230,16 +230,22 @@ function ChatHall() {
                         />
                     ))}
                 </div>
+
                 <div className={classes.room}>
-                    {rooms.map(room => (
-                        <Card key={room.id} className={classes.roomCard} onClick={() => handleCardClick(room.slug)}>
-                            <CardContent>
-                                <Typography className={classes.roomName}>{room.name}</Typography>
-                                <Typography className={classes.roomDescription}>{room.description}</Typography>
-                                <Typography className={classes.roomId}>Room ID: {room.id}</Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
+                    {/* Use Grid container to create a flex container */}
+                    <Grid container spacing={2}>
+                        {rooms.map(room => (
+                            <Grid item key={room.id} xs={14} sm={6} md={6} lg={4}>
+                                <Card className={classes.roomCard} onClick={() => handleCardClick(room.slug)}>
+                                    <CardContent>
+                                        <Typography className={classes.roomName}>{room.name}</Typography>
+                                        <Typography className={classes.roomDescription}>{room.description}</Typography>
+                                        <Typography className={classes.roomId}>Room ID: {room.id}</Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
                 </div>
             </Grid>
         </div>

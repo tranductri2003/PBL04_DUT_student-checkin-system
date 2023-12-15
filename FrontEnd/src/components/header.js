@@ -116,6 +116,7 @@ function Header() {
 
     const goSearch = () => {
         navigate(`/search/?search=${data.search}`);
+        window.location.reload();
     };
 
     return (
