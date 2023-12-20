@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios';
-// reactstrap components
 import { useParams } from 'react-router-dom';
+import jwt_decode from "jwt-decode";
+import Avatar from '@material-ui/core/Avatar';
 
-
+const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 function Profile() {
     const [userInfo, setUserInfo] = useState(null);
+    const [courseInfo, setCourseInfo] = useState(null);
+
     const { staffId } = useParams();
 
     useEffect(() => {
-        // Tải thông tin người dùng từ API
         axiosInstance.get(`/user/${staffId}`)
             .then(response => {
+                console.log(response.data);
                 setUserInfo(response.data);
             })
             .catch(error => {
@@ -19,60 +22,72 @@ function Profile() {
             });
     }, [staffId]);
 
+    useEffect(() => {
+        axiosInstance.get(`/course/?staff_id=${staffId}`)
+            .then(response => {
+                setCourseInfo(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+    }, [staffId]);
     if (!userInfo) {
         return <div>Loading...</div>;
     }
+
     const styles = {
         container: {
             paddingTop: '40px',
             color: '#2e323c',
             background: '#f5f6fa',
-            position: 'relative',
-            height: '100vh', // Chuyển '100%' thành '100vh' để chiếm toàn bộ chiều cao của viewport
+            minHeight: '100vh',
             display: 'flex',
+            flexDirection: 'column', // Set to column to stack children vertically
             justifyContent: 'center',
-            alignItems: 'flex-start', // Cần thêm này nếu bạn muốn căn giữa theo chiều dọc
+            alignItems: 'center', // Center children horizontally
+            width: '100%', // Ensures the container takes full width of the parent
         },
         card: {
             background: '#ffffff',
             borderRadius: '5px',
-            border: 'none',
-            marginBottom: '1rem',
-            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', // Thêm bóng nếu cần
-            width: '70%', // Điều chỉnh chiều rộng tổng thể của card
+            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+            width: '70%',
             display: 'flex',
-            flexDirection: 'row', // Sắp xếp các item theo hàng ngang
+            flexDirection: 'row',
+            overflow: 'hidden', // Prevent content from overflowing the card
+            marginBottom: '20px', // Adds spacing between cards
         },
         leftColumn: {
             flex: '1',
-            padding: '20px', // Điều chỉnh padding nếu cần
-            borderRight: '1px solid #eaeaea', // Đường viền phân cách giữa hai cột
+            padding: '20px',
+            borderRight: '1px solid #eaeaea',
+            textAlign: 'center',
         },
         rightColumn: {
             flex: '2',
-            padding: '20px', // Điều chỉnh padding nếu cần
+            padding: '20px',
         },
         userAvatar: {
-            width: '90px',
-            height: '90px',
-            borderRadius: '100px',
-            margin: '0 auto 1rem auto', // Căn giữa avatar
+            width: '150px',
+            height: '150px',
+            borderRadius: '50%',
+            marginBottom: '1rem',
         },
         userName: {
-            textAlign: 'center',
+            fontSize: '1.5rem',
             fontWeight: 'bold',
+            marginBottom: '0.5rem',
         },
         userEmail: {
-            textAlign: 'center',
             color: '#9fa8b9',
+            fontSize: '1rem', // Increase the font size here
+
         },
         aboutHeading: {
-            textAlign: 'center',
             color: '#007ae1',
-            margin: '2rem 0 1rem 0',
+            margin: '1.5rem 0 1rem 0',
         },
         aboutText: {
-            textAlign: 'center',
             color: '#2e323c',
         },
         formControl: {
@@ -81,123 +96,238 @@ function Profile() {
             fontSize: '0.825rem',
             background: '#ffffff',
             color: '#2e323c',
-        },
-        card: {
-            background: '#ffffff',
-            borderRadius: '5px',
-            border: 0,
-            marginBottom: '1rem',
+            marginBottom: '0.5rem',
+            width: '100%',
+            padding: '0.375rem 0.75rem',
+            boxSizing: 'border-box',
         },
         formGroup: {
             marginBottom: '1rem',
         },
-        // Đảm bảo phần dưới đây được thêm vào để áp dụng cho các đoạn văn bản trong phần 'About'
-        aboutSection: {
-            margin: '2rem 0 0 0',
-            textAlign: 'center',
+        formRow: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '1rem',
         },
+        halfWidthControl: {
+            border: '1px solid #cfd1d8',
+            borderRadius: '2px',
+            fontSize: '0.825rem',
+            background: '#ffffff',
+            color: '#2e323c',
+            width: '48%', // Adjusted to less than half for margin
+            padding: '0.375rem 0.75rem',
+            boxSizing: 'border-box',
+        },
+        formRow: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '1rem',
+        },
+        fullLengthControl: {
+            border: '1px solid #cfd1d8',
+            borderRadius: '2px',
+            fontSize: '0.825rem',
+            background: '#ffffff',
+            color: '#2e323c',
+            width: '100%', // Set to full width
+            padding: '0.5rem 1rem',
+            boxSizing: 'border-box',
+            marginRight: '1%', // Add a small margin to the right
+        },
+        heading: {
+            fontSize: '1rem', // Increase the font size as needed
+            color: '#007bff', // This is a shade of blue, adjust as desired
+            marginBottom: '1rem', // Optional: adds space below the heading
+        },
+        buttonContainer: {
+            display: 'flex',
+            justifyContent: 'flex-end', // Aligns the buttons to the right
+            marginTop: '1rem',
+        },
+        cancelButton: {
+            backgroundColor: '#6c757d', // Bootstrap's gray color
+            color: 'white', // Text color for the cancel button
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '0.25rem',
+            cursor: 'pointer',
+            marginRight: '0.5rem', // Adds space between the cancel and update buttons
+        },
+        updateButton: {
+            backgroundColor: '#007bff', // Bootstrap's blue color
+            color: 'white', // Text color for the update button
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '0.25rem',
+            cursor: 'pointer',
+        },
+        boldLabel: {
+            fontWeight: 'bold', // This makes the text bold
+            color: '#2e323c', // You can adjust the color if needed
+            marginBottom: '0.5rem', // Optional: adds some space below the label
+            display: 'block', // Makes the label take the full width
+        },
+
+
+
+
+
+
+
+
+
+        leaderboard: {
+            top: '0', // Đặt top để leaderboard bắt đầu từ đầu của rightColumn
+            left: '0', // Đặt left để leaderboard bắt đầu từ bên trái của rightColumn
+            width: '100%', // Đảm bảo leaderboard có chiều rộng tối đa
+            fontFamily: 'cursive',
+            textAlign: 'center',
+            margin: '20px',
+        },
+        table: {
+            width: '100%',
+            borderCollapse: 'collapse',
+            border: '1px solid #ddd',
+            margin: '0 auto',
+        },
+        tableHeader: {
+            padding: '16px',
+            backgroundColor: '#f2f2f2',
+            fontSize: '18px',
+            fontWeight: 'bold',
+        },
+        cell: {
+            padding: '12px',
+            textAlign: 'center',
+            fontSize: '16px',
+        },
+        button: {
+            backgroundColor: 'green',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '10px 20px',
+            borderRadius: '5px',
+        },
+        link: {
+            textDecoration: 'none',
+            color: 'blue',
+            cursor: 'pointer',
+        },
+
+
     };
-
     return (
-        <div className="container" style={styles.body}>
-            <div className="row gutters">
-                <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
-                    <div className="card h-100" style={styles.card}>
-                        <div style={styles.leftColumn}>
-
-                            <div className="card-body">
-                                <div className="account-settings">
-                                    <div className="user-profile">
-                                        <div className="user-avatar">
-                                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Maxwell Admin" style={styles.userAvatar} />
-                                        </div>
-                                        <h5 className="user-name" style={styles.userName}>Yuki Hayashi</h5>
-                                        <h6 className="user-email" style={styles.userEmail}>yuki@Maxwell.com</h6>
-                                    </div>
-                                    <div className="about">
-                                        <h5 style={styles.aboutHeading}>About</h5>
-                                        <p style={styles.aboutText}>I'm Yuki. Full Stack Designer I enjoy creating user-centric, delightful and human experiences.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div style={styles.container}>
+            <div style={styles.card}>
+                <div style={styles.leftColumn}>
+                    <img src={`${userInfo.avatar}`} alt="User Avatar" style={styles.userAvatar} />
+                    <h5 style={styles.userName}>{userInfo.full_name}</h5>
+                    <h6 style={styles.userEmail}>{userInfo.staff_id} </h6>
+                    <div>
+                        <h5 style={styles.heading}>About me</h5>
+                        <p style={styles.aboutText}>
+                            {userInfo.about}
+                        </p>
                     </div>
                 </div>
-
                 <div style={styles.rightColumn}>
+                    <div>
+                        <h6 style={styles.heading} >Personal Details</h6>
+                        <div style={styles.formRow}>
 
-                    <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-                        <div className="card h-100">
-                            <div className="card-body">
-                                <div className="row gutters">
-                                    <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <h6 className="mb-2 text-primary">Personal Details</h6>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="fullName">Full Name</label>
-                                            <input type="text" className="form-control" id="fullName" placeholder="Enter full name" style={styles.formControl} />
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="eMail">Email</label>
-                                            <input type="email" className="form-control" id="eMail" placeholder="Enter email ID" style={styles.input} />
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="phone">Phone</label>
-                                            <input type="text" className="form-control" id="phone" placeholder="Enter phone number" style={styles.input} />
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="website">Website URL</label>
-                                            <input type="url" className="form-control" id="website" placeholder="Website url" style={styles.input} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row gutters">
-                                    <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <h6 className="mt-3 mb-2 text-primary">Address</h6>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="Street">Street</label>
-                                            <input type="name" className="form-control" id="Street" placeholder="Enter Street" style={styles.input} />
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="ciTy">City</label>
-                                            <input type="name" className="form-control" id="ciTy" placeholder="Enter City" style={styles.input} />
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="sTate">State</label>
-                                            <input type="text" className="form-control" id="sTate" placeholder="Enter State" style={styles.input} />
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div className="form-group" style={styles.formGroup}>
-                                            <label htmlFor="zIp">Zip Code</label>
-                                            <input type="text" className="form-control" id="zIp" placeholder="Zip Code" style={styles.input} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row gutters">
-                                    <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div className="text-right">
-                                            <button type="button" id="cancel" name="cancel" className="btn btn-secondary" style={styles.button}>Cancel</button>
-                                            <button type="button" id="submit" name="submit" className="btn btn-primary" style={styles.button}>Update</button>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="fullName" style={styles.boldLabel} >Full Name</label>
+                                <input type="text" id="fullName" placeholder="Họ và tên" style={styles.fullLengthControl} value={userInfo.full_name} />
+                            </div>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="eMail" style={styles.boldLabel} >Email</label>
+                                <input type="email" id="eMail" placeholder="Email" style={styles.fullLengthControl} value={userInfo.email} />
+                            </div>
+                        </div>
+                        <div style={styles.formRow}>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="phone" style={styles.boldLabel} >Phone</label>
+                                <input type="text" id="phone" placeholder="Số điện thoại" style={styles.fullLengthControl} value={userInfo.phone_number} />
+                            </div>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="website" style={styles.boldLabel}>Date of birth</label>
+                                <input type="url" id="website" placeholder="Ngày tháng năm sinh" style={styles.fullLengthControl} value={userInfo.date_of_birth} />
                             </div>
                         </div>
                     </div>
+
+                    <div>
+                        <h6 style={styles.heading} >Education</h6>
+                        <div style={styles.formRow}>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="Street" style={styles.boldLabel} >University</label>
+                                <input type="text" id="Street" placeholder="Đại học" style={styles.fullLengthControl} value={userInfo.university} />
+                            </div>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="ciTy" style={styles.boldLabel} >Faculty</label>
+                                <input type="text" id="ciTy" placeholder="Khoa" style={styles.fullLengthControl} value={userInfo.faculty} />
+                            </div>
+                        </div>
+                        <div style={styles.formRow}>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="sTate" style={styles.boldLabel} >Class</label>
+                                <input type="text" id="sTate" placeholder="Lớp sinh hoạt" style={styles.fullLengthControl} value={userInfo.class_id} />
+                            </div>
+                            <div style={{ width: '49%' }}>
+                                <label htmlFor="zIp" style={styles.boldLabel} >Address</label>
+                                <input type="text" id="zIp" placeholder="Địa chỉ" style={styles.fullLengthControl} />
+                            </div>
+                        </div>
+
+                    </div>
+                    {/* <div>
+                        <div style={styles.buttonContainer}>
+
+                            <div>
+                                <button type="button" id="cancel" name="cancel" className="btn btn-secondary" style={styles.cancelButton}>Cancel</button>
+                                <button type="button" id="submit" name="submit" className="btn btn-primary" style={styles.updateButton}>Update</button>
+                            </div>
+                        </div>
+
+                    </div> */}
+                </div>
+            </div>
+
+
+            <div style={styles.card}>
+                <div style={styles.leaderboard}>
+                    <table style={styles.table}>
+                        <thead>
+                            <tr>
+                                <th style={styles.tableHeader}>STT</th>
+                                <th style={styles.tableHeader}>Mã lớp học phần</th>
+                                <th style={styles.tableHeader}>Tên lớp học phần</th>
+                                <th style={styles.tableHeader}>Giảng viên</th>
+                                <th style={styles.tableHeader}>Thời khóa biểu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {courseInfo && Array.isArray(courseInfo) ? (
+                                courseInfo.map((course, index) => (
+                                    <tr key={course.id}>
+                                        <td style={styles.cell}>{index + 1}</td>
+                                        <td style={styles.cell}>{course.course_id}</td>
+                                        <td style={styles.cell}>{course.course_name}</td>
+                                        <td style={styles.cell}>{course.teacher.full_name}</td>
+                                        <td style={styles.cell}>
+                                            {course.day_of_week} {course.start_time} - {course.end_time} - {course.room}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="7">No data available</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

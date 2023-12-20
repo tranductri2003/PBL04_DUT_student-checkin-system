@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.http import Http404
 
-from .models import Courses, UserCourse
+from .models import Courses, UserCourse, NewUser
 from .serializers import CourseSerializer, StudentsCourseSerializer
 from users.models import NewUser
 from helper.models import CustomPageNumberPagination
@@ -16,48 +16,49 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     serializer_class = CourseSerializer
     queryset = Courses.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['course_id', 'teacher_id']
     ordering_fields = ['course_id']
     
     def get_queryset(self):
-        # query_set = Courses.objects.all()
-        query_set = None
         if self.request.user.is_authenticated:
-            recent_user = self.request.user
-            # Truy vấn danh sách các khóa học của người dùng có staff_id tương ứng
-            role = recent_user.role
+            course_id = self.request.GET.get('course_id', None)
             day_of_week = self.request.GET.get('day_of_week', None)
-            if role == 'S':
-                CourseId=UserCourse.objects.filter(user=recent_user).values_list('course__course_id', flat=True)
-                query_set = Courses.objects.filter(course_id__in=CourseId)
-                if day_of_week is not None and day_of_week != '':
-                    day_of_week = int(day_of_week)
-                    query_set = query_set.filter(day_of_week=day_of_week)
-            elif role == 'T':
-                query_set = Courses.objects.filter(teacher_id=recent_user)
+            staff_id = self.request.GET.get('staff_id', None)
+
+            print("\033[91m-----------------------------------------------------\033[0m")
+            print("\033[91mCourse_id_parameter\033[0m", course_id)
+            print("\033[91mDay_of_week_parameter\033[0m", day_of_week)
+            print("\033[91mStaff_id_parameter\033[0m", staff_id)
+            print("\033[91m-----------------------------------------------------\033[0m")
+            
+            query_set = Courses.objects.all()
+                    
+            if course_id is not None and course_id != '':
+                query_set = query_set.filter(course_id=course_id)
+
+            if day_of_week is not None and day_of_week != '':
+                query_set = query_set.filter(day_of_week=int(day_of_week))
                 
-                if day_of_week is not None and day_of_week != '':
-                    day_of_week = int(day_of_week)
-                    query_set = query_set.filter(day_of_week=day_of_week)
-            elif role == 'A':
-                query_set = Courses.objects.all()
-                course_id = self.request.GET.get('course_id', None)
-                staff_id = self.request.GET.get('staff_id', None)
-                if course_id is not None and course_id != '':
-                    query_set = query_set.filter(course_id=course_id)
-
-                if day_of_week is not None and day_of_week != '':
-                    day_of_week = int(day_of_week)
-                    query_set = query_set.filter(day_of_week=day_of_week)
-
-                if staff_id is not None and staff_id != '':
-                    staff = NewUser.objects.get(staff_id=staff_id)
-                    if staff.role == 'T':
-                        query_set = query_set.filter(teacher_id=staff)
-                    elif staff.role == 'S':
-                        course_ids=UserCourse.objects.filter(user=staff).values_list('course__course_id', flat=True)
-                        query_set = Courses.objects.filter(course_id__in=course_ids)
-        return query_set
+            if staff_id is not None and staff_id != '':
+                if NewUser.objects.filter(staff_id=staff_id).exists():
+                    user = NewUser.objects.get(staff_id=staff_id)
+                    print("\033[91mUser\033[0m", user, user.role, user.staff_id)
+                    if user.role == 'T':
+                        query_set = query_set.filter(teacher_id__staff_id=staff_id)
+                    else:
+                        course_ids=UserCourse.objects.filter(user=user).values_list('course__course_id', flat=True)
+                        query_set = query_set.filter(course_id__in=course_ids)
+                else:
+                    raise Http404("User doesn't exist.")
+                
+            print("\033[91m-----------------------------------------------------\033[0m")
+            print("\033[91mQuery_set\033[0m", query_set)
+            for course in query_set:
+                print("\033[91mCourse ID, Course Name\033[0m", course.course_id, course.course_name)
+                print("\033[91mTeacher ID\033[0m", course.teacher_id)
+            print("\033[91m-----------------------------------------------------\033[0m")
+            return query_set
+        else:
+            return Response({"message": "Please login to view."}, status=status.HTTP_400_BAD_REQUEST)
     
     def perform_create(self, serializer):
         
