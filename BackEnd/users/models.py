@@ -57,7 +57,7 @@ class NewUser(TimeSetup, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     full_name = models.CharField(max_length=50)
     avatar = models.ImageField(
-        _("Avatar"), upload_to=upload_to, default='students/default.jpg')
+        _("Avatar"), upload_to=upload_to, default='default.jpg')
 
     university = models.CharField(max_length=50, default = None, null = True)
     faculty = models.CharField(max_length=50, default = None, null = True)

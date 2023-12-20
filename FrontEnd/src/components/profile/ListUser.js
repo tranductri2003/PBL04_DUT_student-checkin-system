@@ -4,6 +4,7 @@ import axiosInstance from '../../axios';
 import { notification } from 'antd';
 import { Button } from "reactstrap";
 import jwt_decode from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
 
 const styles = {
@@ -168,6 +169,7 @@ const Leaderboard = () => {
         search: '',
         users: [],
     });
+    const navigate = useNavigate();
 
     useEffect(() => {
         let searchTerm = new URLSearchParams(window.location.search).get('search');
@@ -260,8 +262,18 @@ const Leaderboard = () => {
                         appState.users.results.map((user, index) => (
                             <tr key={user.id}>
                                 <td style={styles.cell}>{index + 1}</td>
-                                <td style={styles.cell}>{user.staff_id}</td>
-                                <td style={styles.cell}>{user.full_name}</td>
+                                <td style={styles.cell}>
+                                    <a
+                                        href={`/user/${user.staff_id}`}
+                                        style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigate(`/user/${user.staff_id}`);
+                                        }}
+                                    >
+                                        {user.staff_id}
+                                    </a>
+                                </td>                                <td style={styles.cell}>{user.full_name}</td>
                                 <td style={styles.cell}>{user.email}</td>
                                 <td style={styles.cell}>{user.phone_number}</td>
                                 <td style={styles.cell}>{user.class_id}</td>
