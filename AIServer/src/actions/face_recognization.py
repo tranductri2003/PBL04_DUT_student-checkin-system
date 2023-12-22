@@ -16,6 +16,7 @@ from collections import defaultdict
 import os
 from db import *
 
+face_cascade = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
 
 # Tải mô hình VGG16 (chọn include_top=False để loại bỏ các lớp fully connected ở cuối)
 base_model = VGG16(weights='imagenet', include_top=False)
@@ -23,14 +24,37 @@ base_model = VGG16(weights='imagenet', include_top=False)
 def read_image(image):
     image_stream = image.read()
     img_array = np.frombuffer(image_stream, dtype=np.uint8)
-    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)  # Keep the color information
-    img = cv2.resize(img, (224, 224))
+    img = cv2.imdecode(img_array, cv2.IMREAD_UNCHANGED)
+    img = cv2.resize(img, (1024, 1024))
     return img
 
+def detect_face(image):
+    print(face_cascade.__str__())
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+
+    if len(faces) == 0:
+        # No faces detected
+        return None
+
+    # Return only the first detected face
+    x, y, w, h = faces[0]
+    face_roi = image[y:y+h, x:x+w]
+
+    # Resize the face region to (224, 224, 3)
+    face_resized = cv2.resize(face_roi, (224, 224))
+
+    return face_resized
 
 def extract_features(image):
     image_array = read_image(image)
-    x = np.expand_dims(image_array, axis=0)
+    print(type(image))
+    face = detect_face(image_array)
+    if face is None:
+        print("No face detected")
+        return None
+    print(type(image))
+    x = np.expand_dims(face, axis=0)
     x = preprocess_input(x)
     features = base_model.predict(x)
     features_vector = features.flatten()
@@ -51,10 +75,6 @@ def euclidean_distance(vector1, vector2):
     for i in range(len(vector1)):
         distance += (vector1[i] - vector2[i])**2
     return math.sqrt(distance)
-
-
-
-
 
 def face_recognize(student_id, image, threshold):
     check_vector = extract_features(image)
@@ -111,11 +131,6 @@ def face_recognize(student_id, image, threshold):
     print("Tương đồng cosine giữa ảnh trong db và ảnh thực tế của người đó", cosine_similarity_value)
     
     return cosine_similarity_value >= threshold or student_vector[min_distance] == student_id
-
-
-
-
-
 
 def create_features(staff_id, images):
     data_features_vectors = []
