@@ -14,4 +14,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{settings.DB_USER}:{setti
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Register API
-app.register_blueprint(api_v1, url_prefix='/api/v1')
+app.register_blueprint(api_v1, url_prefix='/ai')
