@@ -2,26 +2,39 @@ import React from 'react';
 
 const styles = {
     leaderboard: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
         textAlign: 'center',
         margin: '20px',
+        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+        borderRadius: '10px',
+        background: 'linear-gradient(to bottom, #ffffff, #f1f1f1)', // Gradient background
     },
     table: {
         borderCollapse: 'collapse',
         width: '80%',
-        border: '1px solid #ddd',
+        border: '1px solid #e0e0e0', // Lighter border color
         margin: '0 auto',
+        borderRadius: '10px',
+        background: 'white', // White background for the table
     },
     tableHeader: {
         padding: '16px',
-        backgroundColor: '#f2f2f2',
-        fontSize: '18px',
-        fontWeight: 'bold',
+        backgroundColor: 'darkblue', // Slightly different header background
+        color: 'white', // Màu chữ trắng
+        fontSize: '20px', // Larger font size
+        fontWeight: '600', // Bold but not too heavy
+        borderBottom: '2px solid #e0e0e0', // Header underline
     },
     cell: {
         padding: '12px',
         textAlign: 'center',
         fontSize: '16px',
+        fontWeight: 'bold', // Chữ in đậm
+        borderBottom: '2px solid #e0e0e0', // Light borders for cells
+        transition: 'background-color 0.3s', // Smooth transition for hover
+        '&:hover': {
+            backgroundColor: '#f7f7f7',
+        },
     },
     avatarCell: {
         padding: '12px',
@@ -45,6 +58,10 @@ const styles = {
     },
 };
 
+const getStatusStyle = (isPresent) => ({
+    color: isPresent ? 'green' : 'red',
+    fontSize: '20px',
+});
 
 const Leaderboard = (props) => {
     const { data } = props;
@@ -70,7 +87,11 @@ const Leaderboard = (props) => {
                             <td style={styles.cell}>{attendance.course_name}</td>
                             <td style={styles.cell}>{formatTime(attendance.attendance_time)}</td>
                             <td style={styles.cell}>{attendance.attendance_date}</td>
-                            <td style={styles.cell}>{attendance.status ? 'Present' : 'Absent'}</td>
+                            <td style={styles.cell}>
+                                <span style={getStatusStyle(attendance.status)}>
+                                    {attendance.status ? '✔️' : '❌'}
+                                </span>
+                            </td>
                             <td style={styles.cell}>{attendance.note}</td>
                         </tr>
                     ))}
