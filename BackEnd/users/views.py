@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password  # Thêm import này
+from django.db.models import Q
 
 from helper.models import CustomPageNumberPagination
 
@@ -19,6 +20,16 @@ class UserListCreateView(generics.ListCreateAPIView):
     filterset_fields = ['staff_id', 'university', 'faculty', 'class_id', 'role', 'status']
     ordering_fields = ['staff_id']
     pagination_class = CustomPageNumberPagination   
+
+    def get_queryset(self):
+        full_name_query = self.request.query_params.get('full_name', None)
+
+        queryset = self.queryset
+
+        if full_name_query:
+            queryset = queryset.filter(Q(full_name__icontains=full_name_query))
+
+        return queryset
 
 
 class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):

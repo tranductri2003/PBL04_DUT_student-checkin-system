@@ -3,29 +3,20 @@ from users.models import NewUser
 
 from .models import Courses, UserCourse
 
+
+class TeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = ['full_name', 'staff_id'] 
+
+
+
 class CourseSerializer(serializers.ModelSerializer):
-    teacher_id = serializers.CharField(max_length=50, required=False)
+    teacher = TeacherSerializer(source='teacher_id', read_only=True)
     class Meta:
         model = Courses
-        fields = '__all__'
+        fields = ['course_id', 'course_name', 'num_of_student', 'day_of_week', 'start_time', 'end_time', 'start_date', 'end_date', 'room', 'teacher']
 
-    def create(self, validated_data):
-        teacher_id = validated_data.pop('teacher_id', None)
-        teacher = NewUser.objects.get(staff_id=teacher_id)
-        validated_data['teacher_id'] = teacher
-        course = Courses.objects.create(**validated_data)
-        return course
-    
-    def update(self, instance, validated_data):
-        teacher_id = validated_data.pop('teacher_id', None)
-        if teacher_id:
-            teacher = NewUser.objects.get(staff_id=teacher_id)
-            instance.teacher_id = teacher
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
 
 class StudentsCourseSerializer(serializers.ModelSerializer):
     student_ids = serializers.ListField(child=serializers.CharField(max_length=50), required=False)

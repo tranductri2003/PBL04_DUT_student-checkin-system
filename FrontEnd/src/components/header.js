@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     link: {
         margin: theme.spacing(1, 1.5),
         color: '#ffffff', // Thay đổi màu chữ cho các Link và Button
-        fontFamily: 'cursive', // Thay đổi font chữ sang cursive
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
     },
     toolbarTitle: {
         display: 'flex',
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '1.75rem',
         fontWeight: 600,
         textDecoration: 'none',
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Cập nhật phông chữ
     },
     searchInput: {
         backgroundColor: '#f5f5f5',
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 'auto',
     },
     authButton: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
         fontWeight: 600,
         marginLeft: theme.spacing(2),
         textTransform: 'none',
@@ -61,18 +61,25 @@ const useStyles = makeStyles((theme) => ({
     loginButton: {
         backgroundColor: '#3f51b5',
         color: '#ffffff',
-        fontFamily: 'cursive',
+        fontWeight: 'bold', // Chữ in đậm
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Cập nhật phông chữ
         '&:hover': {
             backgroundColor: '#26698D',
         },
+        marginRight: theme.spacing(2), // Thêm khoảng cách
+        minWidth: '100px', // Độ dài tối thiểu
+
     },
     logoutButton: {
         backgroundColor: '#3f51b5',
         color: '#ffffff',
-        fontFamily: 'cursive',
+        fontWeight: 'bold', // Chữ in đậm
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Cập nhật phông chữ
         '&:hover': {
             backgroundColor: '#8CC3F7',
         },
+        minWidth: '100px', // Độ dài tối thiểu
+
     },
 }));
 
@@ -116,6 +123,10 @@ function Header() {
 
     const goSearch = () => {
         navigate(`/search/?search=${data.search}`);
+    };
+
+    const handleAvatarClick = () => {
+        navigate(`/profile/${staff_id}`); // Thay đổi đường dẫn này theo cấu hình định tuyến của bạn
     };
 
     return (
@@ -171,11 +182,13 @@ function Header() {
                         inputClassName={classes.searchInput}
                     />
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <NavLink to={`/profile/${staff_id}`}>
-                            <Avatar alt={staff_id} src={`${MEDIA_URL}${avatar}`} />
+                        <NavLink to={`/user/${staff_id}`}>
+                            <Avatar alt={staff_id}
+                                src={`${MEDIA_URL}${avatar}`}
+                                onClick={handleAvatarClick} />
                         </NavLink>
                         <div style={{ marginLeft: '10px' }}>
-                            <Typography variant="subtitle1" style={{ fontFamily: 'cursive' }}>
+                            <Typography variant="subtitle1" style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontWeight: 'bold' }}>
                                 {staff_id}
                             </Typography>
                         </div>
@@ -188,7 +201,7 @@ function Header() {
                             className={classes.loginButton}
                             component={NavLink}
                             to="/login"
-                            style={{ fontFamily: 'cursive', marginRight: '5px' }}
+
                         >
                             Login
                         </Button>
@@ -199,7 +212,7 @@ function Header() {
                             className={classes.logoutButton}
                             component={NavLink}
                             to="/logout"
-                            style={{ fontFamily: 'cursive' }}
+
                         >
                             Logout
                         </Button>

@@ -4,73 +4,12 @@ import axiosInstance from '../../axios';
 import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
 import UserStatus from './UserStatus';
+import './hall.css'; // Import CSS file
 
 
-const useStyles = makeStyles((theme) => ({
-    hall: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '50px',
-        fontFamily: 'cursive',
-    },
-    welcomeText: {
-        fontSize: '32px',
-        fontWeight: 'bold',
-        color: theme.palette.primary.main,
-        marginBottom: '20px',
-        fontFamily: 'cursive',
-    },
-    gridContainer: {
-        justifyContent: 'center',
-    },
-    userStatus: {
-        flex: '0 0 30%', // UserStatus chiếm 30% của chiều rộng
-        marginRight: '10px',
-        maxHeight: '600px', // Đặt chiều cao cố định tại đây
-        overflowY: 'auto',
-        border: '1px solid #ccc', // Để tạo khung bao quanh danh sách
-        borderRadius: '5px', // Làm tròn góc của khung
-        padding: '10px', // Khoảng cách bên trong khung
-    },
-    searchInput: {
-        marginBottom: '10px',
-    },
-    room: {
-        flex: '1', // Phần Room chiếm phần còn lại của chiều rộng
-    },
-    roomCard: {
-        border: '1px solid #ccc',
-        borderRadius: '10px',
-        padding: '15px',
-        margin: '10px',
-        width: '250px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s, transform 0.2s',
-        '&:hover': {
-            backgroundColor: '#f5f5f5',
-            transform: 'scale(1.02)',
-        },
-    },
-    roomName: {
-        fontSize: '20px',
-        fontWeight: 'bold',
-        marginBottom: '5px',
-        color: theme.palette.primary.main,
-    },
-    roomDescription: {
-        fontSize: '14px',
-        color: '#666',
-        marginBottom: '10px',
-    },
-    roomId: {
-        fontSize: '14px',
-        color: '#999',
-    },
-}));
+
 
 function ChatHall() {
-    const classes = useStyles();
     const [rooms, setRooms] = useState([]);
     const [users, setUsers] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState(''); // Added this line
@@ -91,7 +30,7 @@ function ChatHall() {
     }, []);
 
     useEffect(() => {
-        const socket = new WebSocket('ws://localhost:8000/ws/user/status/');
+        const socket = new WebSocket(`${process.env.REACT_APP_STATUS_WEBSOCKET_URL}`);
 
         socket.onopen = () => {
             console.log('Kết nối WebSocket đã mở');
@@ -213,14 +152,13 @@ function ChatHall() {
 
 
     return (
-        <div className={classes.hall}>
-            <Typography className={classes.welcomeText}>
+        <div className='hall'>
+            <Typography className="welcomeText">
                 Welcome to the Chat Hall
             </Typography>
 
-            <Grid container spacing={3} className={classes.gridContainer}>
-
-                <div className={classes.userStatus}>
+            <Grid container spacing={3} className="gridContainer">
+                <div className="userStatus">
                     {users && users.length > 0 && users.map((user) => (
                         <UserStatus
                             key={user.id}
@@ -230,16 +168,22 @@ function ChatHall() {
                         />
                     ))}
                 </div>
-                <div className={classes.room}>
-                    {rooms.map(room => (
-                        <Card key={room.id} className={classes.roomCard} onClick={() => handleCardClick(room.slug)}>
-                            <CardContent>
-                                <Typography className={classes.roomName}>{room.name}</Typography>
-                                <Typography className={classes.roomDescription}>{room.description}</Typography>
-                                <Typography className={classes.roomId}>Room ID: {room.id}</Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
+
+                <div className="room">
+                    {/* Use Grid container to create a flex container */}
+                    <Grid container spacing={2}>
+                        {rooms.map(room => (
+                            <Grid item key={room.id} xs={14} sm={6} md={6} lg={4}>
+                                <Card className='roomCard' onClick={() => handleCardClick(room.slug)}>
+                                    <CardContent>
+                                        <Typography className="roomName">{room.name}</Typography>
+                                        <Typography className="roomDescription">{room.description}</Typography>
+                                        <Typography className="roomId">Room ID: {room.id}</Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
                 </div>
             </Grid>
         </div>

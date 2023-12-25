@@ -11,7 +11,9 @@ import Hall from './components/chat/hall';
 import ChatSite from './components/chat/ChatSite'
 import AttendancesSite from './components/attendances/AttendanceSite';
 import CoursesSite from './components/courses/CourseSite';
-//import UserStatus from './components/chat/UserStatus';
+import SearchSite from './components/profile/ListUser';
+import Profile from './components/profile/Profile'; // Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -25,6 +27,8 @@ ReactDOM.render(
       <Route path="/attendance" element={<AttendancesSite />} />
       <Route path="/hall/:slug" element={<ChatSite />} />
       <Route path="/hall" element={<Hall />} />
+      <Route path="/search" element={<SearchSite />} />
+      <Route path="/user/:staffId" element={<Profile />} />
     </Routes>
     <Footer />
   </Router >,

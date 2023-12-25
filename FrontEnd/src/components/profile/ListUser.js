@@ -1,60 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import AttendanceModal from './AttendanceModal';
-import { notification } from 'antd'
 import axiosInstance from '../../axios';
+import { notification } from 'antd';
+import { Button } from "reactstrap";
 import jwt_decode from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
-const customStyles = {
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-        height: '90vh',
-        width: '70%',
-        overflowY: 'auto',
-    },
-};
 
 const styles = {
     leaderboard: {
-        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
         textAlign: 'center',
         margin: '20px',
-        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-        borderRadius: '10px',
-        background: 'linear-gradient(to bottom, #ffffff, #f1f1f1)', // Gradient background
-
     },
     table: {
-        borderCollapse: 'collapse',
         width: '100%',
-        border: '1px solid #e0e0e0', // Lighter border color
+        borderCollapse: 'collapse',
+        border: '1px solid #ddd',
         margin: '0 auto',
-        borderRadius: '10px',
-        background: 'white', // White background for the table
     },
     tableHeader: {
         padding: '16px',
-        backgroundColor: 'darkblue', // Slightly different header background
-        color: 'white', // Màu chữ trắng
-        fontSize: '20px', // Larger font size
-        fontWeight: '600', // Bold but not too heavy
-        borderBottom: '2px solid #e0e0e0', // Header underline
+        backgroundColor: '#f2f2f2',
+        fontSize: '18px',
+        fontWeight: 'bold',
     },
     cell: {
         padding: '12px',
         textAlign: 'center',
         fontSize: '16px',
-        fontWeight: 'bold', // Chữ in đậm
-        borderBottom: '2px solid #e0e0e0', // Light borders for cells
-        transition: 'background-color 0.3s', // Smooth transition for hover
-        '&:hover': {
-            backgroundColor: '#f7f7f7',
-        },
     },
     button: {
         backgroundColor: 'green',
@@ -63,32 +37,16 @@ const styles = {
         cursor: 'pointer',
         padding: '10px 20px',
         borderRadius: '5px',
-        fontWeight: 'bold', // Chữ in đậm
-
     },
     link: {
         textDecoration: 'none',
         color: 'blue',
         cursor: 'pointer',
-        fontWeight: 'bold', // Chữ in đậm
-
     },
 };
 
-function openModal(setModalIsOpen, setSelectedCourse, course) {
-    setSelectedCourse(course);
-    setModalIsOpen(true);
-}
 
-function closeModal(setModalIsOpen, setSelectedCourse) {
-    setSelectedCourse(null);
-    setModalIsOpen(false);
-}
-function getDayOfWeekName(dayOfWeek) {
-    const daysOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật',];
-    return daysOfWeek[dayOfWeek];
-}
-const Leaderboard = (props) => {
+const Leaderboard = () => {
     let staff_id = "";
     if (localStorage.getItem('access_token')) {
         // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
@@ -203,9 +161,87 @@ const Leaderboard = (props) => {
                 }
             });
     };
-    const { data } = props;
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [selectedCourse, setSelectedCourse] = useState(null);
+
+
+
+    const search = 'user?full_name=';
+    const [appState, setAppState] = useState({
+        search: '',
+        users: [],
+    });
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        let searchTerm = new URLSearchParams(window.location.search).get('search');
+
+
+        axiosInstance.get(search + searchTerm).then((res) => {
+            const allUsers = res.data;
+            setAppState({ users: allUsers });
+            console.log(res.data);
+        }).catch((error) => {
+            if (error.response) {
+                // Xử lý lỗi từ phản hồi của server (status code không thành công)
+                console.error('An error occurred while fetching data:', error.response.data);
+                console.error('Status code:', error.response.status);
+
+                if (error.response.status === 400) {
+                    notification.error({
+                        message: 'Bad Request',
+                        description: 'The request sent to the server is invalid.',
+                        placement: 'topRight'
+                    });
+                } else if (error.response.status === 401) {
+                    notification.warning({
+                        message: 'Unauthorized',
+                        description: 'You are not authorized to perform this action.',
+                        placement: 'topRight'
+                    });
+                } else if (error.response.status === 403) {
+                    notification.warning({
+                        message: 'Forbidden',
+                        description: 'You do not have permission to access this resource.',
+                        placement: 'topRight'
+                    });
+                } else if (error.response.status === 404) {
+                    notification.error({
+                        message: 'Not Found',
+                        description: 'The requested resource was not found on the server.',
+                        placement: 'topRight'
+                    });
+                } else if (error.response.status === 405) {
+                    notification.error({
+                        message: 'Method Not Allowed',
+                        description: 'The requested HTTP method is not allowed for this resource.',
+                        placement: 'topRight'
+                    });
+                } else {
+                    notification.error({
+                        message: 'Error',
+                        description: 'An error occurred while fetching data from the server.',
+                        placement: 'topRight'
+                    });
+                }
+            } else if (error.request) {
+                // Xử lý lỗi không có phản hồi từ server
+                console.error('No response received from the server:', error.request);
+                notification.error({
+                    message: 'No Response',
+                    description: 'No response received from the server.',
+                    placement: 'topRight'
+                });
+            } else {
+                // Xử lý lỗi khác
+                console.error('An error occurred:', error.message);
+                notification.error({
+                    message: 'Error',
+                    description: 'An error occurred while processing the request.',
+                    placement: 'topRight'
+                });
+            }
+        });;
+    }, [setAppState]);
+
 
     return (
         <div style={styles.leaderboard}>
@@ -213,30 +249,36 @@ const Leaderboard = (props) => {
                 <thead>
                     <tr>
                         <th style={styles.tableHeader}>STT</th>
-                        <th style={styles.tableHeader}>Mã lớp học phần</th>
-                        <th style={styles.tableHeader}>Tên lớp học phần</th>
-                        <th style={styles.tableHeader}>Giảng viên</th>
-                        <th style={styles.tableHeader}>Thời khóa biểu</th>
-                        <th style={styles.tableHeader}>Trạng thái điểm danh</th>
-                        <th style={styles.tableHeader}>Xin giáo viên nghỉ</th>
+                        <th style={styles.tableHeader}>Staff id</th>
+                        <th style={styles.tableHeader}>Họ và tên</th>
+                        <th style={styles.tableHeader}>Email</th>
+                        <th style={styles.tableHeader}>SDT</th>
+                        <th style={styles.tableHeader}>Lớp</th>
+                        <th style={styles.tableHeader}>Nhắn tin</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {data && Array.isArray(data) ? (
-                        data.map((course, index) => (
-                            <tr key={course.id}>
+                    {appState.users.results && Array.isArray(appState.users.results) ? (
+                        appState.users.results.map((user, index) => (
+                            <tr key={user.id}>
                                 <td style={styles.cell}>{index + 1}</td>
-                                <td style={styles.cell}>{course.course_id}</td>
-                                <td style={styles.cell}>{course.course_name}</td>
-                                <td style={styles.cell}>{course.teacher.full_name}</td>
                                 <td style={styles.cell}>
-                                    {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
-                                </td>
+                                    <a
+                                        href={`/user/${user.staff_id}`}
+                                        style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigate(`/user/${user.staff_id}`);
+                                        }}
+                                    >
+                                        {user.staff_id}
+                                    </a>
+                                </td>                                <td style={styles.cell}>{user.full_name}</td>
+                                <td style={styles.cell}>{user.email}</td>
+                                <td style={styles.cell}>{user.phone_number}</td>
+                                <td style={styles.cell}>{user.class_id}</td>
                                 <td style={styles.cell}>
-                                    <button style={styles.button} onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>Điểm danh</button>
-                                </td>
-                                <td style={styles.cell}>
-                                    <button style={styles.button} onClick={() => handleCreateRoom(staff_id, course.teacher.staff_id, localStorage.getItem("full_name"), course.teacher.full_name)}>Nhắn tin</button>
+                                    <button style={styles.button} onClick={() => handleCreateRoom(staff_id, user.staff_id, localStorage.getItem("full_name"), user.full_name)}>Nhắn tin</button>
                                 </td>
                             </tr>
                         ))
@@ -247,17 +289,6 @@ const Leaderboard = (props) => {
                     )}
                 </tbody>
             </table>
-
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={() => closeModal(setModalIsOpen, setSelectedCourse)}
-                style={customStyles}
-                contentLabel="Example Modal"
-                shouldCloseOnOverlayClick={true}
-            >
-                <AttendanceModal course={selectedCourse} closeModal={() => closeModal(setModalIsOpen, setSelectedCourse)} />
-
-            </Modal>
         </div>
     );
 };

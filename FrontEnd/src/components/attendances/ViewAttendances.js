@@ -1,74 +1,42 @@
 import React from 'react';
+import './ViewAttendances.css'; // Import CSS fil
 
-const styles = {
-    leaderboard: {
-        fontFamily: 'cursive',
-        textAlign: 'center',
-        margin: '20px',
-    },
-    table: {
-        borderCollapse: 'collapse',
-        width: '80%',
-        border: '1px solid #ddd',
-        margin: '0 auto',
-    },
-    tableHeader: {
-        padding: '16px',
-        backgroundColor: '#f2f2f2',
-        fontSize: '18px',
-        fontWeight: 'bold',
-    },
-    cell: {
-        padding: '12px',
-        textAlign: 'center',
-        fontSize: '16px',
-    },
-    avatarCell: {
-        padding: '12px',
-        textAlign: 'center',
-    },
-    avatar: {
-        width: '50px',
-        height: '50px',
-        borderRadius: '50%',
-    },
-    authorContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        minWidth: '150px',
-    },
-    authorName: {
-        marginLeft: '10px',
-        textDecoration: 'none',
-        fontFamily: 'cursive',
-    },
-};
 
+const getStatusStyle = (isPresent) => ({
+    color: isPresent ? 'green' : 'red',
+    fontSize: '20px',
+});
 
 const Leaderboard = (props) => {
     const { data } = props;
     console.log(data);
+    const formatTime = (timeString) => {
+        return timeString.split('.')[0]; // Chỉ lấy phần trước dấu chấm
+    };
     return (
-        <div style={styles.leaderboard}>
-            <table style={styles.table}>
+        <div className="leaderboard">
+            <table className="table">
                 <thead>
                     <tr>
-                        <th style={styles.tableHeader}>ID</th>
-                        <th style={styles.tableHeader}>Attendance Time</th>
-                        <th style={styles.tableHeader}>Attendance Date</th>
-                        <th style={styles.tableHeader}>Status</th>
-                        <th style={styles.tableHeader}>Note</th>
+                        <th className="tableHeader">Subject</th>
+                        <th className="tableHeader">Attendance Time</th>
+                        <th className="tableHeader">Attendance Date</th>
+                        <th className="tableHeader">Status</th>
+                        <th className="tableHeader">Note</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((attendance, index) => (
+                    {data?.map((attendance, index) => (
                         <tr key={attendance.id}>
-                            <td style={styles.cell}>{attendance.course_id}</td>
-                            <td style={styles.cell}>{attendance.attendance_time}</td>
-                            <td style={styles.cell}>{attendance.attendance_date}</td>
-                            <td style={styles.cell}>{attendance.status ? 'Present' : 'Absent'}</td>
-                            <td style={styles.cell}>{attendance.note}</td>
+                            <td className="cell">{attendance.course_name}</td>
+                            <td className="cell">{formatTime(attendance.attendance_time)}</td>
+                            <td className="cell">{attendance.attendance_date}</td>
+                            <td className="cell">
+                                <span className={`status ${attendance.status ? 'statusPresent' : 'statusAbsent'}`}>
+                                    {attendance.status ? '✔️' : '❌'}
+                                </span>
+                            </td>
+                            <td className="cell">{attendance.note}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -76,5 +44,6 @@ const Leaderboard = (props) => {
         </div>
     );
 };
+
 
 export default Leaderboard;
