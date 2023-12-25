@@ -101,7 +101,7 @@ function App() {
 
     return (
         <div className="App">
-            <div style={{ fontFamily: 'cursive', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
+            <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
                 <span role="img" aria-label="Class Today">📝</span> Class Today
             </div>
             <div>
