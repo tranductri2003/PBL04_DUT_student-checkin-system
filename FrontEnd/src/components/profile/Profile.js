@@ -5,6 +5,10 @@ import jwt_decode from "jwt-decode";
 import Avatar from '@material-ui/core/Avatar';
 
 const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+function getDayOfWeekName(dayOfWeek) {
+    const daysOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật',];
+    return daysOfWeek[dayOfWeek];
+}
 function Profile() {
     const [userInfo, setUserInfo] = useState(null);
     const [courseInfo, setCourseInfo] = useState(null);
@@ -331,7 +335,7 @@ function Profile() {
                                         <td style={styles.cell}>{course.course_name}</td>
                                         <td style={styles.cell}>{course.teacher.full_name}</td>
                                         <td style={styles.cell}>
-                                            {course.day_of_week} {course.start_time} - {course.end_time} - {course.room}
+                                            {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
                                         </td>
                                     </tr>
                                 ))
