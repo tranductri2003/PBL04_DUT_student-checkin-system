@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     loadingText: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
         fontSize: '24px',
         color: theme.palette.primary.main,
         marginBottom: '16px',

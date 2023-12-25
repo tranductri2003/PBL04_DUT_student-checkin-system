@@ -57,7 +57,7 @@ const ButtonContainer = styled.div`
 const modalStyles = {
 
     AttendanceModal: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
         textAlign: 'center',
         margin: '20px',
     },
@@ -538,7 +538,7 @@ const AttendanceModal = (props) => {
                             )}
                         </>
                     ) : (
-                        <button style={modalStyles.disabledButton} disabled>Bật camera điểm danh</button>
+                        <button style={modalStyles.cameraButton} disabled>Bật camera điểm danh</button>
                     )}
                     {savedPosition && (
                         <div style={{ margin: '20px', textAlign: 'center' }}>
