@@ -3,7 +3,21 @@ import Courses from './ViewCourse';
 import CourseLoadingComponent from '../../DataLoading';
 import axiosInstance from '../../axios';
 import { notification } from 'antd'
+import styled from 'styled-components';
 
+const RoundedTextContainer = styled.div`
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #00416A, #001022);
+    -webkit-background-clip: text;
+    color: transparent;
+    border-radius: 10px; /* Điều chỉnh giá trị này để làm tròn góc */
+    display: inline-block;
+`;
 
 function getDayOfWeekNumber() {
     const today = new Date();
@@ -101,7 +115,7 @@ function App() {
 
     return (
         <div className="App">
-            <div style={{ fontFamily: 'cursive', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
+            <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px', color: 'darkblue' }}>
                 <span role="img" aria-label="Class Today">📝</span> Class Today
             </div>
             <div>

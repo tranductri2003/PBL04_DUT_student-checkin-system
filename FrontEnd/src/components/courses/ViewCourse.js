@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import AttendanceModal from './AttendanceModal';
+import { notification } from 'antd'
 import axiosInstance from '../../axios';
-import { notification } from 'antd';
-import { Button } from "reactstrap";
 import jwt_decode from "jwt-decode";
 
 const customStyles = {
@@ -22,26 +21,40 @@ const customStyles = {
 
 const styles = {
     leaderboard: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
         textAlign: 'center',
         margin: '20px',
+        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+        borderRadius: '10px',
+        background: 'linear-gradient(to bottom, #ffffff, #f1f1f1)', // Gradient background
+
     },
     table: {
-        width: '100%',
         borderCollapse: 'collapse',
-        border: '1px solid #ddd',
+        width: '100%',
+        border: '1px solid #e0e0e0', // Lighter border color
         margin: '0 auto',
+        borderRadius: '10px',
+        background: 'white', // White background for the table
     },
     tableHeader: {
         padding: '16px',
-        backgroundColor: '#f2f2f2',
-        fontSize: '18px',
-        fontWeight: 'bold',
+        backgroundColor: 'darkblue', // Slightly different header background
+        color: 'white', // Màu chữ trắng
+        fontSize: '20px', // Larger font size
+        fontWeight: '600', // Bold but not too heavy
+        borderBottom: '2px solid #e0e0e0', // Header underline
     },
     cell: {
         padding: '12px',
         textAlign: 'center',
         fontSize: '16px',
+        fontWeight: 'bold', // Chữ in đậm
+        borderBottom: '2px solid #e0e0e0', // Light borders for cells
+        transition: 'background-color 0.3s', // Smooth transition for hover
+        '&:hover': {
+            backgroundColor: '#f7f7f7',
+        },
     },
     button: {
         backgroundColor: 'green',
@@ -50,11 +63,15 @@ const styles = {
         cursor: 'pointer',
         padding: '10px 20px',
         borderRadius: '5px',
+        fontWeight: 'bold', // Chữ in đậm
+
     },
     link: {
         textDecoration: 'none',
         color: 'blue',
         cursor: 'pointer',
+        fontWeight: 'bold', // Chữ in đậm
+
     },
 };
 
@@ -67,7 +84,10 @@ function closeModal(setModalIsOpen, setSelectedCourse) {
     setSelectedCourse(null);
     setModalIsOpen(false);
 }
-
+function getDayOfWeekName(dayOfWeek) {
+    const daysOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật',];
+    return daysOfWeek[dayOfWeek];
+}
 const Leaderboard = (props) => {
     let staff_id = "";
     if (localStorage.getItem('access_token')) {
@@ -183,13 +203,9 @@ const Leaderboard = (props) => {
                 }
             });
     };
-
-
-
     const { data } = props;
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState(null);
-
 
     return (
         <div style={styles.leaderboard}>
@@ -214,7 +230,7 @@ const Leaderboard = (props) => {
                                 <td style={styles.cell}>{course.course_name}</td>
                                 <td style={styles.cell}>{course.teacher.full_name}</td>
                                 <td style={styles.cell}>
-                                    {course.day_of_week} {course.start_time} - {course.end_time} - {course.room}
+                                    {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
                                 </td>
                                 <td style={styles.cell}>
                                     <button style={styles.button} onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>Điểm danh</button>

@@ -5,6 +5,10 @@ import jwt_decode from "jwt-decode";
 import Avatar from '@material-ui/core/Avatar';
 
 const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+function getDayOfWeekName(dayOfWeek) {
+    const daysOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật',];
+    return daysOfWeek[dayOfWeek];
+}
 function Profile() {
     const [userInfo, setUserInfo] = useState(null);
     const [courseInfo, setCourseInfo] = useState(null);
@@ -181,7 +185,7 @@ function Profile() {
             top: '0', // Đặt top để leaderboard bắt đầu từ đầu của rightColumn
             left: '0', // Đặt left để leaderboard bắt đầu từ bên trái của rightColumn
             width: '100%', // Đảm bảo leaderboard có chiều rộng tối đa
-            fontFamily: 'cursive',
+            fontFamily: '"Helvetica Neue", Arial, sans-serif',
             textAlign: 'center',
             margin: '20px',
         },
@@ -190,17 +194,31 @@ function Profile() {
             borderCollapse: 'collapse',
             border: '1px solid #ddd',
             margin: '0 auto',
+            backgroundColor: '#ffffff', // Nền trắng cho bảng
+
         },
         tableHeader: {
             padding: '16px',
-            backgroundColor: '#f2f2f2',
+            backgroundColor: 'darkblue', // Sử dụng màu xanh cho tiêu đề
+            color: 'white', // Màu chữ trắng cho đối lập
             fontSize: '18px',
             fontWeight: 'bold',
+            position: 'sticky',
+            top: '0',
+            fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
+
         },
         cell: {
+            fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
+            fontWeight: 'bold', // Chữ in đậm
             padding: '12px',
             textAlign: 'center',
             fontSize: '16px',
+            borderBottom: '1px solid #ddd', // Thêm viền cho mỗi ô
+            '&:hover': {
+                backgroundColor: '#f2f2f2', // Thêm hiệu ứng di chuột
+            },
+
         },
         button: {
             backgroundColor: 'green',
@@ -317,7 +335,7 @@ function Profile() {
                                         <td style={styles.cell}>{course.course_name}</td>
                                         <td style={styles.cell}>{course.teacher.full_name}</td>
                                         <td style={styles.cell}>
-                                            {course.day_of_week} {course.start_time} - {course.end_time} - {course.room}
+                                            {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
                                         </td>
                                     </tr>
                                 ))

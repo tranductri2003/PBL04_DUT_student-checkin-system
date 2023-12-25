@@ -36,6 +36,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ['https://dutchecker.ddns.net','https://127.0.0.1']
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_TZ = True
 
@@ -243,8 +244,8 @@ SIMPLE_JWT = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_URL = "/django-static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'django-static/')
 
 REACT_APP_MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
