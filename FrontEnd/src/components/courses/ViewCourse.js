@@ -81,7 +81,10 @@ function closeModal(setModalIsOpen, setSelectedCourse) {
     setSelectedCourse(null);
     setModalIsOpen(false);
 }
-
+function getDayOfWeekName(dayOfWeek) {
+    const daysOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật',];
+    return daysOfWeek[dayOfWeek];
+}
 const Leaderboard = (props) => {
     const { data } = props;
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -108,9 +111,9 @@ const Leaderboard = (props) => {
                                 <td style={styles.cell}>{index + 1}</td>
                                 <td style={styles.cell}>{course.course_id}</td>
                                 <td style={styles.cell}>{course.course_name}</td>
-                                <td style={styles.cell}>{course.teacher_id}</td>
+                                <td style={styles.cell}>{course.teacher.full_name}</td>
                                 <td style={styles.cell}>
-                                    {course.day_of_week} {course.start_time} - {course.end_time} - {course.room}
+                                    {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
                                 </td>
                                 <td style={styles.cell}>
                                     <button style={styles.button} onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>Điểm danh</button>
