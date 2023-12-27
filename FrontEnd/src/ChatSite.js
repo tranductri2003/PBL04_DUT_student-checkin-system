@@ -1,53 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import Courses from './ViewCourse';
-import CourseLoadingComponent from '../../DataLoading';
-import axiosInstance from '../../axios';
-import { notification } from 'antd'
-import styled from 'styled-components';
-
-const RoundedTextContainer = styled.div`
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 32px;
-    font-weight: bold;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    padding: 10px 20px;
-    background: linear-gradient(to right, #00416A, #001022);
-    -webkit-background-clip: text;
-    color: transparent;
-    border-radius: 10px; /* Điều chỉnh giá trị này để làm tròn góc */
-    display: inline-block;
-`;
-
-function getDayOfWeekNumber() {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    // Trừ đi 1 để chuyển đổi từ 0 là Chủ Nhật thành 0 là Thứ Hai, 1 là Thứ Ba và tiếp tục
-    return (dayOfWeek + 6) % 7;
-}
-
+import ChatApp from './components/chat/room';
+import MessageLoadingComponent from './DataLoading';
+import axiosInstance from './axios';
+import { useParams } from 'react-router-dom';
+import { notification } from 'antd'; // Import thư viện notification từ antd
 
 function App() {
-    const CourseLoading = CourseLoadingComponent(Courses);
+    const MessageLoading = MessageLoadingComponent(ChatApp);
     const [appState, setAppState] = useState({
         loading: true,
-        courses: null,
+        messages: null,
+        title: null,
     });
-
-
-    const dayOfWeekNumber = getDayOfWeekNumber();
-    const queryParams = {
-        day_of_week: dayOfWeekNumber,
-    };
-    const url = axiosInstance.getUri({
-        url: "/course",
-        params: queryParams,
-    });
+    const { slug } = useParams();
 
     useEffect(() => {
-        axiosInstance.get(url).then((response) => {
-            console.log(response.data);
-            setAppState({ loading: false, courses: response.data });
+        axiosInstance.get("/chat/" + slug + "/").then((res) => {
+            const allMessages = res.data.messages;
+            console.log(res.data);
+            console.log(allMessages);
+            setAppState({ loading: false, messages: allMessages, title: res.data.room_name });
+            console.log("RECEIVED MASSAGES FROM API!!!");
         })
             .catch((error) => {
                 if (error.response) {
@@ -109,20 +82,12 @@ function App() {
                         placement: 'topRight'
                     });
                 }
-            });;
-    }, [setAppState, url]);
-
-
+            });
+    }, [setAppState, slug]);
     return (
         <div className="App">
-            <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px', color: 'darkblue' }}>
-                <span role="img" aria-label="Class Today">📝</span> Class Today
-            </div>
-            <div>
-                <CourseLoading isLoading={appState.loading} data={appState.courses} />
-            </div>
+            <MessageLoading isLoading={appState.loading} messages={appState.messages} room_slug={slug} room_title={appState.title} />
         </div>
     );
 }
-
 export default App;
