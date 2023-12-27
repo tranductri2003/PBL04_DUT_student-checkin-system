@@ -3,10 +3,9 @@ import axiosInstance from '../../axios';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { notification } from 'antd';
 import Webcam from 'react-webcam';
-import styled from 'styled-components';
-import download from 'downloadjs';
 import { FaCheck } from 'react-icons/fa'; // Sử dụng thư viện react-icons cho biểu tượng tick
 import './AttendanceModal.css'
+import jwt_decode from "jwt-decode";
 
 let isFaceValidated = true; // Global variable for overall validation
 let isLocationValidated = true;
@@ -48,6 +47,7 @@ const AttendanceModal = (props) => {
 
     const [savedPosition, setSavedPosition] = useState(null);
     const [avatars, setAvatars] = useState({});
+    const [role, setRole] = useState('');
 
     // const [isImageCaptured, setIsImageCaptured] = useState(false);
     // const [isLocationValidated, setisLocationValidated] = useState(false);
@@ -115,8 +115,13 @@ const AttendanceModal = (props) => {
     // Sử dụng useEffect để thiết lập kết nối WebSocket khi trang được tải
     useEffect(() => {
         const token = localStorage.getItem('access_token');
+        if (token) {
+            const decodedToken = jwt_decode(token);
+            setRole(decodedToken.role);
+        }
         const websocketURL = `${process.env.REACT_APP_CHECK_IN_WEBSOCKET_URL}${course.course_id}/`;
         const client = new W3CWebSocket(websocketURL);
+
 
         client.onopen = () => {
             console.log('WebSocket Client Connected');
@@ -365,39 +370,45 @@ const AttendanceModal = (props) => {
                         </tbody>
 
                     </table>
-                    {isWithinTimeRange(course?.start_time, course?.end_time) ? (
+                    {role !== 'T' && (
                         <>
-                            <>
-                                <div className="ButtonContainer">
+                            {isWithinTimeRange(course?.start_time, course?.end_time) ? (
+                                <>
+                                    <>
+                                        <div className="ButtonContainer">
 
-                                    <button className="cameraButton" onClick={turnOnCamera} disabled={isFaceValidated}>
-                                        {isFaceValidated ? <FaCheck /> : 'Bật camera điểm danh'}
-                                    </button>
-                                    <button className="checkLocationButton" onClick={handleCheckLocation} disabled={isLocationValidated}>
-                                        {isLocationValidated ? <FaCheck /> : 'Kiểm tra vị trí'}
-                                    </button>
-                                </div>
+                                            <button className="cameraButton" onClick={turnOnCamera} disabled={isFaceValidated}>
+                                                {isFaceValidated ? <FaCheck /> : 'Bật camera điểm danh'}
+                                            </button>
+                                            <button className="checkLocationButton" onClick={handleCheckLocation} disabled={isLocationValidated}>
+                                                {isLocationValidated ? <FaCheck /> : 'Kiểm tra vị trí'}
+                                            </button>
+                                        </div>
 
-                            </>
-                            <div style={{ margin: '20px', textAlign: 'center' }}>
-                                <button className="button" onClick={sendWebSocketData}>
-                                    Điểm danh
-                                </button>
-                            </div>
-                            {webcamVisible && (
-                                <div className="WebcamOverlay">
-                                    <Webcam
-                                        audio={false}
-                                        videoConstraints={{ facingMode: 'user' }}
-                                        ref={webcamRef}
-                                    />
-                                    <button className="CaptureButton" onClick={handleCapture}>Chụp ảnh</button>
-                                </div>
+                                    </>
+                                    <div style={{ margin: '20px', textAlign: 'center' }}>
+                                        <button className="button" onClick={sendWebSocketData}>
+                                            Điểm danh
+                                        </button>
+                                    </div>
+                                    {webcamVisible && (
+                                        <div className="WebcamOverlay">
+                                            <Webcam
+                                                audio={false}
+                                                videoConstraints={{ facingMode: 'user' }}
+                                                ref={webcamRef}
+                                            />
+                                            <button className="CaptureButton" onClick={handleCapture}>Chụp ảnh</button>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <button className="cameraButton" disabled>Bật camera điểm danh</button>
                             )}
                         </>
-                    ) : (
-                        <button className="cameraButton" disabled>Bật camera điểm danh</button>
                     )}
+
+
                     {savedPosition && (
                         <div style={{ margin: '20px', textAlign: 'center' }}>
                             <h3>vị trí:</h3>
