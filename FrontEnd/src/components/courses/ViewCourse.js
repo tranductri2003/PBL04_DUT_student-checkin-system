@@ -20,7 +20,8 @@ function getDayOfWeekName(dayOfWeek) {
     return daysOfWeek[dayOfWeek];
 }
 const Leaderboard = (props) => {
-    let staff_id = "";
+    var staff_id = "";
+    var role = "";
     if (localStorage.getItem('access_token')) {
         // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
         const token = localStorage.getItem("access_token"); // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
@@ -30,6 +31,8 @@ const Leaderboard = (props) => {
 
         // Lấy staff_id từ payload của token
         staff_id = decodedToken.staff_id;
+        role = decodedToken.role;
+        //console.log(role);
     }
 
 
@@ -149,7 +152,7 @@ const Leaderboard = (props) => {
                         <th className="tableHeader">Giảng viên</th>
                         <th className="tableHeader">Thời khóa biểu</th>
                         <th className="tableHeader">Trạng thái điểm danh</th>
-                        <th className="tableHeader">Xin giáo viên nghỉ</th>
+                        {role !== 'T' && <th className="tableHeader">Xin giáo viên nghỉ</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -164,11 +167,14 @@ const Leaderboard = (props) => {
                                     {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
                                 </td>
                                 <td className="cell">
-                                    <button className="buttonAttendance" onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>Điểm danh</button>
-                                </td>
-                                <td className="cell">
-                                    <button className="buttonAttendance" onClick={() => handleCreateRoom(staff_id, course.teacher.staff_id, localStorage.getItem("full_name"), course.teacher.full_name)}>Nhắn tin</button>
-                                </td>
+                                    <button className="buttonAttendance" onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>
+                                        {role === 'T' ? 'Xem' : 'Điểm danh'}
+                                    </button>                                </td>
+                                {role !== 'T' && (
+                                    <td className="cell">
+                                        <button className="buttonAttendance" onClick={() => handleCreateRoom(staff_id, course.teacher.staff_id, localStorage.getItem("full_name"), course.teacher.full_name)}>Nhắn tin</button>
+                                    </td>
+                                )}
                             </tr>
                         ))
                     ) : (
