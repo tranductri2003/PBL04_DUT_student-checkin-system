@@ -21,7 +21,8 @@ def add_image_feature():
     try:
         create_features(staff_id, images)
         return jsonify({"msg": "Create successfully!"}), 200
-    except:
+    except Exception as e:
+        print("Error:", str(e))
         return jsonify({"msg": "Create failed!"}), 400
     
 
@@ -35,6 +36,6 @@ def face_recognization():
     avatar = decoded_token.get('avatar')
     
     # Đọc hình ảnh từ đối tượng FileStorage
-    validated = face_recognize(staff_id, image, 0.3)
+    validated = face_recognize(staff_id, image, 0.6)
     
     return jsonify({"validated": validated}), 200
