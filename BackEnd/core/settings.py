@@ -247,7 +247,8 @@ SIMPLE_JWT = {
 STATIC_URL = "/django-static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'django-static/')
 
-REACT_APP_MEDIA_URL = 'media/'
+# REACT_APP_MEDIA_URL = 'media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
