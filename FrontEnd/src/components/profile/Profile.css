@@ -1,0 +1,206 @@
+.container {
+    padding-top: 40px;
+    color: #2e323c;
+    background: #f5f6fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 70%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.leftColumn {
+    flex: 1;
+    padding: 20px;
+    border-right: 1px solid #eaeaea;
+    text-align: center;
+}
+
+.rightColumn {
+    flex: 2;
+    padding: 20px;
+}
+
+.userAvatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.userName {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.userEmail {
+    color: #9fa8b9;
+    font-size: 1rem;
+}
+
+.aboutHeading {
+    color: #007ae1;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.aboutText {
+    color: #2e323c;
+}
+
+.formControl {
+    border: 1px solid #cfd1d8;
+    border-radius: 2px;
+    font-size: 0.825rem;
+    background: #ffffff;
+    color: #2e323c;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    box-sizing: border-box;
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+}
+
+.formRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.halfWidthControl {
+    border: 1px solid #cfd1d8;
+    border-radius: 2px;
+    font-size: 0.825rem;
+    background: #ffffff;
+    color: #2e323c;
+    width: 48%;
+    padding: 0.375rem 0.75rem;
+    box-sizing: border-box;
+}
+
+.fullLengthControl {
+    border: 1px solid #cfd1d8;
+    border-radius: 2px;
+    font-size: 0.825rem;
+    background: #ffffff;
+    color: #2e323c;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    margin-right: 1%;
+}
+
+.heading {
+    font-size: 1rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.cancelButton {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+
+.updateButton {
+    background-color: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.boldLabel {
+    font-weight: bold;
+    color: #2e323c;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Tiếp tục trong file Profile.module.css */
+
+.leaderboard {
+    top: 0;
+    left: 0;
+    width: 100%;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    margin: 0 auto;
+    background-color: #ffffff;
+}
+
+.tableHeader {
+    padding: 16px;
+    background-color: darkblue;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+.cell {
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    /* Hover effect: Uncomment if needed
+    &:hover {
+        background-color: #f2f2f2;
+    }
+    */
+}
+
+.cell:hover {
+    background-color: #f2f2f2;
+}
+
+.button {
+    background-color: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.link {
+    text-decoration: none;
+    color: blue;
+    cursor: pointer;
+    font-weight: bold;
+}

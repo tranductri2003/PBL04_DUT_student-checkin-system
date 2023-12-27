@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Attendances from './ViewAttendances';
-import AttendanceLoadingComponent from '../../DataLoading';
-import axiosInstance from '../../axios';
+import Attendances from './components/attendances/ViewAttendances';
+import AttendanceLoadingComponent from './DataLoading';
+import axiosInstance from './axios';
 import queryString from 'query-string';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';

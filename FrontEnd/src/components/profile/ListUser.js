@@ -5,46 +5,7 @@ import { notification } from 'antd';
 import { Button } from "reactstrap";
 import jwt_decode from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
-
-
-const styles = {
-    leaderboard: {
-        fontFamily: '"Helvetica Neue", Arial, sans-serif',
-        textAlign: 'center',
-        margin: '20px',
-    },
-    table: {
-        width: '100%',
-        borderCollapse: 'collapse',
-        border: '1px solid #ddd',
-        margin: '0 auto',
-    },
-    tableHeader: {
-        padding: '16px',
-        backgroundColor: '#f2f2f2',
-        fontSize: '18px',
-        fontWeight: 'bold',
-    },
-    cell: {
-        padding: '12px',
-        textAlign: 'center',
-        fontSize: '16px',
-    },
-    button: {
-        backgroundColor: 'green',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        padding: '10px 20px',
-        borderRadius: '5px',
-    },
-    link: {
-        textDecoration: 'none',
-        color: 'blue',
-        cursor: 'pointer',
-    },
-};
-
+import './ListUser.css'
 
 const Leaderboard = () => {
     let staff_id = "";
@@ -244,25 +205,25 @@ const Leaderboard = () => {
 
 
     return (
-        <div style={styles.leaderboard}>
-            <table style={styles.table}>
+        <div className="leaderboard">
+            <table className="table">
                 <thead>
                     <tr>
-                        <th style={styles.tableHeader}>STT</th>
-                        <th style={styles.tableHeader}>Staff id</th>
-                        <th style={styles.tableHeader}>Họ và tên</th>
-                        <th style={styles.tableHeader}>Email</th>
-                        <th style={styles.tableHeader}>SDT</th>
-                        <th style={styles.tableHeader}>Lớp</th>
-                        <th style={styles.tableHeader}>Nhắn tin</th>
+                        <th className="tableHeader">STT</th>
+                        <th className="tableHeader">Staff id</th>
+                        <th className="tableHeader">Họ và tên</th>
+                        <th className="tableHeader">Email</th>
+                        <th className="tableHeader">SDT</th>
+                        <th className="tableHeader">Lớp</th>
+                        <th className="tableHeader">Nhắn tin</th>
                     </tr>
                 </thead>
                 <tbody>
                     {appState.users.results && Array.isArray(appState.users.results) ? (
                         appState.users.results.map((user, index) => (
                             <tr key={user.id}>
-                                <td style={styles.cell}>{index + 1}</td>
-                                <td style={styles.cell}>
+                                <td className="cell">{index + 1}</td>
+                                <td className="cell">
                                     <a
                                         href={`/user/${user.staff_id}`}
                                         style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
@@ -273,12 +234,13 @@ const Leaderboard = () => {
                                     >
                                         {user.staff_id}
                                     </a>
-                                </td>                                <td style={styles.cell}>{user.full_name}</td>
-                                <td style={styles.cell}>{user.email}</td>
-                                <td style={styles.cell}>{user.phone_number}</td>
-                                <td style={styles.cell}>{user.class_id}</td>
-                                <td style={styles.cell}>
-                                    <button style={styles.button} onClick={() => handleCreateRoom(staff_id, user.staff_id, localStorage.getItem("full_name"), user.full_name)}>Nhắn tin</button>
+                                </td>
+                                <td className="cell">{user.full_name}</td>
+                                <td className="cell">{user.email}</td>
+                                <td className="cell">{user.phone_number}</td>
+                                <td className="cell">{user.class_id}</td>
+                                <td className="cell">
+                                    <button className="button" onClick={() => handleCreateRoom(staff_id, user.staff_id, localStorage.getItem("full_name"), user.full_name)}>Nhắn tin</button>
                                 </td>
                             </tr>
                         ))

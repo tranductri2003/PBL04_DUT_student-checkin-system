@@ -1,0 +1,80 @@
+.leaderboard {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #ffffff, #f1f1f1);
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    margin: 0 auto;
+    border-radius: 10px;
+    background: white;
+}
+
+.tableHeader {
+    padding: 16px;
+    background-color: darkblue;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.cell {
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 2px solid #e0e0e0;
+    transition: background-color 0.3s;
+}
+
+.cell:hover {
+    background-color: #f7f7f7;
+}
+
+.buttonAttendance {
+    background-color: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.link {
+    text-decoration: none;
+    color: blue;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Phần customStyles cần được xử lý một chút khác biệt */
+.modalContent {
+    position: fixed;
+    /* Dùng fixed để giữ modal luôn ở giữa màn hình */
+    top: 50%;
+    /* Đặt vị trí từ trên xuống 50% chiều cao màn hình */
+    left: 50%;
+    /* Đặt vị trí từ trái sang 50% chiều rộng màn hình */
+    transform: translate(-50%, -50%);
+    /* Dịch chuyển modal lùi lại 50% kích thước của nó để nó nằm chính giữa */
+    width: 70%;
+    /* Giảm chiều rộng của modal xuống còn 60% */
+    /* Đặt giới hạn chiều rộng tối đa nếu muốn */
+    height: auto;
+    /* Chiều cao tự động phù hợp với nội dung */
+    overflow-y: auto;
+    /* Cho phép cuộn nếu nội dung quá dài */
+    background: #fff;
+    /* Màu nền cho modal */
+    border-radius: 10px;
+    /* Bo góc cho modal */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

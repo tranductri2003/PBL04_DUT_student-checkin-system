@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     },
     avatar: {
         backgroundColor: '#3f51b5',
-        fontSize: '1.2rem',
+        fontSize: '1.8rem',
     },
     authButtons: {
         display: 'flex',

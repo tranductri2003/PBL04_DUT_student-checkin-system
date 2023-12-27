@@ -6,152 +6,10 @@ import Webcam from 'react-webcam';
 import styled from 'styled-components';
 import download from 'downloadjs';
 import { FaCheck } from 'react-icons/fa'; // Sử dụng thư viện react-icons cho biểu tượng tick
-
+import './AttendanceModal.css'
 
 let isFaceValidated = true; // Global variable for overall validation
 let isLocationValidated = true;
-
-
-const WebcamOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 18%;
-  width: 65%;
-  height: 80%;
-  border: 2px solid #4caf50; // Viền nổi bật cho khu vực webcam
-  padding: 10px; // Đệm xung quanh webcam
-
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); // Thêm bóng đổ
-  border-radius: 10px; // Bo tròn góc
-  overflow: hidden; // Ẩn các phần tử vượt ra ngoài viền
-  display: flex; // Sử dụng flexbox để căn chỉnh các thành phần bên trong
-  justify-content: center; // Căn giữa các thành phần theo trục ngang
-  align-items: center; // Căn giữa các thành phần theo trục dọc
-  background-color: #fff; // Màu nền tùy chọn
-`;
-
-const CaptureButton = styled.button`
-  position: absolute;
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  fontWeight: 'bold', // Chữ in đậm
-
-`;
-
-const ButtonContainer = styled.div`
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  display: flex;
-  gap: 10px; // Khoảng cách giữa các nút
-  fontWeight: 'bold', // Chữ in đậm
-
-`;
-const modalStyles = {
-
-    AttendanceModal: {
-        fontFamily: '"Helvetica Neue", Arial, sans-serif',
-        textAlign: 'center',
-        margin: '20px',
-    },
-    tableContainer: {
-        width: '100%',
-        overflowX: 'auto',
-        boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)', // Thêm bóng đổ
-
-    },
-    tableWrapper: {
-        maxHeight: 'calc(90vh - 120px)',
-        overflowY: 'auto',
-        backgroundColor: '#f8f9fa', // Nền nhẹ cho bao bọc
-
-    },
-    table: {
-        width: '100%',
-        borderCollapse: 'collapse',
-        border: '1px solid #ddd',
-        margin: '0 auto',
-        backgroundColor: '#ffffff', // Nền trắng cho bảng
-
-    },
-    tableHeader: {
-        padding: '16px',
-        backgroundColor: 'darkblue', // Sử dụng màu xanh cho tiêu đề
-        color: 'white', // Màu chữ trắng cho đối lập
-        fontSize: '18px',
-        fontWeight: 'bold',
-        position: 'sticky',
-        top: '0',
-        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
-
-    },
-    cell: {
-        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
-        fontWeight: 'bold', // Chữ in đậm
-        padding: '12px',
-        textAlign: 'center',
-        fontSize: '16px',
-        borderBottom: '1px solid #ddd', // Thêm viền cho mỗi ô
-        '&:hover': {
-            backgroundColor: '#f2f2f2', // Thêm hiệu ứng di chuột
-        },
-
-    },
-    link: {
-        textDecoration: 'none',
-        color: 'blue',
-        cursor: 'pointer',
-    },
-    tick: {
-        fontSize: '20px',
-        color: 'green',
-    },
-    cross: {
-        fontSize: '20px',
-        color: 'red',
-    },
-    cameraButton: {
-        backgroundColor: 'green',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        fontWeight: 'bold', // Chữ in đậm
-
-    },
-    checkLocationButton: {
-        backgroundColor: 'green',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        fontWeight: 'bold', // Chữ in đậm
-
-    },
-    button: {
-        position: 'absolute',
-        bottom: '10px', // Adjust top position as needed
-        backgroundColor: 'green',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        margin: "center",
-        fontWeight: 'bold', // Chữ in đậm
-
-    },
-};
-
 
 function isWithinTimeRange(startTime, endTime) {
     if (startTime && endTime) {
@@ -452,26 +310,26 @@ const AttendanceModal = (props) => {
     }, [course]);
 
     return (
-        <div style={modalStyles.AttendanceModal}>
+        <div className="AttendanceModal">
 
-            <div style={modalStyles.tableContainer}>
-                <div style={modalStyles.tableWrapper}>
-                    <table style={modalStyles.table}>
+            <div className="tableContainer">
+                <div className="tableWrapper">
+                    <table className="table">
                         <thead>
                             <tr>
-                                <th style={modalStyles.tableHeader}>Avatar</th>
-                                <th style={modalStyles.tableHeader}>Mã số sinh viên</th>
-                                <th style={modalStyles.tableHeader}>Họ và tên sinh viên</th>
-                                <th style={modalStyles.tableHeader}>Môn học</th>
-                                <th style={modalStyles.tableHeader}>Trạng thái điểm danh</th>
-                                <th style={modalStyles.tableHeader}>Ghi chú</th>
+                                <th className="tableHeader">Avatar</th>
+                                <th className="tableHeader">Mã số sinh viên</th>
+                                <th className="tableHeader">Họ và tên sinh viên</th>
+                                <th className="tableHeader">Môn học</th>
+                                <th className="tableHeader">Trạng thái điểm danh</th>
+                                <th className="tableHeader">Ghi chú</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users && Array.isArray(users) ? (
                                 users.map((user, index) => (
                                     <tr key={user.id}>
-                                        <td style={modalStyles.cell}>
+                                        <td className="cell">
                                             {avatars[user.staff_id] &&
                                                 <img
                                                     src={avatars[user.staff_id]}
@@ -482,21 +340,21 @@ const AttendanceModal = (props) => {
                                                         objectFit: 'cover'
                                                     }} />}
                                         </td>
-                                        <td style={modalStyles.cell}>{user.staff_id}</td>
-                                        <td style={modalStyles.cell}>{user.full_name}</td>
-                                        <td style={modalStyles.cell}>
+                                        <td className="cell">{user.staff_id}</td>
+                                        <td className="cell">{user.full_name}</td>
+                                        <td className="cell">
                                             {course ? course.course_name : '-'}
                                         </td>
-                                        <td style={modalStyles.cell}>
+                                        <td className="cell">
                                             {presentStudents[user.staff_id] ? (
-                                                <span style={modalStyles.tick}>&#10003;</span>
+                                                <span className="tick">&#10003;</span>
                                             ) : (
-                                                <span style={modalStyles.cross}>&#10007;</span>
+                                                <span className="cross">&#10007;</span>
                                             )}
                                             {presentStudents[user.staff_id] && presentStudents[user.staff_id].message}
 
                                         </td>
-                                        <td style={modalStyles.cell}>{presentStudents[user.staff_id] || '-'}</td>
+                                        <td className="cell">{presentStudents[user.staff_id] || '-'}</td>
                                     </tr>
                                 ))
                             ) : (
@@ -510,35 +368,35 @@ const AttendanceModal = (props) => {
                     {isWithinTimeRange(course?.start_time, course?.end_time) ? (
                         <>
                             <>
-                                <ButtonContainer>
+                                <div className="ButtonContainer">
 
-                                    <button style={modalStyles.cameraButton} onClick={turnOnCamera} disabled={isFaceValidated}>
+                                    <button className="cameraButton" onClick={turnOnCamera} disabled={isFaceValidated}>
                                         {isFaceValidated ? <FaCheck /> : 'Bật camera điểm danh'}
                                     </button>
-                                    <button style={modalStyles.checkLocationButton} onClick={handleCheckLocation} disabled={isLocationValidated}>
+                                    <button className="checkLocationButton" onClick={handleCheckLocation} disabled={isLocationValidated}>
                                         {isLocationValidated ? <FaCheck /> : 'Kiểm tra vị trí'}
                                     </button>
-                                </ButtonContainer>
+                                </div>
 
                             </>
                             <div style={{ margin: '20px', textAlign: 'center' }}>
-                                <button style={modalStyles.button} onClick={sendWebSocketData}>
+                                <button className="button" onClick={sendWebSocketData}>
                                     Điểm danh
                                 </button>
                             </div>
                             {webcamVisible && (
-                                <WebcamOverlay>
+                                <div className="WebcamOverlay">
                                     <Webcam
                                         audio={false}
                                         videoConstraints={{ facingMode: 'user' }}
                                         ref={webcamRef}
                                     />
-                                    <CaptureButton onClick={handleCapture}>Chụp ảnh</CaptureButton>
-                                </WebcamOverlay>
+                                    <button className="CaptureButton" onClick={handleCapture}>Chụp ảnh</button>
+                                </div>
                             )}
                         </>
                     ) : (
-                        <button style={modalStyles.cameraButton} disabled>Bật camera điểm danh</button>
+                        <button className="cameraButton" disabled>Bật camera điểm danh</button>
                     )}
                     {savedPosition && (
                         <div style={{ margin: '20px', textAlign: 'center' }}>
