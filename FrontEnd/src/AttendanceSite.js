@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Attendances from './ViewAttendances';
-import AttendanceLoadingComponent from '../../DataLoading';
-import axiosInstance from '../../axios';
+import Attendances from './components/attendances/ViewAttendances';
+import AttendanceLoadingComponent from './DataLoading';
+import axiosInstance from './axios';
 import queryString from 'query-string';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
@@ -265,7 +265,7 @@ function AttendanceSite() {
 
     return (
         <div className="App">
-            <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
+            <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px', color: "darkblue" }}>
                 <span role="img" aria-label="Attendance History">📝</span> Attendance History
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

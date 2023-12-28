@@ -8,11 +8,11 @@ import Header from './components/header';
 import Login from './components/auth/login';
 import Logout from './components/auth/logout';
 import Hall from './components/chat/hall';
-import ChatSite from './components/chat/ChatSite'
-import AttendancesSite from './components/attendances/AttendanceSite';
-import CoursesSite from './components/courses/CourseSite';
+import ChatSite from './ChatSite'
+import AttendancesSite from './AttendanceSite';
+import CoursesSite from './CourseSite';
 import SearchSite from './components/profile/ListUser';
-import Profile from './components/profile/Profile'; // Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn
+import Profile from './Profile'; // Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
