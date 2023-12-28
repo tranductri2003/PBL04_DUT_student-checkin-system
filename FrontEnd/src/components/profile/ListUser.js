@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 const styles = {
     leaderboard: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
         textAlign: 'center',
         margin: '20px',
     },

@@ -38,7 +38,7 @@ export default function Footer() {
                 <Grid container spacing={4} justify="space-evenly">
                     {footers.map((footer) => (
                         <Grid item xs={6} sm={3} key={footer.title}>
-                            <Typography variant="h6" color="textPrimary" gutterBottom style={{ fontFamily: 'cursive', fontSize: '28px', fontWeight: 'bold' }}>
+                            <Typography variant="h6" color="textPrimary" gutterBottom style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '28px', fontWeight: 'bold' }}>
                                 {footer.title}
                             </Typography>
                             <ul>
@@ -50,7 +50,7 @@ export default function Footer() {
                                             color="textSecondary"
                                             target="_blank"
                                             rel="noopener"
-                                            style={{ fontFamily: 'cursive', fontSize: '18px' }}
+                                            style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '18px' }}
                                         >
                                             {item.label}
                                         </Link>
@@ -62,7 +62,7 @@ export default function Footer() {
                 </Grid>
             </Container>
             <Box mt={5} textAlign="center">
-                <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'cursive', fontSize: '14px' }}>
+                <Typography variant="body2" color="textSecondary" style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '14px' }}>
                     © {new Date().getFullYear()} Bản quyền Trường Đại học Bách khoa - Đại học Đà Nẵng
                 </Typography>
             </Box>

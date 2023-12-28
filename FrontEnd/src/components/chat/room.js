@@ -11,80 +11,8 @@ import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 
 import { withStyles } from "@material-ui/core/styles";
+import "./room.css";
 
-const useStyles = (theme) => ({
-    root: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        backgroundColor: "#f5f5f5",
-        borderRadius: "8px",
-        padding: "20px",
-        boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-    },
-    chatBoxContainer: {
-        flexGrow: 1,
-        overflowY: "auto", // Set overflow-y to auto to enable vertical scrolling
-        width: "100%",
-    },
-    chatBox: {
-        height: "500px",
-        width: "100%",
-        padding: "10px",
-    },
-    message: {
-        margin: "5px",
-        padding: "10px",
-        backgroundColor: "#fff",
-        borderRadius: "5px",
-        boxShadow: "0px 0px 5px rgba(0,0,0,0.1)",
-        display: "flex",
-        alignItems: "center",
-    },
-    messageText: {
-        marginLeft: "10px",
-    },
-    messageRight: {
-        marginLeft: "auto",
-        marginRight: 0,
-        flexDirection: "row-reverse",
-    },
-    messageLeft: {
-        marginRight: "auto",
-        marginLeft: 0,
-        flexDirection: "row",
-    },
-    messageSender: {
-        fontWeight: "bold",
-    },
-    avatar: {
-        backgroundColor: "#4caf50",
-    },
-    form: {
-        width: "100%",
-        marginTop: theme.spacing(2),
-        display: "flex",
-        alignItems: "center",
-    },
-    input: {
-        flexGrow: 1,
-        marginRight: theme.spacing(2),
-    },
-    submit: {
-        textTransform: "none",
-    },
-    titleContainer: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: "20px",
-        padding: "10px",
-        backgroundColor: "#2196f3",
-        color: "#fff",
-        borderRadius: "8px",
-        boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-    },
-});
 
 class ChatApp extends Component {
     constructor(props) {
@@ -173,8 +101,8 @@ class ChatApp extends Component {
         return (
             <Container component="main" maxWidth="md">
                 <CssBaseline />
-                <div className={classes.root}>
-                    <div className={classes.titleContainer}>
+                <div className="root">
+                    <div className="titleContainer">
                         <Typography variant="h6" color="textPrimary" gutterBottom>
                             <span role="img" aria-label="Chat Icon">
                                 💬
@@ -182,20 +110,20 @@ class ChatApp extends Component {
                             Chat Room: {this.state.room_slug}
                         </Typography>
                     </div>
-                    <div className={classes.chatBoxContainer} id="chatbox-container">
-                        <Paper className={classes.chatBox}>
+                    <div className="chatBoxContainer" id="chatbox-container">
+                        <Paper className="chatBox">
                             {this.state.messages.length > 0 ? (
                                 this.state.messages.map((message, index) => (
                                     <div
                                         key={index}
-                                        className={`${classes.message} ${message.staff_id === this.state.staff_id ? classes.messageRight : classes.messageLeft
+                                        className={`message ${message.staff_id === this.state.staff_id ? 'messageRight' : 'messageLeft'
                                             }`}
                                     >
-                                        <Avatar className={classes.avatar}>
+                                        <Avatar className="avatar">
                                             {message.staff_id.charAt(0).toUpperCase()}
                                         </Avatar>
-                                        <div className={classes.messageText}>
-                                            <Typography variant="subtitle2" className={classes.messageSender}>
+                                        <div className="messageText">
+                                            <Typography variant="subtitle2" className="messageSender">
                                                 {message.staff_id}
                                             </Typography>
                                             <Typography variant="body1">{message.message}</Typography>
@@ -207,9 +135,9 @@ class ChatApp extends Component {
                             )}
                         </Paper>
                     </div>
-                    <form className={classes.form} noValidate onSubmit={this.onButtonClicked}>
+                    <form className="form" noValidate onSubmit={this.onButtonClicked}>
                         <TextField
-                            className={classes.input}
+                            className="input"
                             placeholder="Enter text here"
                             variant="outlined"
                             fullWidth
@@ -220,7 +148,7 @@ class ChatApp extends Component {
                             type="submit"
                             variant="contained"
                             color="primary"
-                            className={classes.submit}
+                            className="submit"
                             disableElevation
                         >
                             Send Message
@@ -231,5 +159,4 @@ class ChatApp extends Component {
         );
     }
 }
-
-export default withStyles(useStyles)(ChatApp);
+export default ChatApp;

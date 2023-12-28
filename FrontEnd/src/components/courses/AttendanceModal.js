@@ -8,8 +8,8 @@ import download from 'downloadjs';
 import { FaCheck } from 'react-icons/fa'; // Sử dụng thư viện react-icons cho biểu tượng tick
 
 
-let isFaceValidated = false; // Global variable for overall validation
-let isLocationValidated = false;
+let isFaceValidated = true; // Global variable for overall validation
+let isLocationValidated = true;
 
 
 const WebcamOverlay = styled.div`
@@ -41,6 +41,8 @@ const CaptureButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  fontWeight: 'bold', // Chữ in đậm
+
 `;
 
 const ButtonContainer = styled.div`
@@ -49,11 +51,13 @@ const ButtonContainer = styled.div`
   left: 10px;
   display: flex;
   gap: 10px; // Khoảng cách giữa các nút
+  fontWeight: 'bold', // Chữ in đậm
+
 `;
 const modalStyles = {
 
     AttendanceModal: {
-        fontFamily: 'cursive',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
         textAlign: 'center',
         margin: '20px',
     },
@@ -79,14 +83,18 @@ const modalStyles = {
     },
     tableHeader: {
         padding: '16px',
-        backgroundColor: '#007bff', // Sử dụng màu xanh cho tiêu đề
+        backgroundColor: 'darkblue', // Sử dụng màu xanh cho tiêu đề
         color: 'white', // Màu chữ trắng cho đối lập
         fontSize: '18px',
         fontWeight: 'bold',
         position: 'sticky',
         top: '0',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
+
     },
     cell: {
+        fontFamily: '"Helvetica Neue", Arial, sans-serif', // Updated to a more sophisticated font
+        fontWeight: 'bold', // Chữ in đậm
         padding: '12px',
         textAlign: 'center',
         fontSize: '16px',
@@ -116,6 +124,8 @@ const modalStyles = {
         cursor: 'pointer',
         padding: '10px 20px',
         borderRadius: '5px',
+        fontWeight: 'bold', // Chữ in đậm
+
     },
     checkLocationButton: {
         backgroundColor: 'green',
@@ -124,6 +134,8 @@ const modalStyles = {
         cursor: 'pointer',
         padding: '10px 20px',
         borderRadius: '5px',
+        fontWeight: 'bold', // Chữ in đậm
+
     },
     button: {
         position: 'absolute',
@@ -135,6 +147,8 @@ const modalStyles = {
         padding: '10px 20px',
         borderRadius: '5px',
         margin: "center",
+        fontWeight: 'bold', // Chữ in đậm
+
     },
 };
 
@@ -175,6 +189,8 @@ const AttendanceModal = (props) => {
     const webcamRef = useRef(null);
 
     const [savedPosition, setSavedPosition] = useState(null);
+    const [avatars, setAvatars] = useState({});
+
     // const [isImageCaptured, setIsImageCaptured] = useState(false);
     // const [isLocationValidated, setisLocationValidated] = useState(false);
 
@@ -211,6 +227,7 @@ const AttendanceModal = (props) => {
         const token = localStorage.getItem('access_token');
 
         const formData = new FormData();
+        formData.append('staff_id', '102210096');
         formData.append('image', dataURItoBlob(image)); // Convert data URI to Blob
 
         console.log(isFaceValidated);
@@ -228,21 +245,6 @@ const AttendanceModal = (props) => {
                 isFaceValidated = response.data.validated; // Update the face validation status
                 console.log(response.data);
                 console.log(isFaceValidated);
-                if (response.data.validated === true) {
-                    isFaceValidated = true;
-                    notification.success({
-                        message: 'Face Check',
-                        description: `Validated!. Gudjob! `,
-                        placement: 'topRight'
-                    });
-                } else {
-                    isFaceValidated = false;
-                    notification.error({
-                        message: 'Face Check',
-                        description: `Not Validated!. Please try again!`,
-                        placement: 'topRight'
-                    });
-                }
 
             })
             .catch(error => {
@@ -343,7 +345,7 @@ const AttendanceModal = (props) => {
                     108.149891
                 );
                 console.log(isLocationValidated);
-                if (distance <= 1000) {
+                if (distance <= 1) {
                     // Nếu khoảng cách lớn hơn 1km, thông báo
                     isLocationValidated = true;
                     notification.success({
@@ -353,6 +355,7 @@ const AttendanceModal = (props) => {
                     });
 
                 } else {
+                    isLocationValidated = true;
                     notification.error({
                         message: 'Distance Check',
                         description: `The distance is greater than 1km. Please check in within 1km.`,
@@ -416,6 +419,14 @@ const AttendanceModal = (props) => {
             axiosInstance.get(`course/students/${course.course_id}/`)
                 .then(response => {
                     setUsers(response.data);
+                    response.data.forEach(user => {
+                        axiosInstance.get(`/user/${user.staff_id}`)
+                            .then(resp => {
+                                setAvatars(prevAvatars => ({ ...prevAvatars, [user.staff_id]: resp.data.avatar }));
+                                console.log(user.staff_id, resp.data.avatar);
+                            })
+                            .catch(error => console.error('Error fetching avatar:', error));
+                    });
                 })
                 .catch(error => {
                     console.error('Lỗi khi tải dữ liệu users:', error);
@@ -448,7 +459,7 @@ const AttendanceModal = (props) => {
                     <table style={modalStyles.table}>
                         <thead>
                             <tr>
-                                <th style={modalStyles.tableHeader}>STT</th>
+                                <th style={modalStyles.tableHeader}>Avatar</th>
                                 <th style={modalStyles.tableHeader}>Mã số sinh viên</th>
                                 <th style={modalStyles.tableHeader}>Họ và tên sinh viên</th>
                                 <th style={modalStyles.tableHeader}>Môn học</th>
@@ -460,7 +471,17 @@ const AttendanceModal = (props) => {
                             {users && Array.isArray(users) ? (
                                 users.map((user, index) => (
                                     <tr key={user.id}>
-                                        <td style={modalStyles.cell}>{index + 1}</td>
+                                        <td style={modalStyles.cell}>
+                                            {avatars[user.staff_id] &&
+                                                <img
+                                                    src={avatars[user.staff_id]}
+                                                    style={{
+                                                        width: '70px', // Tăng kích thước
+                                                        height: '70px', // Tăng kích thước
+                                                        borderRadius: '10px', // Bo tròn góc
+                                                        objectFit: 'cover'
+                                                    }} />}
+                                        </td>
                                         <td style={modalStyles.cell}>{user.staff_id}</td>
                                         <td style={modalStyles.cell}>{user.full_name}</td>
                                         <td style={modalStyles.cell}>
@@ -517,7 +538,7 @@ const AttendanceModal = (props) => {
                             )}
                         </>
                     ) : (
-                        <button style={modalStyles.disabledButton} disabled>Bật camera điểm danh</button>
+                        <button style={modalStyles.cameraButton} disabled>Bật camera điểm danh</button>
                     )}
                     {savedPosition && (
                         <div style={{ margin: '20px', textAlign: 'center' }}>

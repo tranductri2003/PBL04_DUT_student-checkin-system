@@ -265,7 +265,7 @@ function AttendanceSite() {
 
     return (
         <div className="App">
-            <div style={{ fontFamily: 'cursive', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
+            <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px' }}>
                 <span role="img" aria-label="Attendance History">📝</span> Attendance History
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -3,5 +3,5 @@ from .consumers import StatusConsumer
 
 
 websocket_urlpatterns = [
-    re_path(r'^ws/user/status/$', StatusConsumer.as_asgi()),  # Sử dụng mẫu URL khác với chat
+    re_path(r'^ws/user/status', StatusConsumer.as_asgi()),
 ]
