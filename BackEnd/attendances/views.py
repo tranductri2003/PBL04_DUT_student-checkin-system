@@ -31,9 +31,21 @@ class AttendanceListView(generics.ListAPIView):
         if not self.request.user.is_authenticated:
             return Response({"message": "Please login to get data."}, status=status.HTTP_401_UNAUTHORIZED)
         
-        
-        queryset = Attendances.objects.all()
-       
+        if self.request.user.role == 'A':
+            queryset = Attendances.objects.all()
+        elif self.request.user.role == 'T':
+            course_list = Courses.objects.filter(teacher_id=self.request.user)
+            queryset = Attendances.objects.filter(course_id__in=course_list)
+        elif self.request.user.role == 'S':
+            queryset = Attendances.objects.filter(student_id=self.request.user)
+        else:
+            return Response({"message": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+
+        check_in = self.request.GET.get('check_in', None)
+        if check_in == 'true':
+            queryset = Attendances.objects.all()
+            
+            
         course_id = self.request.GET.get('course_id', None)
         if course_id is not None:
             queryset = queryset.filter(course_id__course_id=course_id)

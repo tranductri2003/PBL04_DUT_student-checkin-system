@@ -52,15 +52,6 @@ const AttendanceModal = (props) => {
     const [isValidated, setIsValidated] = useState(false);
 
 
-    // Thêm hàm mới để gọi notification
-    const showNotification = (message, description, type) => {
-        notification[type]({
-            message,
-            description,
-            placement: 'topRight'
-        });
-    };
-
     const saveImageToLocalstorage = (imageName, imageData) => {
         localStorage.setItem(imageName, imageData);
     };
@@ -87,8 +78,7 @@ const AttendanceModal = (props) => {
         setCapturedImage(image);
         setWebcamVisible(false);
         saveImageToLocalstorage('check_in_image', image);
-        // setIsImageCaptured(true);
-        // console.log('isImageCaptured:', isImageCaptured); // Add this line to log the state
+
 
         const token = localStorage.getItem('access_token');
 
@@ -106,8 +96,20 @@ const AttendanceModal = (props) => {
             }
         )
             .then(response => {
+                if (response.data.validated === true) {
+                    notification.success({
+                        message: 'Face Check',
+                        description: `Validated!. Gudjob! `,
+                        placement: 'topRight'
+                    });
+                } else {
+                    notification.error({
+                        message: 'Face Check',
+                        description: `Not Validated!. Please try again!`,
+                        placement: 'topRight'
+                    });
+                }
                 setIsFaceValidated(response.data.validated); // Update the face validation status
-                console.log(response.data);
             })
             .catch(error => {
                 console.error('Lỗi khi tải dữ liệu users:', error);
@@ -172,8 +174,8 @@ const AttendanceModal = (props) => {
 
         // Loại bỏ kết nối WebSocket khi Component unmount
         return () => {
-            if (websocket) {
-                websocket.close();
+            if (client) {
+                client.close();
             }
         };
     }, []); // Rỗng [] đảm bảo hiệu ứng này chỉ chạy một lần khi trang được tải.
@@ -287,7 +289,6 @@ const AttendanceModal = (props) => {
                         axiosInstance.get(`/user/${user.staff_id}`)
                             .then(resp => {
                                 setAvatars(prevAvatars => ({ ...prevAvatars, [user.staff_id]: resp.data.avatar }));
-                                console.log(user.staff_id, resp.data.avatar);
                             })
                             .catch(error => console.error('Error fetching avatar:', error));
                     });
@@ -302,7 +303,7 @@ const AttendanceModal = (props) => {
             const day = currentTime.getDate().toString().padStart(2, '0');
             const today = `${year}-${month}-${day}`;
 
-            axiosInstance.get(`/attendance/?attendance_date=${today}&status=True&course_id=${course.course_id}&page_size=80`)
+            axiosInstance.get(`/attendance/?attendance_date=${today}&status=True&course_id=${course.course_id}&page_size=80&check_in=true`)
                 .then(response => {
                     setPresentStudents(response.data.results.reduce((map, attendance) => {
                         map[attendance.student.staff_id] = attendance.note;
