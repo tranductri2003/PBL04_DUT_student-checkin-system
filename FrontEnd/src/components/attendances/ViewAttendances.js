@@ -19,6 +19,7 @@ const Leaderboard = (props) => {
                 <thead>
                     <tr>
                         <th className="tableHeader">Subject</th>
+                        <th className="tableHeader">Student</th>
                         <th className="tableHeader">Attendance Time</th>
                         <th className="tableHeader">Attendance Date</th>
                         <th className="tableHeader">Status</th>
@@ -28,7 +29,8 @@ const Leaderboard = (props) => {
                 <tbody>
                     {data?.map((attendance, index) => (
                         <tr key={attendance.id}>
-                            <td className="cell">{attendance.course_name}</td>
+                            <td className="cell">{attendance.course.course_name} ({attendance.course.course_id})</td>
+                            <td className="cell">{attendance.student.full_name} ({attendance.student.staff_id})</td>
                             <td className="cell">{formatTime(attendance.attendance_time)}</td>
                             <td className="cell">{attendance.attendance_date}</td>
                             <td className="cell">

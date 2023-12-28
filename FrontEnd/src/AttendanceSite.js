@@ -276,10 +276,11 @@ function AttendanceSite() {
                         placeholder="Select Subject"
                         value={selectedSubject}
                         onChange={value => setSelectedSubject(value)}
+                        style={{ minWidth: '400px' }}  // Đặt chiều rộng của Select
                     >
                         {subjects.map(subject => (
                             <Option key={subject.id} value={subject.course_id}>
-                                {subject.course_name}
+                                {subject.course_name} ({subject.course_id})
                             </Option>
                         ))}
                     </Select>

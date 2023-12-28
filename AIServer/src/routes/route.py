@@ -36,6 +36,6 @@ def face_recognization():
     avatar = decoded_token.get('avatar')
     
     # Đọc hình ảnh từ đối tượng FileStorage
-    validated = face_recognize(staff_id, image, 0.6)
+    validated = face_recognize(staff_id, image, 0.4)
     
     return jsonify({"validated": validated}), 200
