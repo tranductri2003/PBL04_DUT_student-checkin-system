@@ -47,8 +47,6 @@ function AttendanceSite() {
         next: null,
         previous: null,
         currentPage: 1,
-        maxPage: 1,
-        perPage: 1,
     });
 
     const [selectedSubject, setSelectedSubject] = useState(null); // State cho select
@@ -134,6 +132,8 @@ function AttendanceSite() {
 
     useEffect(() => {
         const queryParams = queryString.parse(window.location.search);
+        queryParams.pageSize = 10; // Số lượng mục tối đa trên mỗi trang
+
         const fetchUrl = axiosInstance.getUri({
             url: "attendance/",
             params: queryParams,
@@ -141,7 +141,10 @@ function AttendanceSite() {
 
         axiosInstance.get(fetchUrl).then((response) => {
             console.log(response.data);
-
+            const totalItems = response.data.count;
+            const itemsPerPage = 10;
+            const maxPages = Math.ceil(totalItems / itemsPerPage);
+            console.log(totalItems, itemsPerPage, maxPages)
             if (response.data && response.data.results) {
                 const allAttendances = response.data.results;
                 setAppState({
@@ -149,8 +152,8 @@ function AttendanceSite() {
                     attendances: allAttendances,
                     next: response.data.next,
                     previous: response.data.previous,
-                    maxPage: response.data.count,
-                    perPage: response.data.page_size
+                    maxPage: maxPages,
+                    perPage: itemsPerPage,
                 });
             } else {
                 // Handle the case where response data is null or missing data
@@ -322,8 +325,8 @@ function AttendanceSite() {
                     </Button>
                 )}
                 {/* Hiển thị dãy số trang */}
-                {Array.from({ length: Math.ceil(appState.maxPage / appState.perPage) }, (_, index) => index + 1)
-                    .filter(page => page <= Math.ceil(appState.maxPage / appState.perPage))
+                {Array.from({ length: appState.maxPage }, (_, index) => index + 1)
+                    .filter(page => page <= Math.ceil(appState.maxPage))
                     .map((page) => (
                         <Button
                             key={page}
