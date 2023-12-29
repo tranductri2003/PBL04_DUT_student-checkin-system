@@ -16,6 +16,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { message, notification } from 'antd';
+import Modal from 'react-modal';
+import './login.css';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +48,9 @@ export default function SignIn() {
     });
 
     const [formData, updateFormData] = useState(initialFormData);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
 
     const handleChange = (e) => {
         updateFormData({
@@ -187,7 +192,7 @@ export default function SignIn() {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href="/forgotpassword" variant="body2">
+                            <Link href="#" variant="body2" onClick={openModal}>
                                 Forgot password?
                             </Link>
                         </Grid>
@@ -199,6 +204,87 @@ export default function SignIn() {
                     </Grid>
                 </form>
             </div>
+            <ForgotPasswordModal isOpen={isModalOpen} onRequestClose={closeModal} />
+
         </Container>
+    );
+}
+
+function ForgotPasswordModal({ isOpen, onRequestClose }) {
+    // Trạng thái và hàm xử lý cho form quên mật khẩu
+    const [formData, setFormData] = useState({
+        staff_id: '',
+        email: '',
+    });
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Gửi yêu cầu đặt lại mật khẩu tới server
+        // ...
+        onRequestClose(); // Đóng modal sau khi gửi
+    };
+
+    return (
+        <Modal isOpen={isOpen} onRequestClose={onRequestClose}
+            style={{
+                content: {
+                    top: '50%',
+                    left: '50%',
+                    right: 'auto',
+                    bottom: 'auto',
+                    marginRight: '-50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '70%', // Tăng kích thước chiều rộng
+                    height: '70%', // Điều chỉnh chiều cao tự động
+                    maxWidth: '600px', // Giới hạn kích thước tối đa
+
+                }
+            }}
+
+        >
+            <div className="modalContent">
+                <h2>Forgot Password</h2>
+                <form className="modalForm" onSubmit={handleSubmit}>
+                    <TextField
+                        className="modalInput"
+                        type="text"
+                        name="staff_id"
+                        label="Staff Id"
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        className="modalInput"
+                        type="email"
+                        name="email"
+                        label="Email"
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        onChange={handleChange}
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className="modalButton"
+                    >
+                        Send
+                    </Button>
+                </form>
+            </div>
+        </Modal>
     );
 }

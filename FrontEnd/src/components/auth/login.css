@@ -1,0 +1,26 @@
+.forgotPasswordContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.forgotPasswordPaper {
+    padding: 24px;
+    /* Giả sử theme.spacing(3) tương đương với 24px */
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    font-family: cursive;
+}
+
+.forgotPasswordForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.forgotPasswordTextField {
+    margin-bottom: 16px;
+    /* Giả sử theme.spacing(2) tương đương với 16px */
+}
