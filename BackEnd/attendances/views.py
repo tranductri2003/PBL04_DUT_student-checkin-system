@@ -8,6 +8,7 @@ from attendances.models import Attendances
 from attendances.serializers import AttendanceSerializer
 from helper.models import CustomPageNumberPagination
 from courses.models import Courses
+from users.models import NewUser
 from .filters import AttendanceFilter
 
 # Create your views here.
@@ -16,7 +17,7 @@ class AttendanceListView(generics.ListAPIView):
     serializer_class = AttendanceSerializer
     pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_class = AttendanceFilter
+    # filterset_class = AttendanceFilter
     # filterset_fields = ["student_id", "course_id", "attendance_date", "status"]
     
     def get_queryset(self):
@@ -31,9 +32,38 @@ class AttendanceListView(generics.ListAPIView):
         if not self.request.user.is_authenticated:
             return Response({"message": "Please login to get data."}, status=status.HTTP_401_UNAUTHORIZED)
         
+        if self.request.user.role not in ['A', 'T', 'S']:
+            return Response({"message": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
         
-        queryset = Attendances.objects.all()
-       
+        if self.request.user.role == 'A':
+            staff_id = self.request.GET.get('staff_id', None)
+            if staff_id is not None:
+                try:
+                    user = NewUser.objects.get(staff_id=staff_id)
+                except NewUser.DoesNotExist:
+                    queryset = Attendances.objects.none()
+                else:
+                    if user.role == 'S':
+                        queryset = Attendances.objects.filter(student_id=user)
+                    elif user.role == 'T':
+                        course_list = Courses.objects.filter(teacher_id=user)
+                        queryset = Attendances.objects.filter(course_id__in=course_list)
+                    else:
+                        queryset = Attendances.objects.all()
+            else:
+                queryset = Attendances.objects.all()
+        elif self.request.user.role == 'T':
+            course_list = Courses.objects.filter(teacher_id=self.request.user)
+            queryset = Attendances.objects.filter(course_id__in=course_list)
+        elif self.request.user.role == 'S':
+            queryset = Attendances.objects.filter(student_id=self.request.user)
+
+
+        check_in = self.request.GET.get('check_in', None)
+        if check_in == 'true':
+            queryset = Attendances.objects.all()
+            
+            
         course_id = self.request.GET.get('course_id', None)
         if course_id is not None:
             queryset = queryset.filter(course_id__course_id=course_id)
@@ -45,14 +75,7 @@ class AttendanceListView(generics.ListAPIView):
         attendance_status = self.request.GET.get('status', None)
         if attendance_status is not None:
             queryset = queryset.filter(status=attendance_status)
-            
-        
-        student_id = self.request.GET.get('student_id', None)
-        if student_id is not None:
-            if student_id != self.request.user.staff_id:
-                raise PermissionDenied("You do not have permission")
-            else:
-                queryset = queryset.filter(student_id__staff_id=student_id)
+    
         return queryset.order_by('-attendance_date', '-attendance_time')     
         
 class AttendanceUpdateView(generics.UpdateAPIView):

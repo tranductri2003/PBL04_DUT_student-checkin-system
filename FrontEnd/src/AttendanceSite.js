@@ -152,7 +152,7 @@ function AttendanceSite() {
 
     useEffect(() => {
         const queryParams = queryString.parse(window.location.search);
-        queryParams.pageSize = 10; // Số lượng mục tối đa trên mỗi trang
+        queryParams.pageSize = 20; // Số lượng mục tối đa trên mỗi trang
 
         const fetchUrl = axiosInstance.getUri({
             url: "attendance/?page_size=" + queryParams.pageSize,
@@ -162,9 +162,9 @@ function AttendanceSite() {
         axiosInstance.get(fetchUrl).then((response) => {
             console.log(response.data);
             const totalItems = response.data.count;
-            const itemsPerPage = 10;
+            const itemsPerPage = queryParams.pageSize;
             const maxPages = Math.ceil(totalItems / itemsPerPage);
-            console.log(totalItems, itemsPerPage, maxPages)
+
             if (response.data && response.data.results) {
                 const allAttendances = response.data.results;
                 setAppState({
@@ -353,7 +353,7 @@ function AttendanceSite() {
                 )}
                 {/* Hiển thị dãy số trang */}
                 {Array.from({ length: appState.maxPage }, (_, index) => index + 1)
-                    .filter(page => page <= Math.ceil(appState.maxPage))
+                    .filter(page => page <= Math.ceil(appState.maxPage)) //queryParams.pageSize
                     .map((page) => (
                         <Button
                             key={page}
