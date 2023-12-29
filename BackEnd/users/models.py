@@ -21,7 +21,9 @@ def upload_to(instance, filename):
     else:
         folder = 'admin'
 
-    return f'{folder}/{filename}'
+    return f'{filename}'
+
+    # return f'{folder}/{filename}'
 
 
 class CustomAccountManager(BaseUserManager):
