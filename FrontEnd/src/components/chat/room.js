@@ -9,12 +9,14 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
+import { NavLink } from 'react-router-dom';
 
-import { withStyles } from "@material-ui/core/styles";
 import "./room.css";
 
+const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
 class ChatApp extends Component {
+
     constructor(props) {
         super(props);
 
@@ -37,6 +39,8 @@ class ChatApp extends Component {
         // this.client = new W3CWebSocket("ws://127.0.0.1:8000/ws/" + this.state.room_slug + "/");
         const websocketURL = `${process.env.REACT_APP_CHAT_WEBSOCKET_URL}${this.state.room_slug}/`;
         this.client = new W3CWebSocket(websocketURL);
+
+
 
     }
     onButtonClicked = (e) => {
@@ -119,9 +123,12 @@ class ChatApp extends Component {
                                         className={`message ${message.staff_id === this.state.staff_id ? 'messageRight' : 'messageLeft'
                                             }`}
                                     >
-                                        <Avatar className="avatar">
-                                            {message.staff_id.charAt(0).toUpperCase()}
-                                        </Avatar>
+                                        <NavLink to={`/user/${message.staff_id}`}>
+                                            <Avatar
+                                                alt={message.staff_id}
+                                                src={`${MEDIA_URL}/media/${message.staff_id}.jpg`}
+                                            />
+                                        </NavLink>
                                         <div className="messageText">
                                             <Typography variant="subtitle2" className="messageSender">
                                                 {message.staff_id}
