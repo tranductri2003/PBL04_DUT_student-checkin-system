@@ -126,7 +126,7 @@ function Header() {
     };
 
     const handleAvatarClick = () => {
-        navigate(`/profile/${staff_id}`); // Thay đổi đường dẫn này theo cấu hình định tuyến của bạn
+        navigate(`/user/${staff_id}`); // Thay đổi đường dẫn này theo cấu hình định tuyến của bạn
     };
 
     return (

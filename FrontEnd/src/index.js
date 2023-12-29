@@ -12,7 +12,7 @@ import ChatSite from './ChatSite'
 import AttendancesSite from './AttendanceSite';
 import CoursesSite from './CourseSite';
 import SearchSite from './components/profile/ListUser';
-import Profile from './Profile'; // Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn
+import Profile from './UserSite'; // Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 

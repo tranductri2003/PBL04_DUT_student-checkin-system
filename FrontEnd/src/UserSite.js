@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from './axios';
 import { useParams } from 'react-router-dom';
-import jwt_decode from "jwt-decode";
-import Avatar from '@material-ui/core/Avatar';
+
 import './components/profile/Profile.css'
 
-const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 function getDayOfWeekName(dayOfWeek) {
     const daysOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật',];
     return daysOfWeek[dayOfWeek];
