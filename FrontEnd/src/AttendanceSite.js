@@ -5,6 +5,7 @@ import axiosInstance from './axios';
 import queryString from 'query-string';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
+import jwt_decode from "jwt-decode";
 import { notification, Select, DatePicker } from 'antd'
 
 const { Option } = Select;
@@ -65,7 +66,14 @@ function AttendanceSite() {
     const [selectedStaffId, setSelectedStaffId] = useState('');
 
     const [subjects, setSubjects] = useState([]); // Thêm dòng này
-
+    const [userRole, setUserRole] = useState('');
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            const decodedToken = jwt_decode(token);
+            setUserRole(decodedToken.role); // Hoặc cách lấy role khác tùy thuộc vào cấu trúc token của bạn
+        }
+    }, []);
     useEffect(() => {
         // Gọi API để lấy danh sách các môn học
         axiosInstance.get("/course")
@@ -320,13 +328,15 @@ function AttendanceSite() {
                         placeholder="Select Date"
                         onChange={date => setSelectedDate(date)}
                     />
-                    <input
-                        type="text"
-                        placeholder="Enter Staff ID"
-                        value={selectedStaffId}
-                        onChange={e => setSelectedStaffId(e.target.value)}
-                        className={classes.filterInput}
-                    />
+                    {userRole === 'A' && (
+                        <input
+                            type="text"
+                            placeholder="Enter Staff ID"
+                            value={selectedStaffId}
+                            onChange={e => setSelectedStaffId(e.target.value)}
+                            className={classes.filterInput}
+                        />
+                    )}
                     <Button
                         className={classes.filterButton}
                         variant="contained"

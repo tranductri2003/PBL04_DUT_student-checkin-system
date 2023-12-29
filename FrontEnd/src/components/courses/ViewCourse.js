@@ -5,9 +5,6 @@ import { notification } from 'antd'
 import axiosInstance from '../../axios';
 import jwt_decode from "jwt-decode";
 import './ViewCourse.css';
-import Button from '@material-ui/core/Button';
-
-
 
 function openModal(setModalIsOpen, setSelectedCourse, course) {
     setSelectedCourse(course);
@@ -26,15 +23,7 @@ const Leaderboard = (props) => {
     var staff_id = "";
     var role = "";
 
-    const [filterStaffId, setFilterStaffId] = useState(staff_id);
 
-    const handleFilterChange = (e) => {
-        setFilterStaffId(e.target.value);
-    };
-
-    const applyFilter = () => {
-
-    };
 
     if (localStorage.getItem('access_token')) {
         // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
@@ -157,25 +146,6 @@ const Leaderboard = (props) => {
 
     return (
         <div>
-            <div className="filterContainer">
-                <input
-                    type="text"
-                    placeholder="Enter Staff ID"
-                    value={filterStaffId}
-                    onChange={handleFilterChange}
-                    className="filterInput"
-                />
-
-                {/* Updated Filter Button to match AttendanceSite */}
-                <Button
-                    className="filterButton" // Apply similar className as in AttendanceSite
-                    variant="contained"
-                    color="primary"
-                    onClick={applyFilter}
-                >
-                    Filter
-                </Button>
-            </div>
             <div className="leaderboard">
                 <table className="table">
                     <thead>
@@ -186,7 +156,7 @@ const Leaderboard = (props) => {
                             <th className="tableHeader">Giảng viên</th>
                             <th className="tableHeader">Thời khóa biểu</th>
                             <th className="tableHeader">Trạng thái điểm danh</th>
-                            {role !== 'T' && <th className="tableHeader">Xin giáo viên nghỉ</th>}
+                            {(role !== 'T' && role !== 'A') && <th className="tableHeader">Xin giáo viên nghỉ</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -202,9 +172,9 @@ const Leaderboard = (props) => {
                                     </td>
                                     <td className="cell">
                                         <button className="buttonAttendance" onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>
-                                            {role === 'T' ? 'Xem' : 'Điểm danh'}
+                                            {(role !== 'T' && role !== 'A') ? 'Xem' : 'Điểm danh'}
                                         </button>                                </td>
-                                    {role !== 'T' && (
+                                    {(role !== 'T' && role !== 'A') && (
                                         <td className="cell">
                                             <button className="buttonAttendance" onClick={() => handleCreateRoom(staff_id, course.teacher.staff_id, localStorage.getItem("full_name"), course.teacher.full_name)}>Nhắn tin</button>
                                         </td>
