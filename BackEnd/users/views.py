@@ -158,12 +158,12 @@ def send_password_reset_email (request):
         token = account_activation_token.make_token(user)
         
         mail_subject = 'Reset your password'
-        reset_url = f"{os.getenv('BACK_END_IP')}/confirm-reset-password/{uid}/{token}/"
+        reset_url = f"{os.getenv('FRONT_END_IP')}/reset-password/{uid}/{token}/"
 
 
-        message = f"Hi {user.user_name},\n\n" \
+        message = f"Hi {user.full_name},\n\n" \
                 f"You're receiving this email because you requested a password reset for your account.\n" \
-                f"Please click the following link to reset your password to default (123456789):\n\n" \
+                f"Please click the following link to reset your password:\n\n" \
                 f"{reset_url}\n\n" \
                 f"If you didn't request a password reset, please ignore this email.\n\n" \
                 f"Best regards,\n" \
@@ -193,7 +193,9 @@ def confirm_and_update_password(request, uidb64, token):
         user = None
     
     if user is not None and account_activation_token.check_token(user, token):
-        user.set_password("123456789")
+        password = request.data.get("password")
+
+        user.set_password(password)
         user.save()
 
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
