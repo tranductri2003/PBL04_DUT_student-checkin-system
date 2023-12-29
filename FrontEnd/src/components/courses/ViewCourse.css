@@ -78,3 +78,24 @@
     /* Bo góc cho modal */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
+
+.filterInput {
+    margin-right: 8px;
+    /* Adjust as needed, equivalent to theme.spacing(2) */
+    padding: 7px;
+    /* Adjust as needed, equivalent to theme.spacing(1) */
+    width: 150px;
+    border-radius: 6px;
+    /* Rounded corners */
+    border: 1px solid #ced4da;
+    /* Border similar to other filter components */
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    /* Example font, replace with your theme's font if different */
+}
+
+.filterContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}

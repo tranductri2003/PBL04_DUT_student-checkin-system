@@ -32,6 +32,16 @@ const useStyles = makeStyles((theme) => ({
     },
     datePicker: {
         width: '150px',
+        marginRight: theme.spacing(2),
+
+    },
+    filterInput: {
+        marginRight: theme.spacing(2),
+        padding: theme.spacing(1),
+        width: '150px',
+        borderRadius: '6px', // Rounded corners
+        border: '1px solid #ced4da', // Border similar to other filter components
+        fontFamily: theme.typography.fontFamily, // Consistent font
     },
 }));
 
@@ -52,6 +62,8 @@ function AttendanceSite() {
     const [selectedSubject, setSelectedSubject] = useState(null); // State cho select
     const [selectedStatus, setSelectedStatus] = useState(''); // State cho select
     const [selectedDate, setSelectedDate] = useState(null); // State cho datetime picker
+    const [selectedStaffId, setSelectedStaffId] = useState('');
+
     const [subjects, setSubjects] = useState([]); // Thêm dòng này
 
     useEffect(() => {
@@ -112,6 +124,14 @@ function AttendanceSite() {
         } else {
             urlParams.delete('attendance_date');
         }
+        // Lọc theo ID
+        if (selectedStaffId) {
+            urlParams.set('staff_id', selectedStaffId);
+        } else {
+            urlParams.delete('staff_id');
+        }
+
+
 
         //const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
 
@@ -135,7 +155,7 @@ function AttendanceSite() {
         queryParams.pageSize = 10; // Số lượng mục tối đa trên mỗi trang
 
         const fetchUrl = axiosInstance.getUri({
-            url: "attendance/",
+            url: "attendance/?page_size=" + queryParams.pageSize,
             params: queryParams,
         });
 
@@ -299,6 +319,13 @@ function AttendanceSite() {
                         className={classes.datePicker}
                         placeholder="Select Date"
                         onChange={date => setSelectedDate(date)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Enter Staff ID"
+                        value={selectedStaffId}
+                        onChange={e => setSelectedStaffId(e.target.value)}
+                        className={classes.filterInput}
                     />
                     <Button
                         className={classes.filterButton}
