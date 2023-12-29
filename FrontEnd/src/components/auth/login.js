@@ -38,6 +38,11 @@ const useStyles = makeStyles((theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
+    modal: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 }));
 
 export default function SignIn() {
@@ -49,8 +54,22 @@ export default function SignIn() {
 
     const [formData, updateFormData] = useState(initialFormData);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const openModal = () => {
+        setIsModalOpen(true);
+        // Ẩn label khi modal mở
+        document.querySelectorAll('.loginLabel').forEach(label => {
+            label.style.display = 'none';
+        });
+    };
+
+    // Hàm đóng modal và hiển thị lại label
+    const closeModal = () => {
+        setIsModalOpen(false);
+        // Hiển thị lại label khi modal đóng
+        document.querySelectorAll('.loginLabel').forEach(label => {
+            label.style.display = 'block';
+        });
+    };
 
     const handleChange = (e) => {
         updateFormData({
@@ -163,6 +182,7 @@ export default function SignIn() {
                         autoComplete="Staff Id"
                         autoFocus
                         onChange={handleChange}
+                        className="loginLabel"
                     />
                     <TextField
                         variant="outlined"
@@ -175,6 +195,7 @@ export default function SignIn() {
                         id="password"
                         autoComplete="current-password"
                         onChange={handleChange}
+                        className="loginLabel"
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
@@ -192,13 +213,8 @@ export default function SignIn() {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href="#" variant="body2" onClick={openModal}>
+                            <Link variant="body2" onClick={openModal}>
                                 Forgot password?
-                            </Link>
-                        </Grid>
-                        <Grid item>
-                            <Link href="/register" variant="body2">
-                                {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>
                     </Grid>
@@ -232,8 +248,13 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onRequestClose={onRequestClose}
+        <Modal isOpen={isOpen}
+            onRequestClose={onRequestClose}
             style={{
+                overlay: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                },
+
                 content: {
                     top: '50%',
                     left: '50%',
@@ -242,18 +263,17 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
                     marginRight: '-50%',
                     transform: 'translate(-50%, -50%)',
                     width: '70%', // Tăng kích thước chiều rộng
-                    height: '70%', // Điều chỉnh chiều cao tự động
+                    height: '35%', // Điều chỉnh chiều cao tự động
                     maxWidth: '600px', // Giới hạn kích thước tối đa
-
                 }
             }}
 
         >
-            <div className="modalContent">
+            <div className="forgotPasswordContainertent">
                 <h2>Forgot Password</h2>
-                <form className="modalForm" onSubmit={handleSubmit}>
+                <form className="forgotPasswordForm" onSubmit={handleSubmit}>
                     <TextField
-                        className="modalInput"
+                        className="forgotPasswordTextField"
                         type="text"
                         name="staff_id"
                         label="Staff Id"
@@ -264,7 +284,7 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
                         onChange={handleChange}
                     />
                     <TextField
-                        className="modalInput"
+                        className="forgotPasswordTextField"
                         type="email"
                         name="email"
                         label="Email"
