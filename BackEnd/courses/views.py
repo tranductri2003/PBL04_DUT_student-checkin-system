@@ -27,28 +27,28 @@ class CoursesListCreateView(generics.ListCreateAPIView):
         if self.request.user.role not in ['A', 'T', 'S']:
             return Response({"message": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
         
-        staff_id = self.request.GET.get('staff_id', None)
-        # Nếu truyền vào staff_id thì sẽ truy vấn theo staff_id
-        # Nếu không thì sẽ truy vấn theo role của người đăng nhập
-        if staff_id is not None:
-            query_set = Courses.objects.all()
-            user = NewUser.objects.get(staff_id=staff_id)
-            if user.role == 'T':
-                query_set = query_set.filter(teacher_id=user)
-            elif user.role == 'S':
-                course_ids = UserCourse.objects.filter(user=self.request.user).values_list('course__course_id', flat=True)
-                query_set = query_set.filter(course_id__in=course_ids)
+        if self.request.user.role == 'A':
+            staff_id = self.request.GET.get('staff_id', None)
+            if staff_id is not None:
+                try:
+                    user = NewUser.objects.get(staff_id=staff_id)
+                except NewUser.DoesNotExist:
+                    query_set = Courses.objects.none()
+                else:
+                    if user.role == 'S':
+                        course_ids = UserCourse.objects.filter(user=user).values_list('course__course_id', flat=True)
+                        query_set = Courses.objects.filter(course_id__in=course_ids)
+                    elif user.role == 'T':
+                        query_set = Courses.objects.filter(teacher_id=user)
+                    elif user.role == 'A':
+                        query_set = Courses.objects.all()
             else:
-                query_set = Courses.objects.none()
-        else:
-            if self.request.user.role == 'A':
                 query_set = Courses.objects.all()
-            elif self.request.user.role == 'T':
-                query_set = Courses.objects.filter(teacher_id=self.request.user)
-            elif self.request.user.role == 'S':
-                course_ids = UserCourse.objects.filter(user=self.request.user).values_list('course__course_id', flat=True)
-                query_set = Courses.objects.filter(course_id__in=course_ids)
-        print(list(query_set))
+        elif self.request.user.role == 'T':
+            query_set = Courses.objects.filter(teacher_id=self.request.user)
+        elif self.request.user.role == 'S':
+            course_ids = UserCourse.objects.filter(user=self.request.user).values_list('course__course_id', flat=True)
+            query_set = Courses.objects.filter(course_id__in=course_ids)
         return query_set
 
     def perform_create(self, serializer):

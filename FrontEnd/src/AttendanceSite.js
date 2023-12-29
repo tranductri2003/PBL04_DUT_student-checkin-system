@@ -135,7 +135,7 @@ function AttendanceSite() {
         queryParams.pageSize = 20; // Số lượng mục tối đa trên mỗi trang
 
         const fetchUrl = axiosInstance.getUri({
-            url: "attendance/?page_size=" + queryParams.pageSize,
+            url: "attendance/",
             params: queryParams,
         });
 
@@ -144,7 +144,7 @@ function AttendanceSite() {
             const totalItems = response.data.count;
             const itemsPerPage = queryParams.pageSize;
             const maxPages = Math.ceil(totalItems / itemsPerPage);
-            console.log(totalItems, itemsPerPage, maxPages)
+
             if (response.data && response.data.results) {
                 const allAttendances = response.data.results;
                 setAppState({

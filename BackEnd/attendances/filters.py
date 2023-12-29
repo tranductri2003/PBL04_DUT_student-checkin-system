@@ -7,6 +7,6 @@ class AttendanceFilter(django_filters.FilterSet):
         fields = {
             'attendance_date': ['exact'],
             'status': ['exact'],
-            'student_id__staff_id': ['exact', 'icontains'],
-            'course_id__course_id': ['exact', 'icontains']
+            # 'student_id__staff_id': ['exact', 'icontains'],
+            # 'course_id__course_id': ['exact', 'icontains']
         }

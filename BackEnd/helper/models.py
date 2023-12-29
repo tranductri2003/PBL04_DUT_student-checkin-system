@@ -18,5 +18,5 @@ class CustomPageNumberPagination(PageNumberPagination):
 
     def get_paginated_response(self, data):
         res = super().get_paginated_response(data)
-        res.data['page_size'] = 6
+        res.data['page_size'] = self.page_size
         return res
