@@ -13,6 +13,7 @@ import AttendancesSite from './AttendanceSite';
 import CoursesSite from './CourseSite';
 import SearchSite from './components/profile/ListUser';
 import Profile from './UserSite'; // Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn
+import ResetPassword from './components/auth/resetPassword';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -24,6 +25,7 @@ ReactDOM.render(
       <Route path="/" element={<CoursesSite />} />
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
+      <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
       <Route path="/attendance" element={<AttendancesSite />} />
       <Route path="/hall/:slug" element={<ChatSite />} />
       <Route path="/hall" element={<Hall />} />

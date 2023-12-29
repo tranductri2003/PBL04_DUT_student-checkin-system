@@ -230,7 +230,6 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
     // Trạng thái và hàm xử lý cho form quên mật khẩu
     const [formData, setFormData] = useState({
         staff_id: '',
-        email: '',
     });
 
     const handleChange = (e) => {
@@ -240,11 +239,43 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Gửi yêu cầu đặt lại mật khẩu tới server
-        // ...
-        onRequestClose(); // Đóng modal sau khi gửi
+
+        try {
+            // Gửi yêu cầu đặt lại mật khẩu tới server với trường staff_id
+            await axiosInstance.post('/user/send-reset-password/', formData);
+            // Đóng modal sau khi gửi
+            onRequestClose();
+            // Hiển thị thông báo thành công
+            notification.success({
+                message: 'Check your email',
+                description: 'Please check your mail to reset your password!',
+                placement: 'topRight'
+            });
+        } catch (error) {
+            // Xử lý lỗi nếu có
+            console.error('Error sending reset password email:', error.message);
+            if (error.response) {
+                if (error.response.status === 401) {
+                    // Xử lý thông tin đăng nhập sai
+                    notification.warning({
+                        message: 'Error',
+                        description: 'An error occurred while processing your request',
+                        placement: 'topRight',
+                    });
+                } else {
+                    // Xử lý lỗi khác
+                    notification.error({
+                        message: 'Error',
+                        description: 'Error. Please try again.',
+                        placement: 'topRight',
+                    });
+                }
+            } else {
+                console.error('An error occurred:', error.message);
+            }
+        }
     };
 
     return (
@@ -283,17 +314,6 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
                         fullWidth
                         onChange={handleChange}
                     />
-                    <TextField
-                        className="forgotPasswordTextField"
-                        type="email"
-                        name="email"
-                        label="Email"
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        onChange={handleChange}
-                    />
                     <Button
                         type="submit"
                         fullWidth
@@ -301,7 +321,7 @@ function ForgotPasswordModal({ isOpen, onRequestClose }) {
                         color="primary"
                         className="modalButton"
                     >
-                        Send
+                        Send Reset Password Email
                     </Button>
                 </form>
             </div>
