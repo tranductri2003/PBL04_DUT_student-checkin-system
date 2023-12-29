@@ -94,3 +94,29 @@ class TXTUploadView(APIView):
             return Response({'message': 'Dữ liệu đã được nạp thành công'}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateAllUserInformation(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            # Lấy mật khẩu mới
+            new_password = '123456789'
+
+            # Lấy tất cả người dùng trong hệ thống
+            all_users = NewUser.objects.all()
+
+            # Cập nhật mật khẩu của mỗi người dùng
+            for user in all_users:
+                user.password = make_password(new_password)
+                user.faculty = "Công nghệ thông tin"
+                user.university = "Bách khoa Đà Nẵng"
+
+                if user.role == "S":
+                    user.avatar = f"{user.staff_id}.jpg"
+                    
+                user.save()
+
+            return Response({'message': 'Thông tin của tất cả người dùng đã được cập nhật thành công.'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': 'Lỗi trong quá trình cập nhật Thông tin.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

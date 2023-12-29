@@ -7,7 +7,7 @@ def download_image(student_id):
     
     if response.status_code == 200:
         # Thay đổi đường dẫn để lưu vào thư mục mong muốn
-        save_path = os.path.join('D:\Code\BachKhoa\PBL 4\PBL04_DUT-Student-CheckIn-System\AI Server\student-faces', f'{student_id}.jpg')
+        save_path = os.path.join('D:\Code\BachKhoa\PBL 4\PBL04_DUT-Student-CheckIn-System\BackEnd\media\students', f'{student_id}.jpg')
         with open(save_path, 'wb') as f:
             f.write(response.content)
         print(f'Successfully downloaded image for student {student_id}')
