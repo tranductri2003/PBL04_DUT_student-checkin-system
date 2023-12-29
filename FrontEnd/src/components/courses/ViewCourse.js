@@ -4,7 +4,7 @@ import AttendanceModal from './AttendanceModal';
 import { notification } from 'antd'
 import axiosInstance from '../../axios';
 import jwt_decode from "jwt-decode";
-import './ViewCourse.css'; // Thêm dòng này
+import './ViewCourse.css';
 
 function openModal(setModalIsOpen, setSelectedCourse, course) {
     setSelectedCourse(course);
@@ -22,6 +22,9 @@ function getDayOfWeekName(dayOfWeek) {
 const Leaderboard = (props) => {
     var staff_id = "";
     var role = "";
+
+
+
     if (localStorage.getItem('access_token')) {
         // Lấy token từ nơi bạn lưu trữ nó, ví dụ localStorage hoặc cookies
         const token = localStorage.getItem("access_token"); // Thay thế bằng cách lấy token từ nơi bạn lưu trữ nó
@@ -142,59 +145,61 @@ const Leaderboard = (props) => {
     const [selectedCourse, setSelectedCourse] = useState(null);
 
     return (
-        <div className="leaderboard">
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th className="tableHeader">STT</th>
-                        <th className="tableHeader">Mã lớp học phần</th>
-                        <th className="tableHeader">Tên lớp học phần</th>
-                        <th className="tableHeader">Giảng viên</th>
-                        <th className="tableHeader">Thời khóa biểu</th>
-                        <th className="tableHeader">Trạng thái điểm danh</th>
-                        {role !== 'T' && <th className="tableHeader">Xin giáo viên nghỉ</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {data && Array.isArray(data) ? (
-                        data.map((course, index) => (
-                            <tr key={course.id}>
-                                <td className="cell">{index + 1}</td>
-                                <td className="cell">{course.course_id}</td>
-                                <td className="cell">{course.course_name}</td>
-                                <td className="cell">{course.teacher.full_name}</td>
-                                <td className="cell">
-                                    {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
-                                </td>
-                                <td className="cell">
-                                    <button className="buttonAttendance" onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>
-                                        {role === 'T' ? 'Xem' : 'Điểm danh'}
-                                    </button>                                </td>
-                                {role !== 'T' && (
-                                    <td className="cell">
-                                        <button className="buttonAttendance" onClick={() => handleCreateRoom(staff_id, course.teacher.staff_id, localStorage.getItem("full_name"), course.teacher.full_name)}>Nhắn tin</button>
-                                    </td>
-                                )}
-                            </tr>
-                        ))
-                    ) : (
+        <div>
+            <div className="leaderboard">
+                <table className="table">
+                    <thead>
                         <tr>
-                            <td colSpan="7">No data available</td>
+                            <th className="tableHeader">STT</th>
+                            <th className="tableHeader">Mã lớp học phần</th>
+                            <th className="tableHeader">Tên lớp học phần</th>
+                            <th className="tableHeader">Giảng viên</th>
+                            <th className="tableHeader">Thời khóa biểu</th>
+                            <th className="tableHeader">Trạng thái điểm danh</th>
+                            {(role !== 'T' && role !== 'A') && <th className="tableHeader">Xin giáo viên nghỉ</th>}
                         </tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {data && Array.isArray(data) ? (
+                            data.map((course, index) => (
+                                <tr key={course.id}>
+                                    <td className="cell">{index + 1}</td>
+                                    <td className="cell">{course.course_id}</td>
+                                    <td className="cell">{course.course_name}</td>
+                                    <td className="cell">{course.teacher.full_name}</td>
+                                    <td className="cell">
+                                        {getDayOfWeekName(course.day_of_week)} {course.start_time} - {course.end_time} - {course.room}
+                                    </td>
+                                    <td className="cell">
+                                        <button className="buttonAttendance" onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>
+                                            {(role !== 'T' && role !== 'A') ? 'Xem' : 'Điểm danh'}
+                                        </button>                                </td>
+                                    {(role !== 'T' && role !== 'A') && (
+                                        <td className="cell">
+                                            <button className="buttonAttendance" onClick={() => handleCreateRoom(staff_id, course.teacher.staff_id, localStorage.getItem("full_name"), course.teacher.full_name)}>Nhắn tin</button>
+                                        </td>
+                                    )}
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="7">No data available</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
 
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={() => closeModal(setModalIsOpen, setSelectedCourse)}
-                className="modalContent" // Sử dụng class CSS ở đây
-                contentLabel="Example Modal"
-                shouldCloseOnOverlayClick={true}
-            >
-                <AttendanceModal course={selectedCourse} closeModal={() => closeModal(setModalIsOpen, setSelectedCourse)} />
+                <Modal
+                    isOpen={modalIsOpen}
+                    onRequestClose={() => closeModal(setModalIsOpen, setSelectedCourse)}
+                    className="modalContent" // Sử dụng class CSS ở đây
+                    contentLabel="Example Modal"
+                    shouldCloseOnOverlayClick={true}
+                >
+                    <AttendanceModal course={selectedCourse} closeModal={() => closeModal(setModalIsOpen, setSelectedCourse)} />
 
-            </Modal>
+                </Modal>
+            </div>
         </div>
     );
 };

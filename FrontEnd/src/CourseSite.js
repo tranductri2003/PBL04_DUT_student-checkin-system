@@ -3,6 +3,11 @@ import Courses from './components/courses/ViewCourse';
 import CourseLoadingComponent from './DataLoading';
 import axiosInstance from './axios';
 import { notification } from 'antd'
+import Button from '@material-ui/core/Button';
+import './components/courses/CourseSite.css';
+import queryString from 'query-string';
+import jwt_decode from "jwt-decode";
+
 
 
 function getDayOfWeekNumber() {
@@ -21,9 +26,31 @@ function App() {
     });
 
 
+    const [selectedStaffId, setSelectedStaffId] = useState('');
+    const urlParams = new URLSearchParams(window.location.search);
+    const [userRole, setUserRole] = useState('');
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            const decodedToken = jwt_decode(token);
+            setUserRole(decodedToken.role); // Hoặc cách lấy role khác tùy thuộc vào cấu trúc token của bạn
+        }
+    }, []);
+    const handleFilter = () => {
+        if (selectedStaffId) {
+            urlParams.set('staff_id', selectedStaffId);
+        } else {
+            urlParams.delete('staff_id');
+        }
+        window.location.search = urlParams.toString();
+    }
+
+    const filterParams = queryString.parse(window.location.search);
+
     const dayOfWeekNumber = getDayOfWeekNumber();
     const queryParams = {
         day_of_week: dayOfWeekNumber,
+        staff_id: filterParams.staff_id
     };
     const url = axiosInstance.getUri({
         url: "/course",
@@ -96,7 +123,7 @@ function App() {
                     });
                 }
             });;
-    }, [setAppState, url]);
+    }, [window.location.search]);
 
 
     return (
@@ -104,6 +131,27 @@ function App() {
             <div style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '32px', fontWeight: 'bold', marginTop: '30px', marginBottom: '30px', color: 'darkblue' }}>
                 <span role="img" aria-label="Class Today">📝</span> Class Today
             </div>
+            {userRole === 'A' && (
+                <div className="filterContainer">
+                    <input
+                        type="text"
+                        placeholder="Enter Staff ID"
+                        value={selectedStaffId}
+                        onChange={e => setSelectedStaffId(e.target.value)}
+                        className="filterInput"
+                    />
+
+                    {/* Updated Filter Button to match AttendanceSite */}
+                    <Button
+                        className="filterButton" // Apply similar className as in AttendanceSite
+                        variant="contained"
+                        color="primary"
+                        onClick={handleFilter}
+                    >
+                        Filter
+                    </Button>
+                </div>
+            )}
             <div>
                 <CourseLoading isLoading={appState.loading} data={appState.courses} />
             </div>

@@ -5,6 +5,7 @@ import axiosInstance from './axios';
 import queryString from 'query-string';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
+import jwt_decode from "jwt-decode";
 import { notification, Select, DatePicker } from 'antd'
 
 const { Option } = Select;
@@ -32,6 +33,16 @@ const useStyles = makeStyles((theme) => ({
     },
     datePicker: {
         width: '150px',
+        marginRight: theme.spacing(2),
+
+    },
+    filterInput: {
+        marginRight: theme.spacing(2),
+        padding: theme.spacing(1),
+        width: '150px',
+        borderRadius: '6px', // Rounded corners
+        border: '1px solid #ced4da', // Border similar to other filter components
+        fontFamily: theme.typography.fontFamily, // Consistent font
     },
 }));
 
@@ -52,8 +63,17 @@ function AttendanceSite() {
     const [selectedSubject, setSelectedSubject] = useState(null); // State cho select
     const [selectedStatus, setSelectedStatus] = useState(''); // State cho select
     const [selectedDate, setSelectedDate] = useState(null); // State cho datetime picker
-    const [subjects, setSubjects] = useState([]); // Thêm dòng này
+    const [selectedStaffId, setSelectedStaffId] = useState('');
 
+    const [subjects, setSubjects] = useState([]); // Thêm dòng này
+    const [userRole, setUserRole] = useState('');
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            const decodedToken = jwt_decode(token);
+            setUserRole(decodedToken.role); // Hoặc cách lấy role khác tùy thuộc vào cấu trúc token của bạn
+        }
+    }, []);
     useEffect(() => {
         // Gọi API để lấy danh sách các môn học
         axiosInstance.get("/course")
@@ -112,6 +132,14 @@ function AttendanceSite() {
         } else {
             urlParams.delete('attendance_date');
         }
+        // Lọc theo ID
+        if (selectedStaffId) {
+            urlParams.set('staff_id', selectedStaffId);
+        } else {
+            urlParams.delete('staff_id');
+        }
+
+
 
         //const newUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
 
@@ -135,7 +163,7 @@ function AttendanceSite() {
         queryParams.pageSize = 20; // Số lượng mục tối đa trên mỗi trang
 
         const fetchUrl = axiosInstance.getUri({
-            url: "attendance/",
+            url: "attendance/?page_size=" + queryParams.pageSize,
             params: queryParams,
         });
 
@@ -300,6 +328,15 @@ function AttendanceSite() {
                         placeholder="Select Date"
                         onChange={date => setSelectedDate(date)}
                     />
+                    {userRole === 'A' && (
+                        <input
+                            type="text"
+                            placeholder="Enter Staff ID"
+                            value={selectedStaffId}
+                            onChange={e => setSelectedStaffId(e.target.value)}
+                            className={classes.filterInput}
+                        />
+                    )}
                     <Button
                         className={classes.filterButton}
                         variant="contained"
