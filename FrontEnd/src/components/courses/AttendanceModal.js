@@ -7,8 +7,6 @@ import { FaCheck } from 'react-icons/fa'; // Sử dụng thư viện react-icons
 import './AttendanceModal.css'
 import jwt_decode from "jwt-decode";
 
-let isFaceValidated = true; // Global variable for overall validation
-let isLocationValidated = true;
 
 function isWithinTimeRange(startTime, endTime) {
     if (startTime && endTime) {
@@ -49,8 +47,9 @@ const AttendanceModal = (props) => {
     const [avatars, setAvatars] = useState({});
     const [role, setRole] = useState('');
 
-    // const [isImageCaptured, setIsImageCaptured] = useState(false);
-    // const [isLocationValidated, setisLocationValidated] = useState(false);
+    const [isFaceValidated, setIsFaceValidated] = useState(false);
+    const [isLocationValidated, setIsLocationValidated] = useState(false);
+    const [isValidated, setIsValidated] = useState(false);
 
 
     const saveImageToLocalstorage = (imageName, imageData) => {
@@ -79,16 +78,13 @@ const AttendanceModal = (props) => {
         setCapturedImage(image);
         setWebcamVisible(false);
         saveImageToLocalstorage('check_in_image', image);
-        // setIsImageCaptured(true);
-        // console.log('isImageCaptured:', isImageCaptured); // Add this line to log the state
+
 
         const token = localStorage.getItem('access_token');
 
         const formData = new FormData();
-        formData.append('staff_id', '102210096');
         formData.append('image', dataURItoBlob(image)); // Convert data URI to Blob
 
-        console.log(isFaceValidated);
         axiosInstance.post(
             `${process.env.REACT_APP_AI_URL}`,
             formData,
@@ -100,10 +96,20 @@ const AttendanceModal = (props) => {
             }
         )
             .then(response => {
-                isFaceValidated = response.data.validated; // Update the face validation status
-                console.log(response.data);
-                console.log(isFaceValidated);
-
+                if (response.data.validated === true) {
+                    notification.success({
+                        message: 'Face Check',
+                        description: `Validated!. Gudjob! `,
+                        placement: 'topRight'
+                    });
+                } else {
+                    notification.error({
+                        message: 'Face Check',
+                        description: `Not Validated!. Please try again!`,
+                        placement: 'topRight'
+                    });
+                }
+                setIsFaceValidated(response.data.validated); // Update the face validation status
             })
             .catch(error => {
                 console.error('Lỗi khi tải dữ liệu users:', error);
@@ -111,6 +117,15 @@ const AttendanceModal = (props) => {
     };
 
 
+    // Thêm useEffect để theo dõi thay đổi trong isFaceValidated và isLocationValidated
+    useEffect(() => {
+        // Nếu cả hai điều kiện đều đúng, cập nhật giá trị của isValidated thành true
+        if (isFaceValidated && isLocationValidated) {
+            setIsValidated(true);
+        } else {
+            setIsValidated(false);
+        }
+    }, [isFaceValidated, isLocationValidated]);
 
     // Sử dụng useEffect để thiết lập kết nối WebSocket khi trang được tải
     useEffect(() => {
@@ -133,9 +148,8 @@ const AttendanceModal = (props) => {
             const dataFromServer = JSON.parse(message.data);
             if (dataFromServer) {
                 console.log('RECEIVE DATA FROM SERVER', dataFromServer);
-                console.log(dataFromServer.message)
-                // Lấy student_id từ dữ liệu nhận được
 
+                // Lấy student_id từ dữ liệu nhận được
                 const studentId = dataFromServer.message.student_id;
 
                 // Cập nhật presentStudents
@@ -147,8 +161,9 @@ const AttendanceModal = (props) => {
                     return updatedPresentStudents;
                 });
 
+
                 notification.success({
-                    message: dataFromServer.message,
+                    message: dataFromServer.message.message,
                     description: 'Congratulations!!!',
                     placement: 'topRight'
                 });
@@ -159,8 +174,8 @@ const AttendanceModal = (props) => {
 
         // Loại bỏ kết nối WebSocket khi Component unmount
         return () => {
-            if (websocket) {
-                websocket.close();
+            if (client) {
+                client.close();
             }
         };
     }, []); // Rỗng [] đảm bảo hiệu ứng này chỉ chạy một lần khi trang được tải.
@@ -194,9 +209,6 @@ const AttendanceModal = (props) => {
                     placement: 'topRight'
                 });
 
-                // Open Google Maps with the current coordinates
-                const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                // window.open(googleMapsLink, '_blank');
 
                 // Set the saved position to state for rendering on the screen
                 setSavedPosition(currentPosition);
@@ -207,31 +219,22 @@ const AttendanceModal = (props) => {
                     16.073981,
                     108.149891
                 );
-                console.log(isLocationValidated);
-                if (distance <= 1) {
+                if (distance <= 1000) {
                     // Nếu khoảng cách lớn hơn 1km, thông báo
-                    isLocationValidated = true;
+                    setIsLocationValidated(true);
                     notification.success({
                         message: 'Distance Check',
                         description: `The distance is smaller than 1km. Goood.`,
                         placement: 'topRight'
                     });
-
                 } else {
-                    isLocationValidated = true;
+                    setIsLocationValidated(false);
                     notification.error({
                         message: 'Distance Check',
                         description: `The distance is greater than 1km. Please check in within 1km.`,
                         placement: 'topRight'
                     });
-                    console.log('isLocationValidated:', isLocationValidated); // Add this line to log the state
-
                 }
-                console.log(isLocationValidated);
-
-
-
-
             }, (error) => {
                 console.error('Error getting location:', error);
                 notification.error({
@@ -286,7 +289,6 @@ const AttendanceModal = (props) => {
                         axiosInstance.get(`/user/${user.staff_id}`)
                             .then(resp => {
                                 setAvatars(prevAvatars => ({ ...prevAvatars, [user.staff_id]: resp.data.avatar }));
-                                console.log(user.staff_id, resp.data.avatar);
                             })
                             .catch(error => console.error('Error fetching avatar:', error));
                     });
@@ -301,10 +303,10 @@ const AttendanceModal = (props) => {
             const day = currentTime.getDate().toString().padStart(2, '0');
             const today = `${year}-${month}-${day}`;
 
-            axiosInstance.get(`/attendance/?attendance_date=${today}&status=True&course_id=${course.course_id}&page_size=80`)
+            axiosInstance.get(`/attendance/?attendance_date=${today}&status=True&course_id=${course.course_id}&page_size=80&check_in=true`)
                 .then(response => {
                     setPresentStudents(response.data.results.reduce((map, attendance) => {
-                        map[attendance.student_id] = attendance.note;
+                        map[attendance.student.staff_id] = attendance.note;
                         return map;
                     }, {}));
                 })
@@ -335,15 +337,19 @@ const AttendanceModal = (props) => {
                                 users.map((user, index) => (
                                     <tr key={user.id}>
                                         <td className="cell">
-                                            {avatars[user.staff_id] &&
+                                            {
+                                                avatars[user.staff_id] &&
                                                 <img
                                                     src={avatars[user.staff_id]}
+                                                    alt=""
                                                     style={{
-                                                        width: '70px', // Tăng kích thước
-                                                        height: '70px', // Tăng kích thước
-                                                        borderRadius: '10px', // Bo tròn góc
+                                                        width: '70px',
+                                                        height: '70px',
+                                                        borderRadius: '10px',
                                                         objectFit: 'cover'
-                                                    }} />}
+                                                    }}
+                                                />
+                                            }
                                         </td>
                                         <td className="cell">{user.staff_id}</td>
                                         <td className="cell">{user.full_name}</td>
@@ -352,11 +358,10 @@ const AttendanceModal = (props) => {
                                         </td>
                                         <td className="cell">
                                             {presentStudents[user.staff_id] ? (
-                                                <span className="tick">&#10003;</span>
+                                                <span className="tick">✔</span>
                                             ) : (
-                                                <span className="cross">&#10007;</span>
+                                                <span className="cross">✗</span>
                                             )}
-                                            {presentStudents[user.staff_id] && presentStudents[user.staff_id].message}
 
                                         </td>
                                         <td className="cell">{presentStudents[user.staff_id] || '-'}</td>
@@ -370,24 +375,20 @@ const AttendanceModal = (props) => {
                         </tbody>
 
                     </table>
-                    {role !== 'T' && (
+                    {role === 'S' && (
                         <>
-                            {isWithinTimeRange(course?.start_time, course?.end_time) ? (
+                            {isWithinTimeRange(course?.start_time, course?.end_time) && (
                                 <>
-                                    <>
-                                        <div className="ButtonContainer">
-
-                                            <button className="cameraButton" onClick={turnOnCamera} disabled={isFaceValidated}>
-                                                {isFaceValidated ? <FaCheck /> : 'Bật camera điểm danh'}
-                                            </button>
-                                            <button className="checkLocationButton" onClick={handleCheckLocation} disabled={isLocationValidated}>
-                                                {isLocationValidated ? <FaCheck /> : 'Kiểm tra vị trí'}
-                                            </button>
-                                        </div>
-
-                                    </>
+                                    <div className="ButtonContainer">
+                                        <button className="cameraButton" onClick={turnOnCamera} disabled={isFaceValidated}>
+                                            {isFaceValidated ? <FaCheck /> : 'Bật camera điểm danh'}
+                                        </button>
+                                        <button className="checkLocationButton" onClick={handleCheckLocation} disabled={isLocationValidated}>
+                                            {isLocationValidated ? <FaCheck /> : 'Kiểm tra vị trí'}
+                                        </button>
+                                    </div>
                                     <div style={{ margin: '20px', textAlign: 'center' }}>
-                                        <button className="button" onClick={sendWebSocketData}>
+                                        <button className="button" onClick={sendWebSocketData} disabled={!isValidated}>
                                             Điểm danh
                                         </button>
                                     </div>
@@ -402,26 +403,35 @@ const AttendanceModal = (props) => {
                                         </div>
                                     )}
                                 </>
-                            ) : (
-                                <button className="cameraButton" disabled>Bật camera điểm danh</button>
                             )}
+
                         </>
                     )}
 
 
                     {savedPosition && (
                         <div style={{ margin: '20px', textAlign: 'center' }}>
-                            <h3>vị trí:</h3>
-                            <p>Vĩ độ: {savedPosition.latitude}</p>
-                            <p>Kinh độ: {savedPosition.longitude}</p>
+                            <h3>Vị trí:</h3>
+                            <p><strong>Vĩ độ:</strong> {savedPosition.latitude}</p>
+                            <p><strong>Kinh độ:</strong> {savedPosition.longitude}</p>
                         </div>
                     )}
+
                     {capturedImage && (
-                        <div>
+                        <div style={{ margin: '20px', textAlign: 'center' }}>
                             <h3>Ảnh đã chụp:</h3>
-                            <img src={capturedImage} alt="Captured" />
+                            <img
+                                src={capturedImage}
+                                alt="Captured"
+                                style={{
+                                    maxWidth: '100%', // Ensure the image doesn't exceed its container width
+                                    borderRadius: '10px',
+                                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Add a subtle shadow
+                                }}
+                            />
                         </div>
                     )}
+
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+import os
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db import models
@@ -13,7 +14,7 @@ class UserAdminConfig(UserAdmin):
     list_display = ('email', 'staff_id', 'full_name', 'role', 'is_active', 'is_staff', 'status')
     
     fieldsets = (
-        (None, {'fields': ('staff_id', 'email', 'full_name', 'avatar')}),
+        (None, {'fields': ('staff_id', 'email', 'full_name', 'avatar', 'university', 'faculty')}),
         ('Permissions', {'fields': ('role', 'is_staff', 'is_active', 'status', 'groups')}),
         ('Personal', {'fields': ('about',)}),
     )
@@ -27,4 +28,7 @@ class UserAdminConfig(UserAdmin):
             'fields': ('email', 'full_name', 'password1', 'password2', 'university', 'faculty', 'class_id', 'role','is_active', 'is_staff')}
         ),
     )
+
+
+
 admin.site.register(NewUser, UserAdminConfig)

@@ -143,8 +143,8 @@ def face_recognize(student_id, image, threshold):
         
         student_vector[distance] = staff_id
 
-    print("Sinh viên đăng nhập hệ thống", student_id)
-    print("Sinh viên nhận diện được", student_vector[min_distance])
+    # print("Sinh viên đăng nhập hệ thống", student_id)
+    # print("Sinh viên nhận diện được", student_vector[min_distance])
     print("Khoảng cách chi tiết", student_vector)
     
     #Tính toán độ tương đồng cosine giữa hai vectơ đặc trưng

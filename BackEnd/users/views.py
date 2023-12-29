@@ -8,8 +8,25 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password  # Thêm import này
 from django.db.models import Q
-
+from django.contrib.auth.hashers import check_password
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from rest_framework.decorators import api_view, permission_classes
+from django.shortcuts import get_object_or_404
 from helper.models import CustomPageNumberPagination
+from rest_framework_simplejwt.tokens import RefreshToken
+from .tokens import account_activation_token
+from dotenv import load_dotenv
+from django.core.mail import EmailMessage
+import os
+
+
+# Đặt đường dẫn đến tệp .env ở đây
+env_file = "./.env"
+
+# Load các biến môi trường từ tệp .env
+load_dotenv(env_file)
+
 
 # Create your views here.
 class UserListCreateView(generics.ListCreateAPIView):
@@ -41,18 +58,27 @@ class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         staff_id = self.kwargs['staff_id']
         return NewUser.objects.filter(staff_id=staff_id)
     
-    def update(self, request, *arg, **kwargs):
+    def update(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = self.get_serializer(user, data = request.data, partial = True) # partial = True kết hợp với 'phone_number': {'required': False} bên serializer để cho phép cập nhật dữ liệu chỉ thay đổi những trường đã nhập
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+
         if serializer.is_valid():
-            new_password = request.data.get('password')
             serializer.save()
-            if new_password:
-                user.set_password(new_password)
-                user.save()
-            return Response({'message': 'Profile updated successfully.', 'password': f'{new_password}'}, status=status.HTTP_200_OK)
+            
+            old_password = request.data.get('old_password')
+            new_password = request.data.get('new_password')
+
+            if new_password and old_password: 
+                if not check_password(old_password, user.password):  # Sửa thành not để kiểm tra khi mật khẩu khớp
+                    return Response({'error': 'Invalid old password.'}, status=status.HTTP_400_BAD_REQUEST)    
+                else:
+                    user.set_password(new_password)
+                    user.save()
+
+            return Response({'message': 'Profile updated successfully.'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     # def destroy(self, request, *args, **kwargs):
     #     instance = self.get_object()
     #     instance.is_deleted = True 
@@ -94,3 +120,64 @@ class TXTUploadView(APIView):
             return Response({'message': 'Dữ liệu đã được nạp thành công'}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateAllUserInformation(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            # Lấy mật khẩu mới
+            new_password = '123456789'
+
+            # Lấy tất cả người dùng trong hệ thống
+            all_users = NewUser.objects.all()
+
+            # Cập nhật mật khẩu của mỗi người dùng
+            for user in all_users:
+                user.password = make_password(new_password)
+                user.faculty = "Công nghệ thông tin"
+                user.university = "Bách khoa Đà Nẵng"
+
+                if user.role == "S":
+                    user.avatar = f"{user.staff_id}.jpg"
+                    
+                user.save()
+
+            return Response({'message': 'Thông tin của tất cả người dùng đã được cập nhật thành công.'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': 'Lỗi trong quá trình cập nhật Thông tin.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def send_password_reset_email (request):
+    staff_id= request.data.get("staff_id")
+    user = get_object_or_404(NewUser, staff_id = staff_id)
+    if user:
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        
+        mail_subject = 'Reset your password'
+        reset_url = f"{os.getenv('BACK_END_IP')}/confirm-reset-password/{uid}/{token}/"
+
+
+        message = f"Hi {user.user_name},\n\n" \
+                f"You're receiving this email because you requested a password reset for your account.\n" \
+                f"Please click the following link to reset your password:\n\n" \
+                f"{reset_url}\n\n" \
+                f"If you didn't request a password reset, please ignore this email.\n\n" \
+                f"Best regards,\n" \
+                f"tranductri2003"
+        
+        to_email = user.email
+        email = EmailMessage(
+            mail_subject, message, to=[to_email]
+        )
+        email.send()
+
+        return Response({'success': 'please enter new password!'}, status=status.HTTP_201_CREATED)
+    else:
+        # Trả về cùng một thông báo cho mọi trường hợp lỗi để ẩn thông tin về sự tồn tại của tài khoản
+        return Response({
+            'error': 'An error occurred while processing your request'
+        }, status=status.HTTP_400_BAD_REQUEST)
