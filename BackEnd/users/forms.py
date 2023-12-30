@@ -28,7 +28,7 @@ class CustomUserCreationForm(UserCreationForm):
         user.save()
 
         # Render the email content using the template
-        activation_link = f"{os.getenv('FRONT_END_IP')}/activate/{urlsafe_base64_encode(force_bytes(user.pk))}/{account_activation_token.make_token(user)}/"
+        activation_link = f"{os.getenv('FRONT_END_IP')}/activate-account/{urlsafe_base64_encode(force_bytes(user.pk))}/{account_activation_token.make_token(user)}/{user.staff_id}/"
         mail_subject = 'Activate your account'
         message = render_to_string('registration_activation_email.html', {'user': user, 'activation_link': activation_link})
         to_email = user.email
