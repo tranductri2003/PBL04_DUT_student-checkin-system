@@ -240,7 +240,7 @@ const Leaderboard = () => {
                                 <td className="cell">{user.phone_number}</td>
                                 <td className="cell">{user.class_id}</td>
                                 <td className="cell">
-                                    <button className="button" onClick={() => handleCreateRoom(staff_id, user.staff_id, localStorage.getItem("full_name"), user.full_name)}>Nhắn tin</button>
+                                    <button className="create-room-button" onClick={() => handleCreateRoom(staff_id, user.staff_id, localStorage.getItem("full_name"), user.full_name)}>Nhắn tin</button>
                                 </td>
                             </tr>
                         ))

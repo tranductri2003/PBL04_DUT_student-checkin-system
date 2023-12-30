@@ -26,7 +26,7 @@ ReactDOM.render(
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
-      <Route path="/activate-account" element={<ActivateAccount />} />
+      <Route path="/activate-account/:uid/:token/:staff_id" element={<ActivateAccount />} />
       <Route path="/attendance" element={<AttendancesSite />} />
       <Route path="/hall/:slug" element={<ChatSite />} />
       <Route path="/hall" element={<Hall />} />
