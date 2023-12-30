@@ -3,11 +3,12 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db import models
 from django.forms import TextInput, Textarea, CharField
-
+from .forms import CustomUserCreationForm
 from users.models import NewUser
 
 class UserAdminConfig(UserAdmin):
     model = NewUser
+    add_form = CustomUserCreationForm
     search_fields = ('email', 'full_name',)
     list_filter = ('email', 'full_name', 'avatar', 'is_active', 'is_staff')
     ordering = ('-created_at',)
@@ -25,7 +26,8 @@ class UserAdminConfig(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'full_name', 'password1', 'password2', 'university', 'faculty', 'class_id', 'role','is_active', 'is_staff')}
+            'fields': ('staff_id', 'email', 'full_name', 'university', 'faculty', 'class_id', 'role','is_active', 'is_staff')}
+            # 'fields': ('staff_id', 'email', 'full_name', 'password1', 'password2', 'university', 'faculty', 'class_id', 'role','is_active', 'is_staff')}
         ),
     )
 

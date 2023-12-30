@@ -56,7 +56,7 @@ class CustomAccountManager(BaseUserManager):
 
 class NewUser(TimeSetup, AbstractBaseUser, PermissionsMixin):
     staff_id = models.CharField(max_length=15, unique=True)
-    email = models.EmailField(_('email address'), unique=True)
+    email = models.EmailField(_('email address'))
     full_name = models.CharField(max_length=50)
     avatar = models.ImageField(
         _("Avatar"), upload_to=upload_to, default='default.jpg')
