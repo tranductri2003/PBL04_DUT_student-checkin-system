@@ -32,7 +32,7 @@ class RoomListView(APIView):
         })
         
 
-class CreateRoom(APIView):
+class CreateRoomView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):

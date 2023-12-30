@@ -28,14 +28,19 @@ def add_image_feature():
 
 @api_v1.route('/face-recognization', methods=["POST"])
 def face_recognization():
-    decoded_token = jwt.decode(jwt=request.headers.get('Authorization').split(' ')[1], key=JWT_SECRET_KEY, algorithms=['HS256'])
-    if decoded_token.get('role', None) == None:
-        return jsonify({"msg": "Unauthorized"}), 401
-    staff_id = decoded_token.get('staff_id')
-    image = request.files['image']
-    avatar = decoded_token.get('avatar')
-    
-    # Đọc hình ảnh từ đối tượng FileStorage
-    validated = face_recognize(staff_id, image, 0.4)
-    
-    return jsonify({"validated": validated}), 200
+    try:
+        decoded_token = jwt.decode(jwt=request.headers.get('Authorization').split(' ')[1], key=JWT_SECRET_KEY, algorithms=['HS256'])
+        if decoded_token.get('role', None) == None:
+            return jsonify({"msg": "Unauthorized"}), 401
+        staff_id = decoded_token.get('staff_id')
+        image = request.files['image']
+        
+        # Đọc hình ảnh từ đối tượng FileStorage
+        validated = face_recognize(staff_id, image, 0.554)
+        if validated:
+            return jsonify({"validated": validated}), 200
+        else:
+            return jsonify({"validated": validated}), 400
+    except Exception as e: 
+        print("Error:", str(e))
+        return jsonify({"msg": "Create failed!"}), 400

@@ -8,19 +8,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         refresh = self.get_token(self.user)
         data["refresh"] = str(refresh)
-
-        # Tạo một custom payload cho access token
-        access_payload = {
-            'user_id': self.user.id,
-            'email': self.user.email,
-            'role': self.user.role,  # Thay 'role' bằng tên field chứa vai trò của user
-            'staff_id': self.user.staff_id,  # Thay 'staff_id' bằng tên field chứa staff_id của user
-            'avatar': str(self.user.avatar.url) if self.user.avatar else None,  # Chuyển URL avatar thành chuỗi
-        }
-        access_token = refresh.access_token
-        access_token.payload.update(access_payload)
-        data["access"] = str(access_token)
-
+        
         # Lấy thông tin của người dùng từ request
         user = self.user
         
@@ -30,6 +18,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             user_serializer = BasicUserSerializer(user)
             # Thêm thông tin người dùng vào kết quả trả về
             data['user'] = user_serializer.data
+            
+            # Tạo một custom payload cho access token
+            access_payload = {
+                'user_id': self.user.id,
+                'email': self.user.email,
+                'role': self.user.role,  # Thay 'role' bằng tên field chứa vai trò của user
+                'staff_id': self.user.staff_id,  # Thay 'staff_id' bằng tên field chứa staff_id của user
+                'avatar': str(self.user.avatar.url) if self.user.avatar else None,  # Chuyển URL avatar thành chuỗi
+            }
+            access_token = refresh.access_token
+            access_token.payload.update(access_payload)
+            data["access"] = str(access_token)
 
         if api_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, self.user)
