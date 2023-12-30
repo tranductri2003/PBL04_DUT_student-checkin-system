@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../axios';
 import { useNavigate } from 'react-router-dom';
 //MaterialUI
@@ -51,9 +51,23 @@ export default function SignIn() {
         staff_id: '',
         password: '',
     });
-
+    const [rememberMe, setRememberMe] = useState(false);
     const [formData, updateFormData] = useState(initialFormData);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    useEffect(() => {
+        const savedStaffId = localStorage.getItem('staff_id') || sessionStorage.getItem('staff_id');
+        const savedToken = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+
+        if (savedStaffId && savedToken) {
+            // Xử lý đăng nhập tự động ở đây
+            // Ví dụ: Điều hướng người dùng đến trang chủ hoặc trang đã lưu
+            navigate('/'); // Thay đổi đường dẫn tùy theo ứng dụng của bạn
+        }
+    }, [navigate]);
+    const handleRememberMeChange = (event) => {
+        setRememberMe(event.target.checked);
+    };
+
     const openModal = () => {
         setIsModalOpen(true);
         // Ẩn label khi modal mở
@@ -98,6 +112,14 @@ export default function SignIn() {
 
                 localStorage.setItem('access_token', res.data.access);
                 localStorage.setItem('refresh_token', res.data.refresh);
+                if (rememberMe) {
+                    localStorage.setItem('staff_id', formData.staff_id);
+                    localStorage.setItem('access_token', res.data.access);
+                    // Không nên lưu mật khẩu trong trường hợp này
+                } else {
+                    sessionStorage.setItem('staff_id', formData.staff_id);
+                    sessionStorage.setItem('access_token', res.data.access);
+                }
                 axiosInstance.defaults.headers['Authorization'] =
                     'JWT ' + localStorage.getItem('access_token');
                 console.log("SENT REQUEST TO WEBSOCKET");
@@ -197,10 +219,16 @@ export default function SignIn() {
                         onChange={handleChange}
                         className="loginLabel"
                     />
-                    <FormControlLabel
-                        control={<Checkbox value="remember" color="primary" />}
-                        label="Remember me"
-                    />
+                    {/* <FormControlLabel
+                        control={
+                            <Checkbox
+                                value="remember"
+                                color="primary"
+                                checked={rememberMe}
+                                onChange={handleRememberMeChange}
+                            />
+                        } label="Remember me"
+                    /> */}
                     <Button
                         type="submit"
                         fullWidth
