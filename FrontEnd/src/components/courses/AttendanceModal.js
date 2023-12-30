@@ -85,8 +85,9 @@ const AttendanceModal = (props) => {
         const formData = new FormData();
         formData.append('image', dataURItoBlob(image)); // Convert data URI to Blob
 
+        console.log("FORM DATA", formData);
         axiosInstance.post(
-            `${process.env.REACT_APP_AI_URL}`,
+            `${process.env.REACT_APP_AI_URL}face-recognization`,
             formData,
             {
                 headers: {

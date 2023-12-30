@@ -51,7 +51,7 @@ class UserListCreateView(generics.ListCreateAPIView):
 
 
 class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
     lookup_field = "staff_id"
 
@@ -216,8 +216,19 @@ def active_account(request, uidb64, token):
         user.is_active = True
         user.save()
 
-        return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+        # Generate a new access token
+        refresh = RefreshToken.for_user(user)
+        access_payload = {
+            'user_id': user.id,
+            'email': user.email,
+            'role': user.role,
+            'staff_id': user.staff_id,
+            'avatar': str(user.avatar.url) if user.avatar else None,
+        }
+        access_token = refresh.access_token
+        access_token.payload.update(access_payload)
+        
+
+        return Response({'message': 'Password updated successfully.', 'access_token': str(access_token)}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
-
-
