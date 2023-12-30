@@ -47,21 +47,20 @@ function Profile() {
                         placement: 'topRight',
                     });
 
-
                     const imageFeaturesFormData = new FormData();
-                    imageFeaturesFormData.append("password", password);
-                    for (const image of uploadedImages) {
-                        imageFeaturesFormData.append("image", image.url);
-                    }
+                    uploadedImages.forEach(image => {
+                        imageFeaturesFormData.append('image', image.file, image.name);
+                        console.log(image.name);
+                    });
 
-                    console.log("Image Features Form Data:");
-                    for (const [key, value] of imageFeaturesFormData.entries()) {
+                    imageFeaturesFormData.forEach((value, key) => {
                         console.log(`${key}: ${value}`);
-                    }
+                    });
+
 
                     axiosInstance.post(
                         `${process.env.REACT_APP_AI_URL}create-image-features`,
-                        formData,
+                        imageFeaturesFormData,
                         {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
@@ -72,7 +71,7 @@ function Profile() {
                         .then(response => {
                             notification.success({
                                 message: 'Success',
-                                description: response.data.message,
+                                description: "Update face features",
                                 placement: 'topRight',
                             });
                         })
@@ -115,14 +114,15 @@ function Profile() {
     const handleImageUpload = (event) => {
         if (event.target.files) {
             const filesArray = Array.from(event.target.files);
-            const newImagesUrls = filesArray.map((file, index) => ({
-                id: Date.now() + index, // Tạo id duy nhất cho mỗi ảnh
-                url: URL.createObjectURL(file),
+            const newImages = filesArray.map(file => ({
+                id: Date.now() + file.lastModified, // Tạo id duy nhất cho mỗi ảnh
+                file: file, // Lưu trữ file
                 name: file.name // Lưu trữ tên file
             }));
-            setUploadedImages([...uploadedImages, ...newImagesUrls]); // Kết hợp các ảnh mới với danh sách hiện tại
+            setUploadedImages([...uploadedImages, ...newImages]); // Kết hợp các file mới với danh sách hiện tại
         }
     };
+
     const handleMouseEnter = (id) => {
         setHoveredId(id);
     };
@@ -249,10 +249,11 @@ function Profile() {
                                             X
                                         </button>
                                     )}
-                                    <img src={image.url} alt="Uploaded" />
+                                    <img src={URL.createObjectURL(image.file)} alt="Uploaded" />
                                 </div>
                             ))}
                         </div>
+
 
                         <div className="file-upload-button-container">
                             {uploadedImages.length < 10 && (
