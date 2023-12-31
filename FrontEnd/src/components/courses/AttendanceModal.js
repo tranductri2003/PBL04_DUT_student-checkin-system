@@ -220,7 +220,7 @@ const AttendanceModal = (props) => {
                     16.073981,
                     108.149891
                 );
-                if (distance <= 1000) {
+                if (distance <= 1) {
                     // Nếu khoảng cách lớn hơn 1km, thông báo
                     setIsLocationValidated(true);
                     notification.success({
