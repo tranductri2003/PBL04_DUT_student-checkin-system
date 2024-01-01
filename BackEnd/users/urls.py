@@ -9,6 +9,7 @@ from .views import (
     UpdateAllUserInformation,
     send_password_reset_email,
     confirm_and_update_password,
+    active_account,
 )
 
 app_name = 'users'
@@ -16,6 +17,8 @@ app_name = 'users'
 urlpatterns = [
     path('send-reset-password/',send_password_reset_email, name='send-password-reset'),
     path('confirm-reset-password/<str:uidb64>/<str:token>/', confirm_and_update_password, name='confirm-reset-password'),
+    path('confirm-active-account/<str:uidb64>/<str:token>/', active_account, name='active_account'),
+
     path('upload-txt/', TXTUploadView.as_view(), name='upload-txt'),
     path('update-all-user/', UpdateAllUserInformation.as_view(), name='update-password'),
 

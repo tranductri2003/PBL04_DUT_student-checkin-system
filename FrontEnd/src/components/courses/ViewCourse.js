@@ -172,7 +172,7 @@ const Leaderboard = (props) => {
                                     </td>
                                     <td className="cell">
                                         <button className="buttonAttendance" onClick={() => openModal(setModalIsOpen, setSelectedCourse, course)}>
-                                            {(role !== 'T' && role !== 'A') ? 'Xem' : 'Điểm danh'}
+                                            {(role !== "T" && role !== "A") ? 'Điểm danh' : 'Xem'}
                                         </button>                                </td>
                                     {(role !== 'T' && role !== 'A') && (
                                         <td className="cell">

@@ -197,10 +197,10 @@ export default function SignIn() {
                         onChange={handleChange}
                         className="loginLabel"
                     />
-                    <FormControlLabel
+                    {/* <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
                         label="Remember me"
-                    />
+                    /> */}
                     <Button
                         type="submit"
                         fullWidth

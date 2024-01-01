@@ -85,8 +85,9 @@ const AttendanceModal = (props) => {
         const formData = new FormData();
         formData.append('image', dataURItoBlob(image)); // Convert data URI to Blob
 
+        console.log("FORM DATA", formData);
         axiosInstance.post(
-            `${process.env.REACT_APP_AI_URL}`,
+            `${process.env.REACT_APP_AI_URL}face-recognization`,
             formData,
             {
                 headers: {
@@ -219,7 +220,7 @@ const AttendanceModal = (props) => {
                     16.073981,
                     108.149891
                 );
-                if (distance <= 1000) {
+                if (distance <= 1) {
                     // Nếu khoảng cách lớn hơn 1km, thông báo
                     setIsLocationValidated(true);
                     notification.success({

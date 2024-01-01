@@ -18,6 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .tokens import account_activation_token
 from dotenv import load_dotenv
 from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 import os
 
 
@@ -50,7 +51,7 @@ class UserListCreateView(generics.ListCreateAPIView):
 
 
 class UserRetriveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
     lookup_field = "staff_id"
 
@@ -150,9 +151,10 @@ class UpdateAllUserInformation(APIView):
         
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
-def send_password_reset_email (request):
-    staff_id= request.data.get("staff_id")
-    user = get_object_or_404(NewUser, staff_id = staff_id)
+def send_password_reset_email(request):
+    staff_id = request.data.get("staff_id")
+    user = get_object_or_404(NewUser, staff_id=staff_id)
+
     if user:
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = account_activation_token.make_token(user)
@@ -160,27 +162,22 @@ def send_password_reset_email (request):
         mail_subject = 'Reset your password'
         reset_url = f"{os.getenv('FRONT_END_IP')}/reset-password/{uid}/{token}/"
 
-
-        message = f"Hi {user.full_name},\n\n" \
-                f"You're receiving this email because you requested a password reset for your account.\n" \
-                f"Please click the following link to reset your password:\n\n" \
-                f"{reset_url}\n\n" \
-                f"If you didn't request a password reset, please ignore this email.\n\n" \
-                f"Best regards,\n" \
-                f"Dutchecker staff!"
+        # Render the email content using the template
+        message = render_to_string('password_reset_email.html', {'user': user, 'reset_url': reset_url})
         
         to_email = user.email
         email = EmailMessage(
-            mail_subject, message, to=[to_email]
+            mail_subject,
+            message,  # HTML version
+            to=[to_email]
         )
+        email.content_subtype = 'html'  # Set the content type to HTML
         email.send()
 
-        return Response({'success': 'check your mail to reset your password!'}, status=status.HTTP_201_CREATED)
+        return Response({'success': 'Check your email to reset your password!'}, status=status.HTTP_201_CREATED)
     else:
         # Trả về cùng một thông báo cho mọi trường hợp lỗi để ẩn thông tin về sự tồn tại của tài khoản
-        return Response({
-            'error': 'An error occurred while processing your request'
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
         
         
 @api_view(['POST'])
@@ -202,3 +199,36 @@ def confirm_and_update_password(request, uidb64, token):
     else:
         return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def active_account(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = NewUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, NewUser.DoesNotExist):
+        user = None
+    
+    if user is not None and account_activation_token.check_token(user, token):
+        password = request.data.get("new_password")
+
+        user.set_password(password)
+        user.is_active = True
+        user.save()
+
+        # Generate a new access token
+        refresh = RefreshToken.for_user(user)
+        access_payload = {
+            'user_id': user.id,
+            'email': user.email,
+            'role': user.role,
+            'staff_id': user.staff_id,
+            'avatar': str(user.avatar.url) if user.avatar else None,
+        }
+        access_token = refresh.access_token
+        access_token.payload.update(access_payload)
+        
+
+        return Response({'message': 'Password updated successfully.', 'access_token': str(access_token)}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)

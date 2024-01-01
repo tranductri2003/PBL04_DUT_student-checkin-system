@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import cv2
 import jwt
-from settings import JWT_SECRET_KEY, MEDIA_URL
+from settings import JWT_SECRET_KEY
 from flask import request, jsonify
 import requests
 import io
