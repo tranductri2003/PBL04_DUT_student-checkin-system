@@ -17,7 +17,6 @@ import os
 from db import *
 
 face_cascade = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
-face_cascade = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
 
 # Tải mô hình VGG16 (chọn include_top=False để loại bỏ các lớp fully connected ở cuối)
 base_model = VGG16(weights='imagenet', include_top=False)
@@ -26,26 +25,9 @@ def read_image(image):
     image_stream = image.read()
     img_array = np.frombuffer(image_stream, dtype=np.uint8)
     img = cv2.imdecode(img_array, cv2.IMREAD_UNCHANGED)
-    img = cv2.resize(img, (1024, 1024))
+    # img = cv2.resize(img, (1024, 1024))
     return img
 
-def detect_face(image):
-    print(face_cascade.__str__())
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
-
-    if len(faces) == 0:
-        # No faces detected
-        return None
-
-    # Return only the first detected face
-    x, y, w, h = faces[0]
-    face_roi = image[y:y+h, x:x+w]
-
-    # Resize the face region to (224, 224, 3)
-    face_resized = cv2.resize(face_roi, (224, 224))
-
-    return face_resized
 def detect_face(image):
     print(face_cascade.__str__())
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -66,13 +48,6 @@ def detect_face(image):
 
 def extract_features(image):
     image_array = read_image(image)
-    print(type(image))
-    face = detect_face(image_array)
-    if face is None:
-        print("No face detected")
-        return None
-    print(type(image))
-    x = np.expand_dims(face, axis=0)
     print(type(image))
     face = detect_face(image_array)
     if face is None:
