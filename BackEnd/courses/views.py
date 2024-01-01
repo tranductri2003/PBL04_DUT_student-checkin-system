@@ -20,7 +20,6 @@ class CoursesListCreateView(generics.ListCreateAPIView):
     ordering_fields = ['course_id']
     
     def get_queryset(self):
-        print(self.request.user)
         if not self.request.user.is_authenticated:
             return Response({"message": "Please login to get data."}, status=status.HTTP_401_UNAUTHORIZED)
         
