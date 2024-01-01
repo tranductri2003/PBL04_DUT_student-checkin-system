@@ -36,7 +36,7 @@ def face_recognization():
         image = request.files['image']
         
         # Đọc hình ảnh từ đối tượng FileStorage
-        validated = face_recognize(staff_id, image, 0.4)
+        validated = face_recognize(staff_id, image, 0.5)
         if validated:
             return jsonify({"validated": validated}), 200
         else:
