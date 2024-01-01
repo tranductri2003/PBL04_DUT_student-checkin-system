@@ -26,7 +26,7 @@ class CoursesListCreateView(generics.ListCreateAPIView):
         if self.request.user.role not in ['A', 'T', 'S']:
             return Response({"message": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
         
-        query_set = None
+        query_set = Courses.objects.none()
         if self.request.user.role == 'A':
             staff_id = self.request.GET.get('staff_id', None)
             if staff_id is not None:
@@ -80,8 +80,8 @@ class CoursesListCreateView(generics.ListCreateAPIView):
                 course_ids = UserCourse.objects.filter(user=self.request.user).values_list('course__course_id', flat=True)
                 query_set = Courses.objects.filter(course_id__in=course_ids)
         day_of_week = self.request.GET.get('day_of_week', None)
-        if day_of_week != None:
-            query_set = query_set.filter(day_of_week=query_set)
+        if day_of_week is not None:
+            query_set = query_set.filter(day_of_week=day_of_week)
         return query_set
 
     def perform_create(self, serializer):
