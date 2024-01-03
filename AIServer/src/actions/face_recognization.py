@@ -78,6 +78,9 @@ def euclidean_distance(vector1, vector2):
 
 def face_recognize(student_id, image, threshold):
     check_vector = extract_features(image)
+    if check_vector is None:
+        return False
+    
     check_vector = normalize_vector(check_vector)
 
     conn = get_connection()
@@ -166,10 +169,10 @@ def create_features(staff_id, images):
 
 
         if existing_record:
-            print("Existing")
+            # print("Existing")
             cur.execute("UPDATE FaceFeatures SET features = %s WHERE staff_id = %s", (string_features_vector, staff_id))
         else:
-            print("No existing features")
+            # print("No existing features")
             cur.execute("INSERT INTO FaceFeatures (features, staff_id) VALUES (%s , %s)", (string_features_vector, staff_id))
 
         conn.commit()

@@ -97,7 +97,8 @@ const AttendanceModal = (props) => {
             }
         )
             .then(response => {
-                if (response.data.validated === true) {
+                console.log(response.data.validated);
+                if (response.data.validated == true) {
                     notification.success({
                         message: 'Face Check',
                         description: `Validated!. Gudjob! `,
@@ -220,7 +221,7 @@ const AttendanceModal = (props) => {
                     16.073981,
                     108.149891
                 );
-                if (distance <= 1) {
+                if (distance <= 1000) {
                     // Nếu khoảng cách lớn hơn 1km, thông báo
                     setIsLocationValidated(true);
                     notification.success({

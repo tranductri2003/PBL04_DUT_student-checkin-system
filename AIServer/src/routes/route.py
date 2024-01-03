@@ -36,11 +36,8 @@ def face_recognization():
         image = request.files['image']
         
         # Đọc hình ảnh từ đối tượng FileStorage
-        validated = face_recognize(staff_id, image, 0.5)
-        if validated:
-            return jsonify({"validated": validated}), 200
-        else:
-            return jsonify({"validated": validated}), 400
+        validated = face_recognize(staff_id, image, 0.6)
+        return jsonify({"validated": validated}), 200
     except Exception as e: 
         print("Error:", str(e))
         return jsonify({"msg": "Create failed!"}), 400
