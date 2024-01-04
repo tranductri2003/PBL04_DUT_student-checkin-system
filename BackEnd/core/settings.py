@@ -73,7 +73,7 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
-CHANNELS_WS_KEEPALIVE_INTERVAL = 30  # Thời gian timeout tính bằng giây, tùy chỉnh theo ý muốn
+CHANNELS_WS_KEEPALIVE_INTERVAL = 600  # Thời gian timeout tính bằng giây, tùy chỉnh theo ý muốn
 
 
 MIDDLEWARE = [
