@@ -129,7 +129,7 @@ linux_venv/
 ENV/
 env.bak/
 venv.bak/
-
+env.txt
 # Spyder project settings
 .spyderproject
 .spyproject
