@@ -1,0 +1,71 @@
+### LOCAL HOST:
+
+#### BE (Backend):
+DJANGO_SECRET_KEY=put-yours-here
+
+DB_NAME=put-yours-here
+DB_USER=put-yours-here
+DB_HOST=put-yours-here
+DB_PASSWORD=put-yours-here
+DB_PORT=5432
+
+FRONT_END_IP=http://127.0.0.1:3000
+BACK_END_IP=http://127.0.0.1:8000
+
+EMAIL_HOST_USER=put-yours-here
+EMAIL_HOST_PORT=587
+EMAIL_HOST_PASSWORD=put-yours-here
+SECRET_KEY=put-yours-here
+
+#### FE (Frontend):
+REACT_APP_API_URL=http://127.0.0.1:8000/api/
+REACT_APP_MEDIA_URL=http://127.0.0.1:8000
+REACT_APP_CHAT_WEBSOCKET_URL=ws://127.0.0.1:8001/ws/chat/
+REACT_APP_CHECK_IN_WEBSOCKET_URL=ws://127.0.0.1:8001/ws/attendance/
+REACT_APP_STATUS_WEBSOCKET_URL=ws://127.0.0.1:8001/ws/user/status/
+REACT_APP_AI_URL=http://127.0.0.1:5000/ai/face-recognization  
+
+#### AI:
+DB_NAME=put-yours-here
+DB_USER=put-yours-here
+DB_HOST=put-yours-here
+DB_PASSWORD=put-yours-here
+DB_PORT=5432
+MEDIA_URL=http://127.0.0.1:8000/media/
+JWT_SECRET_KEY=put-yours-here
+
+### RASPBERRY OR EC2:
+
+#### BE (Backend):
+DJANGO_SECRET_KEY=put-yours-here
+
+DB_NAME=put-yours-here
+DB_USER=put-yours-here
+DB_HOST=put-yours-here
+DB_PASSWORD=put-yours-here
+DB_PORT=5432
+
+FRONT_END_IP=http://dutchecker.ddns.net
+BACK_END_IP=https://dutchecker.ddns.net/api
+
+EMAIL_HOST_USER=put-yours-here
+EMAIL_HOST_PORT=587
+EMAIL_HOST_PASSWORD=put-yours-here
+SECRET_KEY=put-yours-here
+
+#### FE (Frontend):
+REACT_APP_API_URL=https://dutchecker.ddns.net/api/
+REACT_APP_MEDIA_URL=https://dutchecker.ddns.net
+REACT_APP_CHAT_WEBSOCKET_URL=wss://dutchecker.ddns.net/ws/chat/
+REACT_APP_CHECK_IN_WEBSOCKET_URL=wss://dutchecker.ddns.net/ws/attendance/
+REACT_APP_STATUS_WEBSOCKET_URL=wss://dutchecker.ddns.net/ws/user/status/
+REACT_APP_AI_URL=https://dutchecker.ddns.net/ai/face-recognization
+
+#### AI:
+DB_NAME=put-yours-here
+DB_USER=put-yours-here
+DB_HOST=put-yours-here
+DB_PASSWORD=put-yours-here
+DB_PORT=5432
+MEDIA_URL=https://dutchecker.ddns.net
+JWT_SECRET_KEY=put-yours-here
