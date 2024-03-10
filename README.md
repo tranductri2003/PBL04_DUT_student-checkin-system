@@ -88,3 +88,29 @@ Feel free to contact me if you would like to learn more about how to install and
 ![image](https://github.com/tranductri2003/PBL04_DUT_Student-CheckIn-System/assets/89126960/fd7548b8-2c17-469a-88ac-72e5488dbe1c)
 - Chat Room Interface:
 ![image](https://github.com/tranductri2003/PBL04_DUT_Student-CheckIn-System/assets/89126960/a77e402c-8b4e-4c3c-b57a-c8b1081b871b)
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Feedback
+
+Your feedback is highly appreciated. If you have any suggestions or encounter any issues while using the solver, feel free to reach out to me.
+
+## Credits
+
+- **Developer**: Trần Đức Trí
+- **Email**: tranductri2003@gmail.com
+
+### Connect with Me
+- **Github:** [tranductri2003](https://github.com/tranductri2003)
+- **Facebook:** [Trần Đức Trí](https://www.facebook.com/tranductri2003/)
+- **LinkedIn:** [Duc Tri Tran](https://www.linkedin.com/in/duc-tri-tran-464343218/)
